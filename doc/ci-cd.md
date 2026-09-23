@@ -24,15 +24,24 @@ Scaffolding must add NUnit tests, the test SDK and compatible adapter for the
 VSTest/TRX commands used here. Review compatibility if adopting another test runner.
 Code without a root solution fails repository validation.
 
-Run locally with PowerShell 7:
+CI checks live directly in the GitHub Actions workflow. There are no standalone
+helper scripts. Creating scripts requires prior explicit user approval with a
+clear reason; see [agent instructions](../AGENTS.md).
+
+Once the root solution exists, run the standard commands directly from its directory:
 
 ```powershell
-./scripts/Validate-Repository.ps1
-# Once the solution exists:
-./scripts/Test-Solution.ps1
+dotnet restore
+dotnet format --verify-no-changes --no-restore
+dotnet build --configuration Release --no-restore -warnaserror
+dotnet test --configuration Release --no-build --no-restore --logger trx --results-directory TestResults
 ```
 
-Repository validation examines tracked files; stage newly added files first.
+Confirm tests actually execute. CI independently rejects missing or zero-test
+reports and uses a fresh results directory. During the documentation-only phase,
+review relative Markdown links and run `git diff --check`; no .NET tests exist yet.
+CI repository validation examines tracked files.
+
 Dependabot checks GitHub Actions weekly. Add NuGet updates when projects exist.
 
 ## Delivery

@@ -23,3 +23,12 @@ During scaffolding, propose XML documentation generation and missing-public-docu
 - Relevant tests and build checks pass.
 - Documentation and affected ADRs are updated.
 - Any genuine domain ambiguity is raised with the user.
+
+## Script policy
+
+Ask the user before creating any script and wait for explicit approval. Explain
+its purpose, why direct commands or existing tools are insufficient, and its
+maintenance cost. This applies to helper, generated, temporary, and wrapper scripts
+in any language. Avoid substantial inline automation as an approval workaround.
+Prefer direct tooling and necessary commands in the existing CI workflow.
+See [AGENTS.md](../AGENTS.md) for the complete agent policy.
