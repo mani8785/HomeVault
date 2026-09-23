@@ -1,0 +1,123 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main, 'phase-*/**']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: Validate repository and detect solution
+        id: repository
+        run: |
+          $ErrorActionPreference = 'Stop'
+          Set-StrictMode -Version Latest
+          $files = @(git ls-files)
+          if ($LASTEXITCODE -ne 0) { throw 'Unable to list tracked files.' }
+          foreach ($required in @('README.md', 'doc/workflow.md', '.github/workflows/ci.yml')) {
+              if (-not (Test-Path -LiteralPath $required)) { throw "Missing required file: $required" }
+          }
+          # Validate relative Markdown file links, excluding external URLs and anchors.
+          foreach ($file in @($files | Where-Object { $_ -like '*.md' })) {
+              $content = Get-Content -LiteralPath $file -Raw
+              foreach ($match in [regex]::Matches($content, '\[[^\]]*\]\(([^\s)]+)\)')) {
+                  $target = $match.Groups[1].Value
+                  if ($target -match '^(?:[a-zA-Z][a-zA-Z0-9+.-]*:|#|/)') { continue }
+                  $target = [Uri]::UnescapeDataString(($target -split '#', 2)[0])
+                  $parent = Split-Path $file -Parent
+                  if (-not $parent) { $parent = '.' }
+                  if ($target -and -not (Test-Path -LiteralPath (Join-Path $parent $target))) {
+                      throw "Broken link in ${file}: $target"
+                  }
+              }
+          }
+          $solutions = @($files | Where-Object { $_ -match '^[^/]+\.slnx?$' })
+          $code = @($files | Where-Object { $_ -match '\.(cs|csproj|fsproj|vbproj)$' })
+          if ($solutions.Count -gt 1) { throw 'Expected one root solution.' }
+          if ($code.Count -gt 0 -and $solutions.Count -eq 0) { throw 'Code exists without a root solution; CI must not skip it.' }
+          $hasSolution = $solutions.Count -eq 1
+          if ($hasSolution -and -not (Test-Path global.json)) { throw 'Add the agreed SDK pin in global.json with the solution.' }
+          if ($env:GITHUB_OUTPUT) {
+              "has_solution=$($hasSolution.ToString().ToLowerInvariant())" >> $env:GITHUB_OUTPUT
+          }
+          if ($hasSolution) {
+              Write-Host "Repository checks passed. Solution: $($solutions[0])"
+          } else {
+              $message = 'Documentation-only phase: repository checks passed; no application build or tests exist yet.'
+              Write-Host $message
+              if ($env:GITHUB_STEP_SUMMARY) { $message >> $env:GITHUB_STEP_SUMMARY }
+          }
+      - name: Set up agreed .NET SDK
+        if: steps.repository.outputs.has_solution == 'true'
+        uses: actions/setup-dotnet@v5
+        with:
+          global-json-file: global.json
+      - name: Restore, format, build, and test
+        if: steps.repository.outputs.has_solution == 'true'
+        run: |
+          $ErrorActionPreference = 'Stop'
+          Set-StrictMode -Version Latest
+          $solutions = @(Get-ChildItem -File | Where-Object { $_.Extension -in '.sln', '.slnx' })
+          if ($solutions.Count -ne 1) { throw 'Expected one root solution.' }
+          $solution = $solutions[0].FullName
+
+          dotnet restore $solution
+          if ($LASTEXITCODE -ne 0) { throw 'Restore failed.' }
+          dotnet format $solution --verify-no-changes --no-restore
+          if ($LASTEXITCODE -ne 0) { throw 'Formatting check failed.' }
+          dotnet build $solution --configuration Release --no-restore -warnaserror
+          if ($LASTEXITCODE -ne 0) { throw 'Build failed.' }
+          # Fresh results prevent stale reports from hiding a zero-test run.
+          $results = Join-Path 'TestResults' ([Guid]::NewGuid().ToString('N'))
+          dotnet test $solution --configuration Release --no-build --no-restore --logger trx --results-directory $results
+          if ($LASTEXITCODE -ne 0) { throw 'Tests failed.' }
+          $reports = @(Get-ChildItem $results -Filter '*.trx' -Recurse -ErrorAction SilentlyContinue)
+          if ($reports.Count -eq 0) { throw 'No TRX reports produced. Add NUnit tests and a compatible test adapter.' }
+          $executed = 0
+          foreach ($report in $reports) {
+              [xml]$xml = Get-Content $report.FullName -Raw
+              $executed += [int]$xml.TestRun.ResultSummary.Counters.executed
+          }
+          if ($executed -eq 0) { throw 'No tests executed.' }
+          Write-Host "Build and tests passed ($executed tests executed)."
+      - name: Upload test results
+        if: always() && steps.repository.outputs.has_solution == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: TestResults/**/*.trx
+          if-no-files-found: warn
+          retention-days: 14
+      - name: Package validated source
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          New-Item -ItemType Directory -Force artifacts | Out-Null
+          git archive --format=zip --output=artifacts/HomeVault-source.zip HEAD
+          if ($LASTEXITCODE -ne 0) { throw 'Source packaging failed.' }
+      - name: Deliver source artifact
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@v4
+        with:
+          name: HomeVault-source-${{ github.sha }}
+          path: artifacts/HomeVault-source.zip
+          if-no-files-found: error
+          retention-days: 14
