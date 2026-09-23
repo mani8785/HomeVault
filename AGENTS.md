@@ -91,5 +91,7 @@ moved into the existing workflow are the baseline, not blanket approval for more
    without explicit user approval. GitHub checks do not replace phase approval.
 
 The GitHub review policy requires passing Validate checks, an up-to-date branch,
-another contributor's approval, and resolved conversations. Verify server-side
+and resolved conversations. In solo-owner mode, no GitHub approving review is
+required; explicit owner approval in the task or PR is still required before an
+agent merges. Policy changes alone do not authorize a merge. Verify server-side
 protection before claiming it is active; the local JSON alone does not enforce it.

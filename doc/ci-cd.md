@@ -57,15 +57,18 @@ in GitHub environments.
 Actions runs checks; GitHub branch protection enforces reviews and merging.
 The [branch protection payload](../.github/branch-protection.json) specifies:
 
-- At least one approving review from another contributor.
-- Stale approvals dismissed and approval of the latest push required.
+- Pull requests required, with zero mandatory approving reviews in solo-owner mode.
+- Latest-push approval and stale-review dismissal disabled in solo-owner mode.
 - `Validate` passing with the branch up to date with `main`.
 - Review conversations resolved, including for administrators.
 - No force pushes or deletion of `main`.
 
-A solo author cannot approve their own pull request; a second reviewer with the
-appropriate access is needed. CODEOWNERS awaits actual maintainer assignments.
-Explicit phase approval remains required by the project workflow.
+GitHub does not allow PR authors to submit an approving review on their own PR.
+The owner can review and merge once CI and the remaining protections pass.
+Agents still need explicit owner approval in the task or PR before merging;
+GitHub does not enforce that conversational approval. A policy-change request
+alone is not merge approval. Revisit required reviewers when collaborators join.
+CODEOWNERS awaits actual maintainer assignments.
 
 The JSON does not activate protection by itself. After pushing both branches and
 running CI once, an admin can apply it with authenticated GitHub CLI:
@@ -89,13 +92,15 @@ replaces the configured policy. See [GitHub protected branches](https://docs.git
   because application scaffolding does not exist yet.
 - The run produced `HomeVault-source-17f30d74e97085647a5b32c51775b9de90f130a5`,
   a source artifact with 14-day retention. Deployment remains deferred.
-- Applied the versioned protection payload and verified the server response:
+- Initially applied the two-person protection payload and verified the response:
   required `Validate` check, strict up-to-date requirement, one approval, dismissal
   of stale approvals, approval of the latest push, resolved conversations, and
   administrator enforcement. Force pushes and branch deletion are disabled.
-- Only `mani8785` is currently a collaborator. Future merges require an eligible
-  second reviewer. Any change to that review policy needs explicit agreement;
-  agents must not bypass protection to complete a task.
+- The owner then explicitly requested a solo-owner policy because `mani8785` is
+  the only collaborator. Required approving reviews are now zero; latest-push
+  approval and stale-review dismissal are disabled. Pull requests, passing CI,
+  up-to-date branches, resolved conversations, and administrator enforcement
+  remain required. Force pushes and branch deletion remain disabled.
 
 The HV-01 follow-up remains subject to user review and approval. No next-phase
 implementation or merge is authorized by this verification record. GitHub settings
