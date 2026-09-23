@@ -68,7 +68,7 @@ jobs:
           }
       - name: Set up agreed .NET SDK
         if: steps.repository.outputs.has_solution == 'true'
-        uses: actions/setup-dotnet@v5
+        uses: actions/setup-dotnet@v6
         with:
           global-json-file: global.json
       - name: Restore, format, build, and test
