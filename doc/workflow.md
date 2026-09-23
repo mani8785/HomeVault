@@ -7,7 +7,7 @@
 5. Review XML comments alongside behavior and tests.
 6. Stop for explicit user confirmation after every step. Do not merge or start the next step before approval.
 
-Use a separate Git branch per phase. Merge accepted, verified phases into main only after approval. Keep reviewed work and architecture decisions versioned in Git, following the [ADR process](ADRs/README.md). This folder is not yet a Git repository; the current documentation edits are not yet versioned. Initial Git setup and solution scaffolding require a separately confirmed step after documentation review.
+Use a separate Git branch per phase. Merge accepted, verified phases into main only after approval. Keep reviewed work and architecture decisions versioned in Git, following the [ADR process](ADRs/README.md). Git was initialized in phase 0 with the existing documents on main. CI changes are prepared on phase-0/ci-cd; see the [CI/CD and review policy](ci-cd.md). Solution scaffolding remains a separate confirmed step.
 
 ## XML documentation standard
 

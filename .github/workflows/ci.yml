@@ -1,0 +1,61 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main, 'phase-*/**']
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  validate:
+    name: Validate
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - name: Validate repository and detect solution
+        id: repository
+        run: ./scripts/Validate-Repository.ps1
+      - name: Set up agreed .NET SDK
+        if: steps.repository.outputs.has_solution == 'true'
+        uses: actions/setup-dotnet@v5
+        with:
+          global-json-file: global.json
+      - name: Restore, format, build, and test
+        if: steps.repository.outputs.has_solution == 'true'
+        run: ./scripts/Test-Solution.ps1
+      - name: Upload test results
+        if: always() && steps.repository.outputs.has_solution == 'true'
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results
+          path: TestResults/**/*.trx
+          if-no-files-found: warn
+          retention-days: 14
+      - name: Package validated source
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        run: |
+          New-Item -ItemType Directory -Force artifacts | Out-Null
+          git archive --format=zip --output=artifacts/HomeVault-source.zip HEAD
+          if ($LASTEXITCODE -ne 0) { throw 'Source packaging failed.' }
+      - name: Deliver source artifact
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        uses: actions/upload-artifact@v4
+        with:
+          name: HomeVault-source-${{ github.sha }}
+          path: artifacts/HomeVault-source.zip
+          if-no-files-found: error
+          retention-days: 14
