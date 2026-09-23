@@ -1,8 +1,8 @@
 # Phase 0: Git, CI, and review policy
 
-Git starts on `main` with the existing design documents. Phase 0 changes live on
-`phase-0/ci-cd` until reviewed and explicitly approved. The requested remote is
-public repository `mani8785/HomeVault`.
+The public repository is `mani8785/HomeVault`. The initial phase 0 changes were
+merged into `main` by the owner in PR #1. HV-01 verifies the delivered CI and
+activates the review policy for subsequent pull requests.
 
 ## Continuous integration
 
@@ -77,5 +77,26 @@ gh api --method PUT repos/mani8785/HomeVault/branches/main/protection --input .g
 For an existing repository, inspect and reconcile protection first: this PUT
 replaces the configured policy. See [GitHub protected branches](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches).
 
-Remote publication, GitHub CI execution, and protection activation must be
-verified separately from the local configuration.
+## HV-01 verification (2026-09-23)
+
+- [PR #1](https://github.com/mani8785/HomeVault/pull/1) was merged by `mani8785`
+  at 14:18:04 UTC, producing commit `17f30d74e97085647a5b32c51775b9de90f130a5`.
+  GitHub records no approving reviews on that PR; branch protection was not active
+  at the time. This records the existing merge, not a retrospective review approval.
+- [The main-branch CI run](https://github.com/mani8785/HomeVault/actions/runs/35873169307)
+  passed its `Validate` job. Repository validation, source packaging, and artifact
+  upload succeeded. SDK setup, build, and NUnit tests were correctly skipped
+  because application scaffolding does not exist yet.
+- The run produced `HomeVault-source-17f30d74e97085647a5b32c51775b9de90f130a5`,
+  a source artifact with 14-day retention. Deployment remains deferred.
+- Applied the versioned protection payload and verified the server response:
+  required `Validate` check, strict up-to-date requirement, one approval, dismissal
+  of stale approvals, approval of the latest push, resolved conversations, and
+  administrator enforcement. Force pushes and branch deletion are disabled.
+- Only `mani8785` is currently a collaborator. Future merges require an eligible
+  second reviewer. Any change to that review policy needs explicit agreement;
+  agents must not bypass protection to complete a task.
+
+The HV-01 follow-up remains subject to user review and approval. No next-phase
+implementation or merge is authorized by this verification record. GitHub settings
+can change; recheck server-side protection when relying on it later.
