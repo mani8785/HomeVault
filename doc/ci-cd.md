@@ -1,8 +1,8 @@
 # Phase 0: Git, CI, and review policy
 
-Git starts on `main` with the existing design documents. Phase 0 changes live on
-`phase-0/ci-cd` until reviewed and explicitly approved. The requested remote is
-public repository `mani8785/HomeVault`.
+The public repository is `mani8785/HomeVault`. The initial phase 0 changes were
+merged into `main` by the owner in PR #1. HV-01 verifies the delivered CI and
+activates the review policy for subsequent pull requests.
 
 ## Continuous integration
 
@@ -57,15 +57,18 @@ in GitHub environments.
 Actions runs checks; GitHub branch protection enforces reviews and merging.
 The [branch protection payload](../.github/branch-protection.json) specifies:
 
-- At least one approving review from another contributor.
-- Stale approvals dismissed and approval of the latest push required.
+- Pull requests required, with zero mandatory approving reviews in solo-owner mode.
+- Latest-push approval and stale-review dismissal disabled in solo-owner mode.
 - `Validate` passing with the branch up to date with `main`.
 - Review conversations resolved, including for administrators.
 - No force pushes or deletion of `main`.
 
-A solo author cannot approve their own pull request; a second reviewer with the
-appropriate access is needed. CODEOWNERS awaits actual maintainer assignments.
-Explicit phase approval remains required by the project workflow.
+GitHub does not allow PR authors to submit an approving review on their own PR.
+The owner can review and merge once CI and the remaining protections pass.
+Agents still need explicit owner approval in the task or PR before merging;
+GitHub does not enforce that conversational approval. A policy-change request
+alone is not merge approval. Revisit required reviewers when collaborators join.
+CODEOWNERS awaits actual maintainer assignments.
 
 The JSON does not activate protection by itself. After pushing both branches and
 running CI once, an admin can apply it with authenticated GitHub CLI:
@@ -77,5 +80,28 @@ gh api --method PUT repos/mani8785/HomeVault/branches/main/protection --input .g
 For an existing repository, inspect and reconcile protection first: this PUT
 replaces the configured policy. See [GitHub protected branches](https://docs.github.com/en/repositories/configuring-branches-and-merges-in-your-repository/managing-protected-branches/about-protected-branches).
 
-Remote publication, GitHub CI execution, and protection activation must be
-verified separately from the local configuration.
+## HV-01 verification (2026-09-23)
+
+- [PR #1](https://github.com/mani8785/HomeVault/pull/1) was merged by `mani8785`
+  at 14:18:04 UTC, producing commit `17f30d74e97085647a5b32c51775b9de90f130a5`.
+  GitHub records no approving reviews on that PR; branch protection was not active
+  at the time. This records the existing merge, not a retrospective review approval.
+- [The main-branch CI run](https://github.com/mani8785/HomeVault/actions/runs/35873169307)
+  passed its `Validate` job. Repository validation, source packaging, and artifact
+  upload succeeded. SDK setup, build, and NUnit tests were correctly skipped
+  because application scaffolding does not exist yet.
+- The run produced `HomeVault-source-17f30d74e97085647a5b32c51775b9de90f130a5`,
+  a source artifact with 14-day retention. Deployment remains deferred.
+- Initially applied the two-person protection payload and verified the response:
+  required `Validate` check, strict up-to-date requirement, one approval, dismissal
+  of stale approvals, approval of the latest push, resolved conversations, and
+  administrator enforcement. Force pushes and branch deletion are disabled.
+- The owner then explicitly requested a solo-owner policy because `mani8785` is
+  the only collaborator. Required approving reviews are now zero; latest-push
+  approval and stale-review dismissal are disabled. Pull requests, passing CI,
+  up-to-date branches, resolved conversations, and administrator enforcement
+  remain required. Force pushes and branch deletion remain disabled.
+
+The HV-01 follow-up remains subject to user review and approval. No next-phase
+implementation or merge is authorized by this verification record. GitHub settings
+can change; recheck server-side protection when relying on it later.
