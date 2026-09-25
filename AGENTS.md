@@ -26,10 +26,7 @@ The old project's reported completed phases are context, not code in this restar
 
 ## Decision and implementation boundaries
 
-At phase 0 the repository contains documentation and CI configuration; solution
-scaffolding is still a separate approval step. NUnit is confirmed in ADR-0001.
-The remaining C#/.NET 10 stack proposals and ADR-0002 project boundaries await
-confirmation. Selective dependency injection in ADR-0003 is accepted.
+ADR-0001 and ADR-0002 were accepted on 2026-09-25, and the owner authorized HV-03 solution scaffolding. The repository now contains the five-project .NET 10 foundation with NUnit architecture tests. Selective dependency injection in ADR-0003 remains accepted. Domain implementation is a subsequent reviewed step.
 Check the ADRs for updates instead of treating this snapshot as permanent.
 
 Discuss architectural choices with the user and record them as Proposed ADRs
@@ -46,7 +43,7 @@ DI container, or event-dispatch library merely because an older plan mentioned i
   project-owned domain/result patterns. Favor domain behavior over generic CRUD.
 - Keep Domain independent of UI, persistence, DI frameworks, and other frameworks;
   .NET base libraries are allowed. Encryption and storage belong in Infrastructure.
-- Follow the proposed dependency direction once approved: Application references
+- Follow the accepted dependency direction: Application references
   Domain; Infrastructure references Application/Domain; Playground composes them;
   initial tests reference Domain/Application. Never introduce reverse dependencies.
 - Use constructor injection where explicit collaborators improve clarity or tests.
@@ -60,7 +57,7 @@ DI container, or event-dispatch library merely because an older plan mentioned i
   or merely repeat names. Private helpers and test names need no redundant comments.
 - Never expose secrets or sensitive values in examples, logs, or failure output.
 - Follow .editorconfig and existing conventions. Use NUnit for behavioral tests
-  when application code exists; review package and adapter choices at scaffolding.
+  when application code exists; use the package and adapter versions recorded in ADR-0001.
 
 ## Scripts require explicit approval
 

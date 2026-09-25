@@ -1,0 +1,11 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../HomeVault.Application/HomeVault.Application.csproj" />
+    <ProjectReference Include="../HomeVault.Infrastructure/HomeVault.Infrastructure.csproj" />
+    <ProjectReference Include="../HomeVault.Domain/HomeVault.Domain.csproj" />
+  </ItemGroup>
+</Project>

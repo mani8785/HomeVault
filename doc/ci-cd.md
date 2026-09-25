@@ -10,9 +10,7 @@ The `CI` workflow runs on pull requests targeting `main`, pushes to `main` and
 phase branches, manual dispatch, and nightly at 03:17 in `Europe/Copenhagen`. Its required check is `Validate`.
 It uses a read-only token, cancels superseded runs, and has a 15-minute timeout.
 
-Today it checks required files and relative Markdown file links. No application
-or tests exist yet; the run explicitly reports this instead of claiming tests passed.
-Once scaffolding adds one root `.sln` or `.slnx` and an agreed `global.json`, it runs:
+CI checks required files and relative Markdown links. The approved HV-03 scaffold now provides one root HomeVault.slnx and global.json, enabling:
 
 1. SDK setup from `global.json` and dependency restore.
 2. Formatting verification.
@@ -20,15 +18,14 @@ Once scaffolding adds one root `.sln` or `.slnx` and an agreed `global.json`, it
 4. Tests with TRX reports; zero executed tests fails the check.
 5. Test report upload, including on failure when reports exist.
 
-Scaffolding must add NUnit tests, the test SDK and compatible adapter for the
-VSTest/TRX commands used here. Review compatibility if adopting another test runner.
+The scaffold uses the NUnit framework, test SDK and adapter versions recorded in ADR-0001, with the existing VSTest/TRX commands. Review compatibility if adopting another test runner.
 Code without a root solution fails repository validation.
 
 CI checks live directly in the GitHub Actions workflow. There are no standalone
 helper scripts. Creating scripts requires prior explicit user approval with a
 clear reason; see [agent instructions](../AGENTS.md).
 
-Once the root solution exists, run the standard commands directly from its directory:
+Run the standard commands directly from the solution directory:
 
 ```powershell
 dotnet restore
@@ -38,11 +35,10 @@ dotnet test --configuration Release --no-build --no-restore --logger trx --resul
 ```
 
 Confirm tests actually execute. CI independently rejects missing or zero-test
-reports and uses a fresh results directory. During the documentation-only phase,
-review relative Markdown links and run `git diff --check`; no .NET tests exist yet.
+reports and uses a fresh results directory. Also review relative Markdown links and run `git diff --check` for documentation changes.
 CI repository validation examines tracked files.
 
-Dependabot checks GitHub Actions weekly. Add NuGet updates when projects exist.
+Dependabot checks GitHub Actions and NuGet packages weekly.
 
 ## Delivery
 
@@ -115,8 +111,8 @@ GitHub can delay scheduled runs, so this is a target time rather than a guarante
 
 Concurrency is separated by event type so a push cannot cancel a scheduled run.
 Nightly runs use the same repository validation and, when the solution exists,
-restore, formatting, Release build, and NUnit test steps. Until scaffolding exists,
-application build and tests are explicitly skipped. Successful nightly runs also
+restore, formatting, Release build, and NUnit test steps. Before HV-03 scaffolding,
+application build and tests were explicitly skipped. Successful nightly runs also
 upload the source ZIP with 14-day retention. No application deployment is added.
 
 Inspect scheduled runs under Actions > CI and check the run date as well as its
@@ -126,3 +122,7 @@ merge to verify scheduling and nightly artifact delivery end to end.
 
 Email notifications are configured in the owner's GitHub notification settings;
 this change does not enable email or add a mail-sending step. No scripts are added.
+
+## HV-03 scaffold validation
+
+The five-project solution targets net10.0 with SDK 10.0.300 pinned exactly. Initial NUnit tests inspect source project files to enforce the accepted dependency boundaries, Domain framework independence, and solution coverage. They require a source checkout. Domain use-case behavior is intentionally deferred to later approved issues. The Playground currently reports scaffold readiness. Production projects generate XML documentation with compiler warnings treated as errors; test APIs do not require XML comments.
