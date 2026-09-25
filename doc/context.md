@@ -42,3 +42,10 @@ The earlier Vault plan included Personal/Household/Organization types, Active/Ar
 16. UI selection and implementation.
 
 Every step requires review before the next one. A phase can contain several small review steps.
+
+## Domain decision under review
+
+[ADR-0004: Domain language and aggregate boundaries](ADRs/0004-domain-language-and-boundaries.md)
+provides concrete examples, proposed consistency rules, and the Vault rules to
+reconfirm for HV-04. It is Proposed; the historical rules above are not newly
+accepted merely because they are described there.
