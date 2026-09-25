@@ -1,0 +1,9 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="../HomeVault.Application/HomeVault.Application.csproj" />
+    <ProjectReference Include="../HomeVault.Domain/HomeVault.Domain.csproj" />
+  </ItemGroup>
+</Project>

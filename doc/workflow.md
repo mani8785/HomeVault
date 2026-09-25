@@ -7,13 +7,13 @@
 5. Review XML comments alongside behavior and tests.
 6. Stop for explicit user confirmation after every step. Do not merge or start the next step before approval.
 
-Use a separate Git branch per phase. Merge accepted, verified phases into main only after approval. Keep reviewed work and architecture decisions versioned in Git, following the [ADR process](ADRs/README.md). Git was initialized in phase 0 with the existing documents on main. Initial CI changes were merged through PR #1; main-branch protection was activated and verified in HV-01; see the [CI/CD and review policy](ci-cd.md). Solution scaffolding remains a separate confirmed step.
+Use a separate Git branch per phase. Merge accepted, verified phases into main only after approval. Keep reviewed work and architecture decisions versioned in Git, following the [ADR process](ADRs/README.md). Git was initialized in phase 0 with the existing documents on main. Initial CI changes were merged through PR #1; main-branch protection was activated and verified in HV-01; see the [CI/CD and review policy](ci-cd.md). The owner authorized HV-03 scaffolding on 2026-09-25; subsequent steps remain subject to review.
 
 ## XML documentation standard
 
 Document public types and members with meaningful summaries describing their purpose and domain behavior. Include param, returns, value, exception, and remarks tags where relevant. Explain invariants, validation failures, side effects, and sensitive-value handling. Keep comments consistent with the actual API; do not invent exceptions or repeat a member name as its entire description. Test names and private helpers need no redundant XML comments.
 
-During scaffolding, propose XML documentation generation and missing-public-documentation diagnostics for production projects. Compiler checks catch missing or malformed documentation; manual review must still check meaning and accuracy. No secret values should appear in examples, logs, or failure output.
+Production projects generate XML documentation and treat compiler warnings, including missing-public-documentation diagnostics, as errors. Test projects do not require XML documentation. Compiler checks catch missing or malformed documentation; manual review must still check meaning and accuracy. No secret values should appear in examples, logs, or failure output.
 
 ## Review checklist
 

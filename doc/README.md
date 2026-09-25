@@ -13,4 +13,4 @@ Start here for project context, architecture, and the decisions governing each s
 7. [ADR-0002: Domain-first DDD-lite and project boundaries](ADRs/0002-domain-first-boundaries.md)
 8. [ADR-0003: Selective dependency injection](ADRs/0003-selective-dependency-injection.md)
 
-See also [Phase 0 Git, CI/CD, and review policy](ci-cd.md). Git and CI setup is authorized; solution scaffolding remains pending. NUnit is confirmed within ADR-0001; its remaining stack proposals and ADR-0002 await confirmation. ADR-0003 records the confirmed dependency injection direction. No code scaffolding is authorized by this step.
+See also [Phase 0 Git, CI/CD, and review policy](ci-cd.md). ADR-0001 and ADR-0002 were accepted on 2026-09-25, and HV-03 scaffolding was authorized. ADR-0003 preserves the accepted dependency injection direction. The solution and architecture tests implement this foundation; domain use cases remain subsequent reviewed steps.
