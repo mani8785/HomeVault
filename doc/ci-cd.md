@@ -7,7 +7,7 @@ activates the review policy for subsequent pull requests.
 ## Continuous integration
 
 The `CI` workflow runs on pull requests targeting `main`, pushes to `main` and
-phase branches, and manual dispatch. Its required check is `Validate`.
+phase branches, manual dispatch, and nightly at 03:17 in `Europe/Copenhagen`. Its required check is `Validate`.
 It uses a read-only token, cancels superseded runs, and has a 15-minute timeout.
 
 Today it checks required files and relative Markdown file links. No application
@@ -46,7 +46,7 @@ Dependabot checks GitHub Actions weekly. Add NuGet updates when projects exist.
 
 ## Delivery
 
-Successful pushes to `main` upload a source ZIP identified by commit SHA,
+Successful pushes to `main` and nightly runs upload a source ZIP identified by commit SHA,
 retained for 14 days. This is the phase 0 delivery artifact, not a deployable app.
 Application publishing and deployment require an application and hosting target.
 Add them in a later approved phase with production approval and secrets stored
@@ -105,3 +105,24 @@ replaces the configured policy. See [GitHub protected branches](https://docs.git
 The HV-01 follow-up remains subject to user review and approval. No next-phase
 implementation or merge is authorized by this verification record. GitHub settings
 can change; recheck server-side protection when relying on it later.
+
+## Nightly validation
+
+The existing CI workflow runs daily at 03:17 Copenhagen time using GitHub's
+schedule timezone setting. Runs use the latest default-branch commit; the schedule
+activates only after this workflow change is merged into the default branch.
+GitHub can delay scheduled runs, so this is a target time rather than a guarantee.
+
+Concurrency is separated by event type so a push cannot cancel a scheduled run.
+Nightly runs use the same repository validation and, when the solution exists,
+restore, formatting, Release build, and NUnit test steps. Until scaffolding exists,
+application build and tests are explicitly skipped. Successful nightly runs also
+upload the source ZIP with 14-day retention. No application deployment is added.
+
+Inspect scheduled runs under Actions > CI and check the run date as well as its
+conclusion. Manual dispatch exercises the validation jobs, but does not test the
+schedule trigger or upload the source ZIP. Confirm the first scheduled run after
+merge to verify scheduling and nightly artifact delivery end to end.
+
+Email notifications are configured in the owner's GitHub notification settings;
+this change does not enable email or add a mail-sending step. No scripts are added.

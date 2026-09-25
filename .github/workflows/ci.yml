@@ -6,12 +6,15 @@ on:
   push:
     branches: [main, 'phase-*/**']
   workflow_dispatch:
+  schedule:
+    - cron: '17 3 * * *'
+      timezone: 'Europe/Copenhagen'
 
 permissions:
   contents: read
 
 concurrency:
-  group: ci-${{ github.workflow }}-${{ github.ref }}
+  group: ci-${{ github.workflow }}-${{ github.event_name }}-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -108,13 +111,13 @@ jobs:
           if-no-files-found: warn
           retention-days: 14
       - name: Package validated source
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'schedule')
         run: |
           New-Item -ItemType Directory -Force artifacts | Out-Null
           git archive --format=zip --output=artifacts/HomeVault-source.zip HEAD
           if ($LASTEXITCODE -ne 0) { throw 'Source packaging failed.' }
       - name: Deliver source artifact
-        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+        if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'schedule')
         uses: actions/upload-artifact@v7
         with:
           name: HomeVault-source-${{ github.sha }}
