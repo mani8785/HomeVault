@@ -7,11 +7,14 @@ if (result.Asset is { } asset)
     // Only fictional example data is displayed; real Asset names may be sensitive.
     Console.WriteLine($"Asset identity: {asset.Id}");
     Console.WriteLine($"Asset name: {asset.Name}");
-    Console.WriteLine($"Add attribute: {asset.AddAttribute("Material", "Steel")}");
-    Console.WriteLine($"Duplicate attribute: {asset.AddAttribute(" material ", "Wood")}");
+    Console.WriteLine($"Add attribute: {asset.AddAttribute("Material", "Steel", AttributeSensitivity.Ordinary)}");
+    Console.WriteLine($"Duplicate attribute: {asset.AddAttribute(" material ", "Wood", AttributeSensitivity.Ordinary)}");
     Console.WriteLine($"Change attribute: {asset.ChangeAttribute("MATERIAL", "Aluminium")}");
     Console.WriteLine($"Example attribute: {asset.Attributes.Single().Name} = {asset.Attributes.Single().Value}");
     Console.WriteLine($"Remove attribute: {asset.RemoveAttribute("Material")}");
+    asset.AddAttribute("Private note", "Fictional demonstration text", AttributeSensitivity.Sensitive);
+    var privateNote = asset.Attributes.Single();
+    Console.WriteLine($"Sensitive attribute: {privateNote.IsSensitive}; value: {privateNote.Value ?? "[redacted]"}");
 }
 
 var invalidResult = Asset.Create(Guid.Empty, "Example bicycle");

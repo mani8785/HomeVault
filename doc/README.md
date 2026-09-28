@@ -1,5 +1,7 @@
 # HomeVault documentation
 
+See [HV-09: Sensitive attributes](hv-09-sensitive-attributes.md) for classification, deliberate reads, redaction, and verification.
+
 See [HV-08: Asset attributes](hv-08-asset-attributes.md) for the accepted text attribute contract and terminal validation.
 
 Start here for project context, architecture, and the decisions governing each small review step.

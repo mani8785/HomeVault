@@ -1,6 +1,8 @@
 # ADR-0006: Initial Asset attribute contract
 
 Status: Accepted
+Partially superseded by [ADR-0007](0007-sensitive-attributes.md) for attribute
+Value access and explicit classification on add; other rules remain accepted.
 Created: 2026-09-28
 Accepted: 2026-09-28
 Issue: [HV-08 / #12](https://github.com/mani8785/HomeVault/issues/12)
