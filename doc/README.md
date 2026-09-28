@@ -20,3 +20,5 @@ See also [Phase 0 Git, CI/CD, and review policy](ci-cd.md). ADR-0001 and ADR-000
 See the [HV-05 implementation record](hv-05-domain-building-blocks.md) for the first Asset creation operation, validation behavior, and deferred capabilities.
 
 See [HV-06: Validated Asset value objects](hv-06-value-objects.md) for AssetId and AssetName construction, equality, and compatibility guarantees.
+
+See [HV-07: Register and inspect an Asset](hv-07-register-inspect.md) for the initial supported scenario, acceptance coverage, and current Playground output.
