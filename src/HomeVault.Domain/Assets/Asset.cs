@@ -1,5 +1,3 @@
-using Ardalis.GuardClauses;
-
 namespace HomeVault.Domain.Assets;
 
 /// <summary>
@@ -11,17 +9,20 @@ namespace HomeVault.Domain.Assets;
 /// </remarks>
 public sealed class Asset
 {
+    private readonly AssetId _id;
+    private readonly AssetName _name;
+
     private Asset(Guid id, string? name)
     {
-        Id = Guard.Against.NullOrEmpty(id, nameof(id));
-        Name = Guard.Against.NullOrWhiteSpace(name, nameof(name));
+        _id = new AssetId(id);
+        _name = new AssetName(name);
     }
 
     /// <summary>Gets the non-empty identity supplied when the Asset was created.</summary>
-    public Guid Id { get; }
+    public Guid Id => _id.Value;
 
     /// <summary>Gets the nonblank name exactly as supplied, without trimming or normalization.</summary>
-    public string Name { get; }
+    public string Name => _name.Value;
 
     /// <summary>Creates an Asset after validating its identity and name with guard clauses.</summary>
     /// <param name="id">The caller-supplied identity; must not be <see cref="Guid.Empty"/>.</param>

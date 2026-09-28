@@ -14,6 +14,6 @@ dotnet test --configuration Release --no-build --no-restore --logger trx --resul
 dotnet run --project src/HomeVault.Playground --configuration Release --no-build
 ```
 
-Tests cover Asset creation success/failure behavior, project dependency boundaries, and solution coverage. Run them from a source checkout; they inspect project files. Playground demonstrates valid Asset creation and rejection of an empty identity; persistence and Vault access are not implemented. See the [HV-05 implementation record](doc/hv-05-domain-building-blocks.md). See the [CI/CD and review policy](doc/ci-cd.md) for validation and delivery requirements.
+Tests cover Asset creation, validated identity/name value objects, project dependency boundaries, and solution coverage. See [HV-06](doc/hv-06-value-objects.md) for value equality and validation details. Run them from a source checkout; they inspect project files. Playground demonstrates valid Asset creation and rejection of an empty identity; persistence and Vault access are not implemented. See the [HV-05 implementation record](doc/hv-05-domain-building-blocks.md). See the [CI/CD and review policy](doc/ci-cd.md) for validation and delivery requirements.
 
 Agent guidance: [AGENTS.md](AGENTS.md).

@@ -18,3 +18,5 @@ Start here for project context, architecture, and the decisions governing each s
 See also [Phase 0 Git, CI/CD, and review policy](ci-cd.md). ADR-0001 and ADR-0002 were accepted on 2026-09-25, and HV-03 scaffolding was authorized. ADR-0003 preserves the accepted dependency injection direction. The solution and architecture tests implement this foundation; domain use cases remain subsequent reviewed steps.
 
 See the [HV-05 implementation record](hv-05-domain-building-blocks.md) for the first Asset creation operation, validation behavior, and deferred capabilities.
+
+See [HV-06: Validated Asset value objects](hv-06-value-objects.md) for AssetId and AssetName construction, equality, and compatibility guarantees.

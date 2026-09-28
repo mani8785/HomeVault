@@ -36,7 +36,7 @@ require the agreed Vault ownership checks. Asset and result default string
 representations do not format the name; callers must also avoid logging names
 or other potentially sensitive values themselves.
 
-HV-06 (#10) still needs specific value-object constraints and equality semantics.
+HV-06 (#10) extracts these approved constraints into validated AssetId and AssetName values; see the [value-object implementation record](hv-06-value-objects.md).
 This slice implements the creation core relevant to HV-07 (#11), but does not
 close that story or imply that its full supported scenarios and integration are
 complete. Later work should reuse this operation and refine its contract rather
