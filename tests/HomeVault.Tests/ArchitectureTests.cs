@@ -35,16 +35,21 @@ public sealed class ArchitectureTests
     }
 
     [Test]
-    public void DomainRemainsIndependentOfPackagesAndExternalAssemblies()
+    public void DomainAllowsOnlyTheApprovedGuardPackage()
     {
         var domain = XDocument.Load(Path.Combine(RepositoryRoot, "src/HomeVault.Domain/HomeVault.Domain.csproj"));
         var sharedSettings = XDocument.Load(Path.Combine(RepositoryRoot, "Directory.Build.props"));
 
+        Assert.That(domain.Descendants("PackageReference").Select(package => package.Attribute("Include")?.Value),
+            Is.EquivalentTo(new[] { "Ardalis.GuardClauses" }), "Only the explicitly approved guard package is allowed.");
+        Assert.That(sharedSettings.Descendants("PackageReference"), Is.Empty,
+            "Shared settings must not introduce implicit Domain dependencies.");
+
         foreach (var document in new[] { domain, sharedSettings })
         {
             Assert.That(document.Descendants().Where(element =>
-                element.Name.LocalName is "PackageReference" or "ProjectReference" or "Reference" or "FrameworkReference"),
-                Is.Empty, "Domain and shared settings must use only the base framework.");
+                element.Name.LocalName is "ProjectReference" or "Reference" or "FrameworkReference"),
+                Is.Empty, "Domain must remain independent of project, external assembly, and framework references.");
         }
     }
 

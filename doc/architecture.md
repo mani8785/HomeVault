@@ -25,7 +25,7 @@ flowchart BT
     style Tests fill:#f1f5f9,stroke:#64748b,color:#0f172a
 ```
 
-Domain has no project dependencies or framework-specific business logic. .NET base libraries are allowed. Tests initially reference Domain and Application only. Revisit infrastructure testing when persistence is introduced.
+Domain has no project dependencies or framework-specific business logic. .NET base libraries and Ardalis.GuardClauses are allowed under [ADR-0005](ADRs/0005-guard-clauses.md); other Domain package dependencies remain prohibited. Tests initially reference Domain and Application only. Revisit infrastructure testing when persistence is introduced.
 
 ## Dependency injection
 

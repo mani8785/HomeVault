@@ -12,7 +12,7 @@ No separate subtasks existed; implementation follows the three tasks below.
 ## Completed tasks
 
 1. Implement `Asset.Create(Guid, string?)` and immutable inspection of its Id
-   and Name. Validate manually, checking identity first. Preserve valid names
+   and Name. Validate with Ardalis.GuardClauses, checking identity first. Preserve valid names
    exactly; do not introduce trimming, normalization, uniqueness, or length rules.
 2. Return a concrete `AssetCreationResult`: success contains an Asset and
    `None`; failure contains no Asset and `EmptyIdentity` or `BlankName`.
@@ -64,5 +64,6 @@ Domain-only demonstration: nothing is persisted and Vault access is not implemen
 ```
 
 The `--no-build` commands require a successful build first. Tests include the
-existing architecture suite and the new Asset creation cases. No additional
-packages or scripts are needed.
+existing architecture suite and the new Asset creation cases. Ardalis.GuardClauses is the approved input-guard dependency; no scripts are needed.
+
+The owner requested the guard library during PR review on 2026-09-28. [ADR-0005](ADRs/0005-guard-clauses.md) records the approved dependency exception and safe exception-to-result mapping. Public behavior is unchanged.

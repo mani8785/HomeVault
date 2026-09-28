@@ -1,3 +1,5 @@
+using Ardalis.GuardClauses;
+
 namespace HomeVault.Domain.Assets;
 
 /// <summary>
@@ -9,10 +11,10 @@ namespace HomeVault.Domain.Assets;
 /// </remarks>
 public sealed class Asset
 {
-    private Asset(Guid id, string name)
+    private Asset(Guid id, string? name)
     {
-        Id = id;
-        Name = name;
+        Id = Guard.Against.NullOrEmpty(id, nameof(id));
+        Name = Guard.Against.NullOrWhiteSpace(name, nameof(name));
     }
 
     /// <summary>Gets the non-empty identity supplied when the Asset was created.</summary>
@@ -21,7 +23,7 @@ public sealed class Asset
     /// <summary>Gets the nonblank name exactly as supplied, without trimming or normalization.</summary>
     public string Name { get; }
 
-    /// <summary>Creates an Asset after manually validating its identity and name.</summary>
+    /// <summary>Creates an Asset after validating its identity and name with guard clauses.</summary>
     /// <param name="id">The caller-supplied identity; must not be <see cref="Guid.Empty"/>.</param>
     /// <param name="name">A name containing at least one non-whitespace character.</param>
     /// <returns>
@@ -34,16 +36,17 @@ public sealed class Asset
     /// </remarks>
     public static AssetCreationResult Create(Guid id, string? name)
     {
-        if (id == Guid.Empty)
+        try
+        {
+            return new AssetCreationResult(new Asset(id, name));
+        }
+        catch (ArgumentException exception) when (exception.ParamName == nameof(id))
         {
             return new AssetCreationResult(AssetCreationError.EmptyIdentity);
         }
-
-        if (string.IsNullOrWhiteSpace(name))
+        catch (ArgumentException exception) when (exception.ParamName == nameof(name))
         {
             return new AssetCreationResult(AssetCreationError.BlankName);
         }
-
-        return new AssetCreationResult(new Asset(id, name));
     }
 }

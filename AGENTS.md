@@ -39,10 +39,10 @@ DI container, or event-dispatch library merely because an older plan mentioned i
 
 - Keep changes small, coherent, and within the approved step. Avoid unrelated
   refactors, speculative abstractions, and dependencies without a concrete need.
-- Preserve Guid identifiers, manual validation, lightweight domain events, and
+- Preserve Guid identifiers, explicit business validation, lightweight domain events, and
   project-owned domain/result patterns. Favor domain behavior over generic CRUD.
 - Keep Domain independent of UI, persistence, DI frameworks, and other frameworks;
-  .NET base libraries are allowed. Encryption and storage belong in Infrastructure.
+  .NET base libraries and the explicitly approved Ardalis.GuardClauses utility are allowed. Encryption and storage belong in Infrastructure.
 - Follow the accepted dependency direction: Application references
   Domain; Infrastructure references Application/Domain; Playground composes them;
   initial tests reference Domain/Application. Never introduce reverse dependencies.
@@ -58,6 +58,16 @@ DI container, or event-dispatch library merely because an older plan mentioned i
 - Never expose secrets or sensitive values in examples, logs, or failure output.
 - Follow .editorconfig and existing conventions. Use NUnit for behavioral tests
   when application code exists; use the package and adapter versions recorded in ADR-0001.
+
+## Preferred input guards
+
+Use Ardalis.GuardClauses for standard input preconditions where its semantics
+match the approved rules; see accepted [ADR-0005](doc/ADRs/0005-guard-clauses.md).
+Read the pinned version from the project file. Keep business invariants explicit.
+Guard methods throw: preserve existing result-returning factory contracts by
+mapping only expected argument failures to safe domain errors. Never return or
+log guard exception messages or caller values. This package is a narrow Domain
+dependency exception, not permission to add unrelated frameworks.
 
 ## Scripts require explicit approval
 
