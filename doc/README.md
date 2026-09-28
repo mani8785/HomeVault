@@ -1,5 +1,7 @@
 # HomeVault documentation
 
+See [HV-13: Relationship domain slice](hv-13-asset-relationships.md) for creation/removal and the remaining integration requirements.
+
 See [HV-12: Vault archive](hv-12-vault-archive.md) for lifecycle behavior, blocked mutations, and remaining application enforcement.
 
 See [HV-11: Vault membership](hv-11-vault-membership.md) for membership invariants, authorization boundaries, and verification.
