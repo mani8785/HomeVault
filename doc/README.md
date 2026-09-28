@@ -1,5 +1,7 @@
 # HomeVault documentation
 
+See [HV-10: Vault creation](hv-10-vault-creation.md) for the initial Owner contract, Asset reference boundary, and validation commands.
+
 See [HV-09: Sensitive attributes](hv-09-sensitive-attributes.md) for classification, deliberate reads, redaction, and verification.
 
 See [HV-08: Asset attributes](hv-08-asset-attributes.md) for the accepted text attribute contract and terminal validation.
