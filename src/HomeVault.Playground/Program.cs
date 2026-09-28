@@ -7,6 +7,11 @@ if (result.Asset is { } asset)
     // Only fictional example data is displayed; real Asset names may be sensitive.
     Console.WriteLine($"Asset identity: {asset.Id}");
     Console.WriteLine($"Asset name: {asset.Name}");
+    Console.WriteLine($"Add attribute: {asset.AddAttribute("Material", "Steel")}");
+    Console.WriteLine($"Duplicate attribute: {asset.AddAttribute(" material ", "Wood")}");
+    Console.WriteLine($"Change attribute: {asset.ChangeAttribute("MATERIAL", "Aluminium")}");
+    Console.WriteLine($"Example attribute: {asset.Attributes.Single().Name} = {asset.Attributes.Single().Value}");
+    Console.WriteLine($"Remove attribute: {asset.RemoveAttribute("Material")}");
 }
 
 var invalidResult = Asset.Create(Guid.Empty, "Example bicycle");
