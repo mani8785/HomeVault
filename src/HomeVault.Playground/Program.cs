@@ -1,4 +1,5 @@
 using HomeVault.Domain.Assets;
+using HomeVault.Domain.Relationships;
 using HomeVault.Domain.Vaults;
 
 var result = Asset.Create(Guid.Parse("74128a99-4eb5-4b75-8ad1-6bf2d2c8453d"), "Example bicycle");
@@ -39,4 +40,14 @@ if (vaultResult.Vault is { } vault)
 
 var invalidVault = Vault.Create(Guid.NewGuid(), "Example household", VaultType.Household, Guid.Empty);
 Console.WriteLine($"Invalid Vault creation: {invalidVault.Error}");
+// Standalone fictional references; no endpoint existence or ownership lookup is implied.
+var relationshipResult = Relationship.Create(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), RelationshipKind.Covers);
+Console.WriteLine($"Valid Relationship creation: {relationshipResult.IsSuccess}");
+if (relationshipResult.Relationship is { } relationship)
+{
+    Console.WriteLine($"Relationship kind: {relationship.Kind}; state: {relationship.Status}");
+    relationship.Remove();
+    relationship.Remove();
+    Console.WriteLine($"Relationship state after removal: {relationship.Status}");
+}
 Console.WriteLine("Domain-only demonstration: nothing is persisted and Vault access is not implemented.");
