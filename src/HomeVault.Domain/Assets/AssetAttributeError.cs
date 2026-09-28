@@ -12,5 +12,7 @@ public enum AssetAttributeError
     /// <summary>An attribute already matches the trimmed name, ignoring ordinal case.</summary>
     DuplicateName,
     /// <summary>No attribute matches the trimmed name, ignoring ordinal case.</summary>
-    NotFound
+    NotFound,
+    /// <summary>The supplied classification is not a supported sensitivity value.</summary>
+    InvalidSensitivity
 }

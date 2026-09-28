@@ -14,7 +14,7 @@ public sealed class AssetAttributeTests
     public void AddPreservesTextAndTrimsName(string name, string value, string expectedName)
     {
         var asset = CreateAsset();
-        Assert.That(asset.AddAttribute(name, value), Is.EqualTo(AssetAttributeError.None));
+        Assert.That(asset.AddAttribute(name, value, AttributeSensitivity.Ordinary), Is.EqualTo(AssetAttributeError.None));
         Assert.That(asset.Attributes.Single().Name, Is.EqualTo(expectedName));
         Assert.That(asset.Attributes.Single().Value, Is.EqualTo(value));
     }
@@ -26,8 +26,8 @@ public sealed class AssetAttributeTests
     public void InvalidNamesAreRejectedBeforeValuesWithoutMutation(string? name)
     {
         var asset = CreateAsset();
-        asset.AddAttribute("Material", "Steel");
-        Assert.That(asset.AddAttribute(name, null), Is.EqualTo(AssetAttributeError.BlankName));
+        asset.AddAttribute("Material", "Steel", AttributeSensitivity.Ordinary);
+        Assert.That(asset.AddAttribute(name, null, AttributeSensitivity.Ordinary), Is.EqualTo(AssetAttributeError.BlankName));
         Assert.That(asset.ChangeAttribute(name, null), Is.EqualTo(AssetAttributeError.BlankName));
         Assert.That(asset.RemoveAttribute(name), Is.EqualTo(AssetAttributeError.BlankName));
         Assert.That(asset.Attributes.Single().Value, Is.EqualTo("Steel"));
@@ -40,8 +40,8 @@ public sealed class AssetAttributeTests
     public void InvalidValuesAreRejectedBeforeLookupWithoutMutation(string? value)
     {
         var asset = CreateAsset();
-        asset.AddAttribute("Material", "Steel");
-        Assert.That(asset.AddAttribute("material", value), Is.EqualTo(AssetAttributeError.BlankValue));
+        asset.AddAttribute("Material", "Steel", AttributeSensitivity.Ordinary);
+        Assert.That(asset.AddAttribute("material", value, AttributeSensitivity.Ordinary), Is.EqualTo(AssetAttributeError.BlankValue));
         Assert.That(asset.ChangeAttribute("Missing", value), Is.EqualTo(AssetAttributeError.BlankValue));
         Assert.That(asset.ChangeAttribute("Material", value), Is.EqualTo(AssetAttributeError.BlankValue));
         Assert.That(asset.Attributes.Single().Value, Is.EqualTo("Steel"));
@@ -51,10 +51,10 @@ public sealed class AssetAttributeTests
     public void DuplicateAddAndMissingMutationsPreserveExistingEntries()
     {
         var asset = CreateAsset();
-        asset.AddAttribute("Material", "Steel");
-        asset.AddAttribute("Color", "Blue");
+        asset.AddAttribute("Material", "Steel", AttributeSensitivity.Ordinary);
+        asset.AddAttribute("Color", "Blue", AttributeSensitivity.Ordinary);
         var before = asset.Attributes;
-        Assert.That(asset.AddAttribute(" MATERIAL ", "Wood"), Is.EqualTo(AssetAttributeError.DuplicateName));
+        Assert.That(asset.AddAttribute(" MATERIAL ", "Wood", AttributeSensitivity.Ordinary), Is.EqualTo(AssetAttributeError.DuplicateName));
         Assert.That(asset.ChangeAttribute("Missing", "Text"), Is.EqualTo(AssetAttributeError.NotFound));
         Assert.That(asset.RemoveAttribute("Missing"), Is.EqualTo(AssetAttributeError.NotFound));
         Assert.That(asset.Attributes, Is.EquivalentTo(before));
@@ -64,8 +64,8 @@ public sealed class AssetAttributeTests
     public void ChangeAndRemoveMatchNamesAndPreserveOtherEntries()
     {
         var asset = CreateAsset();
-        asset.AddAttribute("Material", "Steel");
-        asset.AddAttribute("Color", "Blue");
+        asset.AddAttribute("Material", "Steel", AttributeSensitivity.Ordinary);
+        asset.AddAttribute("Color", "Blue", AttributeSensitivity.Ordinary);
         Assert.That(asset.ChangeAttribute(" MATERIAL ", " Wood "), Is.EqualTo(AssetAttributeError.None));
         var changed = asset.Attributes.Single(entry => entry.Name == "Material");
         Assert.That(changed.Value, Is.EqualTo(" Wood "));
@@ -82,7 +82,7 @@ public sealed class AssetAttributeTests
     {
         var asset = CreateAsset();
         var empty = asset.Attributes;
-        asset.AddAttribute("Material", "Steel");
+        asset.AddAttribute("Material", "Steel", AttributeSensitivity.Ordinary);
         var snapshot = asset.Attributes;
         Assert.Throws<NotSupportedException>(() => ((IList<AssetAttribute>)snapshot).Clear());
         asset.ChangeAttribute("Material", "Wood");
@@ -97,10 +97,10 @@ public sealed class AssetAttributeTests
     {
         var first = CreateAsset();
         var second = CreateAsset();
-        first.AddAttribute("Private example name", "Private example text");
-        Assert.That(second.AddAttribute("Private example name", "Other text"), Is.EqualTo(AssetAttributeError.None));
+        first.AddAttribute("Private example name", "Private example text", AttributeSensitivity.Ordinary);
+        Assert.That(second.AddAttribute("Private example name", "Other text", AttributeSensitivity.Ordinary), Is.EqualTo(AssetAttributeError.None));
         Assert.That(first.Attributes.Single().ToString(), Is.EqualTo("AssetAttribute"));
-        Assert.That(first.AddAttribute("Private example name", "Secret example").ToString(), Is.EqualTo("DuplicateName"));
+        Assert.That(first.AddAttribute("Private example name", "Secret example", AttributeSensitivity.Ordinary).ToString(), Is.EqualTo("DuplicateName"));
         first.RemoveAttribute("Private example name");
         Assert.That(second.Attributes.Single().Value, Is.EqualTo("Other text"));
     }

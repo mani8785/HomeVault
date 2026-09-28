@@ -34,16 +34,17 @@ public sealed class Asset
     /// <summary>Adds a text attribute, rejecting names already present after trimming and ignoring ordinal case.</summary>
     /// <param name="name">A nonblank name; trimmed spelling is retained.</param>
     /// <param name="value">Nonblank text preserved exactly.</param>
-    /// <returns>None on success, or BlankName, BlankValue, or DuplicateName. Name validation precedes value validation and lookup.</returns>
+    /// <param name="sensitivity">An explicit classification; use Sensitive for private values. No automatic content detection occurs.</param>
+    /// <returns>None on success, or BlankName, BlankValue, InvalidSensitivity, or DuplicateName. Validation checks name, value, then classification before lookup.</returns>
     /// <remarks>Failures leave all entries unchanged and never return supplied values.</remarks>
-    public AssetAttributeError AddAttribute(string? name, string? value) => SetAttribute(name, value, false);
+    public AssetAttributeError AddAttribute(string? name, string? value, AttributeSensitivity sensitivity) => SetAttribute(name, value, false, sensitivity);
 
     /// <summary>Replaces an existing attribute value without changing its original name spelling.</summary>
     /// <param name="name">A nonblank lookup name, trimmed and matched ignoring ordinal case.</param>
     /// <param name="value">Nonblank replacement text preserved exactly.</param>
     /// <returns>None on success, or BlankName, BlankValue, or NotFound. Name validation precedes value validation and lookup.</returns>
-    /// <remarks>An identical replacement succeeds. Failures leave all entries unchanged.</remarks>
-    public AssetAttributeError ChangeAttribute(string? name, string? value) => SetAttribute(name, value, true);
+    /// <remarks>An identical replacement succeeds. Classification is preserved; failures leave all entries unchanged.</remarks>
+    public AssetAttributeError ChangeAttribute(string? name, string? value) => SetAttribute(name, value, true, AttributeSensitivity.Sensitive);
 
     /// <summary>Removes one attribute from this Asset instance.</summary>
     /// <param name="name">A nonblank lookup name, trimmed and matched ignoring ordinal case.</param>
@@ -62,12 +63,12 @@ public sealed class Asset
         }
     }
 
-    private AssetAttributeError SetAttribute(string? name, string? value, bool replace)
+    private AssetAttributeError SetAttribute(string? name, string? value, bool replace, AttributeSensitivity sensitivity)
     {
         AssetAttribute candidate;
         try
         {
-            candidate = new AssetAttribute(name, value);
+            candidate = new AssetAttribute(name, value, sensitivity);
         }
         catch (ArgumentException exception) when (exception.ParamName == nameof(name))
         {
@@ -76,6 +77,10 @@ public sealed class Asset
         catch (ArgumentException exception) when (exception.ParamName == nameof(value))
         {
             return AssetAttributeError.BlankValue;
+        }
+        catch (ArgumentException exception) when (exception.ParamName == nameof(sensitivity))
+        {
+            return AssetAttributeError.InvalidSensitivity;
         }
 
         var exists = _attributes.TryGetValue(candidate.Name, out var current);
@@ -86,7 +91,7 @@ public sealed class Asset
                 return AssetAttributeError.NotFound;
             }
 
-            _attributes[candidate.Name] = new AssetAttribute(current!.Name, candidate.Value);
+            _attributes[candidate.Name] = new AssetAttribute(current!.Name, candidate.ReadValue(), current.Sensitivity);
         }
         else if (!exists)
         {
