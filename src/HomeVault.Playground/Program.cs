@@ -1,4 +1,5 @@
 using HomeVault.Domain.Assets;
+using HomeVault.Domain.Vaults;
 
 var result = Asset.Create(Guid.Parse("74128a99-4eb5-4b75-8ad1-6bf2d2c8453d"), "Example bicycle");
 Console.WriteLine($"Valid Asset creation: {result.IsSuccess}");
@@ -21,4 +22,13 @@ var invalidResult = Asset.Create(Guid.Empty, "Example bicycle");
 Console.WriteLine($"Invalid Asset creation: {invalidResult.Error}");
 var blankNameResult = Asset.Create(Guid.Parse("74128a99-4eb5-4b75-8ad1-6bf2d2c8453d"), " ");
 Console.WriteLine($"Blank Asset name: {blankNameResult.Error}");
+var vaultResult = Vault.Create(Guid.NewGuid(), "Example household", VaultType.Household, Guid.NewGuid());
+Console.WriteLine($"Valid Vault creation: {vaultResult.IsSuccess}");
+if (vaultResult.Vault is { } vault)
+{
+    Console.WriteLine($"Vault state: {vault.Status}; initial role: {vault.Memberships.Single().Role}");
+}
+
+var invalidVault = Vault.Create(Guid.NewGuid(), "Example household", VaultType.Household, Guid.Empty);
+Console.WriteLine($"Invalid Vault creation: {invalidVault.Error}");
 Console.WriteLine("Domain-only demonstration: nothing is persisted and Vault access is not implemented.");

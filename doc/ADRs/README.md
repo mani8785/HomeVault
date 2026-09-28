@@ -17,6 +17,7 @@ Use stable sequential IDs. Git history versions each document. Once accepted, pr
 | [0005](0005-guard-clauses.md) | Ardalis.GuardClauses input guards | Accepted 2026-09-28 |
 | [0006](0006-asset-attributes.md) | Initial Asset attribute contract | Accepted 2026-09-28 |
 | [0007](0007-sensitive-attributes.md) | Explicit sensitivity and deliberate attribute reads | Accepted 2026-09-28; partially supersedes ADR-0006 |
+| [0008](0008-vault-creation.md) | Initial Vault creation contract | Accepted 2026-09-28 |
 
 ## Template
 
