@@ -27,6 +27,11 @@ Console.WriteLine($"Valid Vault creation: {vaultResult.IsSuccess}");
 if (vaultResult.Vault is { } vault)
 {
     Console.WriteLine($"Vault state: {vault.Status}; initial role: {vault.Memberships.Single().Role}");
+    var memberId = Guid.NewGuid();
+    Console.WriteLine($"Add member: {vault.AddMember(memberId, VaultRole.Editor)}");
+    Console.WriteLine($"Change member role: {vault.ChangeMemberRole(memberId, VaultRole.Viewer)}");
+    Console.WriteLine($"Remove member: {vault.RemoveMember(memberId)}");
+    Console.WriteLine($"Remove last Owner: {vault.RemoveMember(vault.Memberships.Single().ActorId)}");
 }
 
 var invalidVault = Vault.Create(Guid.NewGuid(), "Example household", VaultType.Household, Guid.Empty);
