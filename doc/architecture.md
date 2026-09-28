@@ -52,3 +52,11 @@ Do not infer that Vault loads or owns every Asset as an in-memory aggregate chil
 ## Deferred decisions
 
 Database engine, ORM adoption, hosting, UI framework, authentication provider, encryption/key management, and event dispatch are undecided. The prior EF Core + SQL Server roadmap is context, not acceptance for this restart.
+
+## Proposed domain boundaries
+
+[ADR-0004](ADRs/0004-domain-language-and-boundaries.md) proposes separate Vault,
+Asset, Relationship, and Reminder roots, with attributes and Evidence metadata
+owned by Asset. It details cross-aggregate ownership and archive consistency,
+including concurrent changes. This proposal awaits owner confirmation and does
+not change the accepted project dependencies above.

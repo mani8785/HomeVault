@@ -13,6 +13,7 @@ Use stable sequential IDs. Git history versions each document. Once accepted, pr
 | [0001](0001-initial-stack.md) | C# / .NET 10 and initial testing stack | Accepted 2026-09-25; NUnit initially confirmed 2026-09-23 |
 | [0002](0002-domain-first-boundaries.md) | Domain-first DDD-lite and project boundaries | Accepted 2026-09-25 |
 | [0003](0003-selective-dependency-injection.md) | Selective dependency injection | Accepted 2026-09-23 |
+| [0004](0004-domain-language-and-boundaries.md) | Domain language and aggregate boundaries | Proposed; HV-04 review pending |
 
 ## Template
 
