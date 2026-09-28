@@ -1,5 +1,7 @@
 # HomeVault documentation
 
+See [HV-12: Vault archive](hv-12-vault-archive.md) for lifecycle behavior, blocked mutations, and remaining application enforcement.
+
 See [HV-11: Vault membership](hv-11-vault-membership.md) for membership invariants, authorization boundaries, and verification.
 
 See [HV-10: Vault creation](hv-10-vault-creation.md) for the initial Owner contract, Asset reference boundary, and validation commands.

@@ -14,5 +14,7 @@ public enum VaultMembershipError
     /// <summary>The actor has no membership in this Vault.</summary>
     MemberNotFound,
     /// <summary>The mutation would remove or demote the final Owner.</summary>
-    LastOwner
+    LastOwner,
+    /// <summary>The Vault is archived and membership mutations are prohibited.</summary>
+    Archived
 }
