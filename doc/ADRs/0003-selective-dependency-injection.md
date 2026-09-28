@@ -1,6 +1,6 @@
 # ADR-0003: Selective dependency injection
 
-Status: Accepted
+Status: Superseded in part by [ADR-0005](0005-guard-clauses.md) on 2026-09-28 for the base-library-only restriction; selective DI remains accepted
 Created: 2026-09-23
 Accepted: 2026-09-23
 

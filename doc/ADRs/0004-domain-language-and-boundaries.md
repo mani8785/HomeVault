@@ -1,8 +1,8 @@
 # ADR-0004: Domain language and aggregate boundaries
 
-Status: Proposed
+Status: Accepted
 Created: 2026-09-25
-Accepted: Not yet
+Accepted: 2026-09-28
 Issue: [HV-04 / #8](https://github.com/mani8785/HomeVault/issues/8)
 
 ## Context
@@ -14,7 +14,7 @@ Vault rules in [context](../context.md) need concrete examples and confirmation
 before the first domain types are implemented. This ADR supplements ADR-0002;
 it does not change the accepted stack or selective dependency injection decision.
 
-## Proposed vocabulary
+## Vocabulary
 
 All examples below are fictional and contain no credentials or account numbers.
 
@@ -31,7 +31,7 @@ A person represented as an Asset is distinct from an authenticated actor or
 Vault member. Recording a person does not create an account or grant access.
 Actor identity mapping remains an authentication decision under HV-22.
 
-## Proposed aggregate boundaries
+## Aggregate boundaries
 
 An aggregate is the unit whose own invariants must hold after every successful
 mutation. References between aggregates use Guid identities, not loaded object
@@ -44,16 +44,16 @@ graphs. Do not add generic aggregate frameworks solely to express this proposal.
 | Relationship | Source/target identities and the association's own metadata. | One VaultId and two AssetIds; Application checks endpoint existence and ownership. |
 | Reminder | Its action, due information, and lifecycle once defined in HV-15. | One VaultId and one AssetId; Application checks existence and ownership. |
 
-Evidence is proposed as an Asset-owned component because it has no independent
+Evidence is an Asset-owned component because it has no independent
 lifecycle in the current stories. External files remain external resources;
 removing a reference does not delete a file. Revisit this boundary if shared
 Evidence or large independent collections become a concrete requirement.
 
-Relationships and Reminders are proposed as separate roots so they can be
+Relationships and Reminders are separate roots so they can be
 queried or changed without loading every association into an Asset or Vault.
 Their detailed schemas and lifecycle rules remain later story decisions.
 
-## Proposed consistency and ownership rules
+## Consistency and ownership rules
 
 1. A persisted Asset belongs to exactly one Vault. Cross-vault moves are not an
    initial operation. Registration validates the referenced Vault through the
@@ -78,23 +78,23 @@ Their detailed schemas and lifecycle rules remain later story decisions.
    deletion that could orphan Relationships or Reminders. When deletion is
    scoped, decide rejection, archival, or cleanup semantics before implementation.
 
-## Historical Vault rules proposed for reconfirmation
+## Reconfirmed Vault rules
 
 - Types: Personal, Household, Organization. Type describes context, not a
-  separate permission system. Proposed default: all three use the same role
+  separate permission system. All three use the same role
   rules; Personal does not imply a hard one-member limit without confirmation.
 - States: Active and Archived. Creation produces Active with an initial Owner
   atomically. Reject invalid identifiers and unsupported type values; detailed
   naming constraints are refined before constructors are implemented.
 - Membership: one membership per actor per Vault. Mutations go through Vault;
   removing or demoting the last Owner is rejected without partial changes.
-- Roles: Owner, Administrator, Editor, Viewer, with the proposed matrix below.
+- Roles: Owner, Administrator, Editor, Viewer, with the accepted matrix below.
 - Archival: only an Owner can transition Active to Archived. Existing authorized
   members may still read. All record and membership mutations are blocked after
   archival, including attributes, Evidence, Relationships, and Reminders.
-  Repeating archive is proposed as a no-op after access checks. Reactivation,
+  Repeating archive is a no-op after access checks. Reactivation,
   permanent deletion, and emergency membership recovery are out of initial scope.
-  The inability to revoke membership in an archived Vault needs explicit review.
+  The owner explicitly accepted the inability to revoke membership in an archived Vault on 2026-09-28.
 
 | Operation on an Active Vault | Owner | Administrator | Editor | Viewer |
 | --- | --- | --- | --- | --- |
@@ -105,13 +105,13 @@ Their detailed schemas and lifecycle rules remain later story decisions.
 | Change Vault metadata or archive | Yes | No | No | No |
 
 An Administrator cannot promote themselves or alter another Administrator or
-Owner. This is a proposed operation matrix, not implemented authorization.
+Owner. This is an accepted operation matrix, not implemented authorization.
 Sensitive-value access must be refined in HV-09/HV-22; ordinary read permission
 must not be interpreted as approval to expose every sensitive value.
 
 ## Review examples and future acceptance scenarios
 
-| Scenario | Proposed outcome |
+| Scenario | Agreed outcome |
 | --- | --- |
 | Create a Household Vault with an initial Owner. | Active Vault with exactly the supplied initial membership; no Assets need to be loaded. |
 | Add a second membership for the same actor. | Reject; existing membership remains unchanged. |
@@ -123,7 +123,7 @@ must not be interpreted as approval to expose every sensitive value.
 | Archive races with an Asset update. | Serialize the operations or reject/revalidate the stale update; a write cannot commit after archive based on an earlier Active check. |
 
 These are review scenarios for future tests, not claims that these features or
-behavioral tests exist today. Current NUnit tests cover scaffold architecture.
+behavioral tests exist today. Current NUnit tests cover scaffold architecture and the separately authorized minimal Asset creation slice.
 
 ## Alternatives and consequences
 
@@ -134,18 +134,18 @@ Embedding Relationships and Reminders in Asset is initially simpler but makes
 independent queries and lifecycles harder. Separate roots add coordination cost;
 revisit if real usage does not justify it. Evidence stays within Asset initially.
 
-The proposed strict archive behavior preserves the historical no-mutation rule
+The accepted strict archive behavior preserves the historical no-mutation rule
 but prevents membership recovery. Allowing Owner-only recovery would be a
 reasonable alternative, requiring an explicit exception and dedicated tests.
 
 ## Review checklist and remaining decisions
 
-The following decisions require owner confirmation before this ADR is Accepted:
+The owner explicitly confirmed all four decisions on 2026-09-28:
 
-- [ ] Confirm the six definitions and the distinction between a person Asset and an actor.
-- [ ] Confirm the root/component boundaries and same-Vault reference rules.
-- [ ] Confirm all three Vault types, common role rules, the operation matrix, and last-Owner protection.
-- [ ] Confirm strict archive behavior, retained reads, repeated archive as a no-op, and deferred recovery/reactivation.
+- [x] Confirm the six definitions and the distinction between a person Asset and an actor.
+- [x] Confirm the root/component boundaries and same-Vault reference rules.
+- [x] Confirm all three Vault types, common role rules, the operation matrix, and last-Owner protection.
+- [x] Confirm strict archive behavior, retained reads, repeated archive as a no-op, and deferred recovery/reactivation.
 
 Later stories refine Asset naming and required fields (HV-07), attribute rules
 and sensitivity (HV-08/HV-09), Relationship kinds/self-links/duplicates (HV-13),
@@ -155,7 +155,8 @@ These are explicit boundaries on this proposal, not silently chosen defaults.
 
 HV-04 has no linked subtasks. Its small deliverable consists of this vocabulary,
 boundary proposal, and confirmation checklist; duplicate sub-issues are unnecessary.
-The request authorized preparing and delivering this proposal through a PR, not
-recording new product decisions as already accepted. Keep #8 open until review
-resolves the checklist. After acceptance, implement only the next authorized
-slice; do not scaffold generic domain types or advance automatically to HV-05.
+PR #34 delivered the proposal and was merged on 2026-09-28. The owner then explicitly confirmed all four decisions in the implementation task, including the strict archive policy, and authorized minimal Asset creation for HV-05. This records acceptance rather than inferring it from the merge. Further slices still require their own authorization.
+
+## HV-05 implementation scope
+
+On 2026-09-28, the owner selected minimal Asset creation with a supplied non-empty Guid and a nonblank name as the first concrete operation. This domain-only slice neither persists an Asset nor establishes Vault ownership. The single-Vault invariant still applies when persistence and Vault integration are implemented. See the [HV-05 implementation record](../hv-05-domain-building-blocks.md).

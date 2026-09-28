@@ -25,7 +25,7 @@ flowchart BT
     style Tests fill:#f1f5f9,stroke:#64748b,color:#0f172a
 ```
 
-Domain has no project dependencies or framework-specific business logic. .NET base libraries are allowed. Tests initially reference Domain and Application only. Revisit infrastructure testing when persistence is introduced.
+Domain has no project dependencies or framework-specific business logic. .NET base libraries and Ardalis.GuardClauses are allowed under [ADR-0005](ADRs/0005-guard-clauses.md); other Domain package dependencies remain prohibited. Tests initially reference Domain and Application only. Revisit infrastructure testing when persistence is introduced.
 
 ## Dependency injection
 
@@ -53,10 +53,9 @@ Do not infer that Vault loads or owns every Asset as an in-memory aggregate chil
 
 Database engine, ORM adoption, hosting, UI framework, authentication provider, encryption/key management, and event dispatch are undecided. The prior EF Core + SQL Server roadmap is context, not acceptance for this restart.
 
-## Proposed domain boundaries
+## Accepted domain boundaries
 
-[ADR-0004](ADRs/0004-domain-language-and-boundaries.md) proposes separate Vault,
+[ADR-0004](ADRs/0004-domain-language-and-boundaries.md) records separate Vault,
 Asset, Relationship, and Reminder roots, with attributes and Evidence metadata
 owned by Asset. It details cross-aggregate ownership and archive consistency,
-including concurrent changes. This proposal awaits owner confirmation and does
-not change the accepted project dependencies above.
+including concurrent changes. The owner accepted this decision on 2026-09-28. It does not change the accepted project dependencies above.

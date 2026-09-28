@@ -17,7 +17,7 @@ The earlier project moved away from a CRUD-first prototype toward domain-first D
 
 ## Prior requirements to preserve
 
-Use Guid identifiers, manual validation, lightweight domain events, and project-owned domain/result patterns. Core logic stays independent of UI, persistence, and frameworks. Encryption and storage protection belong in Infrastructure; secrets must not be casually logged or exposed. Prefer use cases and domain behavior over generic CRUD operations. Add dependencies only for a clear need.
+Use Guid identifiers, explicit business validation, lightweight domain events, and project-owned domain/result patterns. Standard input guards use Ardalis.GuardClauses under [ADR-0005](ADRs/0005-guard-clauses.md). Core logic stays independent of UI, persistence, and frameworks. Encryption and storage protection belong in Infrastructure; secrets must not be casually logged or exposed. Prefer use cases and domain behavior over generic CRUD operations. Add dependencies only for a clear need.
 
 The earlier Vault plan included Personal/Household/Organization types, Active/Archived states, and Owner/Administrator/Editor/Viewer roles. Creation supplies an initial owner; duplicate members are forbidden; the last owner cannot be removed or demoted; archived vaults cannot be modified. Vault controls member mutations. Review these rules again when implementing Vaults.
 
@@ -43,9 +43,7 @@ The earlier Vault plan included Personal/Household/Organization types, Active/Ar
 
 Every step requires review before the next one. A phase can contain several small review steps.
 
-## Domain decision under review
+## Accepted domain decision
 
 [ADR-0004: Domain language and aggregate boundaries](ADRs/0004-domain-language-and-boundaries.md)
-provides concrete examples, proposed consistency rules, and the Vault rules to
-reconfirm for HV-04. It is Proposed; the historical rules above are not newly
-accepted merely because they are described there.
+records the concrete examples, consistency rules, and Vault rules explicitly accepted on 2026-09-28, including strict archive behavior. HV-05 implements only the separately authorized minimal Asset creation operation.
