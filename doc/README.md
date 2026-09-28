@@ -1,5 +1,7 @@
 # HomeVault documentation
 
+See [HV-11: Vault membership](hv-11-vault-membership.md) for membership invariants, authorization boundaries, and verification.
+
 See [HV-10: Vault creation](hv-10-vault-creation.md) for the initial Owner contract, Asset reference boundary, and validation commands.
 
 See [HV-09: Sensitive attributes](hv-09-sensitive-attributes.md) for classification, deliberate reads, redaction, and verification.
