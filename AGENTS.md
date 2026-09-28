@@ -26,7 +26,7 @@ The old project's reported completed phases are context, not code in this restar
 
 ## Decision and implementation boundaries
 
-ADR-0001 and ADR-0002 were accepted on 2026-09-25, and the owner authorized HV-03 solution scaffolding. The repository now contains the five-project .NET 10 foundation with NUnit architecture tests. Selective dependency injection in ADR-0003 remains accepted. Domain implementation is a subsequent reviewed step.
+ADR-0001 and ADR-0002 were accepted on 2026-09-25, and the owner authorized HV-03 solution scaffolding. The repository now contains the five-project .NET 10 foundation with NUnit architecture tests. Selective dependency injection in ADR-0003 remains accepted. ADR-0004 was explicitly accepted on 2026-09-28. HV-05 implements the authorized minimal Asset creation operation; additional domain behavior remains a subsequent reviewed step.
 Check the ADRs for updates instead of treating this snapshot as permanent.
 
 Discuss architectural choices with the user and record them as Proposed ADRs

@@ -43,9 +43,7 @@ The earlier Vault plan included Personal/Household/Organization types, Active/Ar
 
 Every step requires review before the next one. A phase can contain several small review steps.
 
-## Domain decision under review
+## Accepted domain decision
 
 [ADR-0004: Domain language and aggregate boundaries](ADRs/0004-domain-language-and-boundaries.md)
-provides concrete examples, proposed consistency rules, and the Vault rules to
-reconfirm for HV-04. It is Proposed; the historical rules above are not newly
-accepted merely because they are described there.
+records the concrete examples, consistency rules, and Vault rules explicitly accepted on 2026-09-28, including strict archive behavior. HV-05 implements only the separately authorized minimal Asset creation operation.
