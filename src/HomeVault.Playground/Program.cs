@@ -1,5 +1,6 @@
 using HomeVault.Domain.Assets;
 using HomeVault.Domain.Relationships;
+using HomeVault.Domain.Reminders;
 using HomeVault.Domain.Vaults;
 
 var result = Asset.Create(Guid.Parse("74128a99-4eb5-4b75-8ad1-6bf2d2c8453d"), "Example bicycle");
@@ -56,3 +57,13 @@ if (relationshipResult.Relationship is { } relationship)
     Console.WriteLine($"Relationship state after removal: {relationship.Status}");
 }
 Console.WriteLine("Domain-only demonstration: nothing is persisted and Vault access is not implemented.");
+var exampleDue = new DateTimeOffset(2026, 10, 1, 12, 0, 0, TimeSpan.Zero);
+var reminderResult = Reminder.Create(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), "Example insurance review", exampleDue);
+Console.WriteLine($"Valid Reminder creation: {reminderResult.IsSuccess}");
+if (reminderResult.Reminder is { } reminder)
+{
+    Console.WriteLine($"Update Reminder: {reminder.Update("Updated example review", exampleDue)}");
+    Console.WriteLine($"Reminder overdue at supplied later instant: {reminder.IsOverdue(exampleDue.AddMinutes(1))}");
+    Console.WriteLine($"Complete Reminder: {reminder.Complete()}; state: {reminder.Status}");
+    Console.WriteLine($"Update completed Reminder: {reminder.Update("Another example", exampleDue)}");
+}
