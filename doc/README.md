@@ -1,5 +1,7 @@
 # HomeVault documentation
 
+See [HV-15: Reminder domain operations](hv-15-reminders.md) for UTC due times, lifecycle rules, and validation.
+
 See [HV-14: Evidence domain slice](hv-14-evidence.md) for URL/note metadata, removal, and deferred file/document resolution.
 
 See [HV-13: Relationship domain slice](hv-13-asset-relationships.md) for creation/removal and the remaining integration requirements.

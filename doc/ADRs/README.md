@@ -20,6 +20,7 @@ Use stable sequential IDs. Git history versions each document. Once accepted, pr
 | [0008](0008-vault-creation.md) | Initial Vault creation contract | Accepted 2026-09-28 |
 | [0009](0009-asset-relationships.md) | Initial Asset relationship contract | Accepted 2026-09-28 |
 | [0010](0010-asset-evidence.md) | Initial Asset evidence contract | Accepted 2026-09-29 |
+| [0011](0011-asset-reminders.md) | Initial Asset reminder contract | Accepted 2026-09-29 |
 
 ## Template
 
