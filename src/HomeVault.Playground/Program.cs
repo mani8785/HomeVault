@@ -17,6 +17,11 @@ if (result.Asset is { } asset)
     asset.AddAttribute("Private note", "Fictional demonstration text", AttributeSensitivity.Sensitive);
     var privateNote = asset.Attributes.Single();
     Console.WriteLine($"Sensitive attribute: {privateNote.IsSensitive}; value: {privateNote.Value ?? "[redacted]"}");
+    var evidenceId = Guid.NewGuid();
+    Console.WriteLine($"Add URL evidence: {asset.AddEvidence(evidenceId, "Example receipt", EvidenceKind.Url, "https://example.invalid/receipt")}");
+    Console.WriteLine($"Evidence kind: {asset.Evidence.Single().Kind}");
+    Console.WriteLine($"Remove evidence: {asset.RemoveEvidence(evidenceId)}");
+    Console.WriteLine($"Add note evidence: {asset.AddEvidence(Guid.NewGuid(), "Example note", EvidenceKind.Note, "Fictional supporting text")}");
 }
 
 var invalidResult = Asset.Create(Guid.Empty, "Example bicycle");
