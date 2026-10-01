@@ -13,16 +13,22 @@ internal static class DurableJourney
 
     internal static async Task<int> RunAsync(string[] args)
     {
-        if (args.Length != 3 || args[1] is not ("migrate" or "create" or "read"))
+        var copy = args.Length == 4 && args[1] is "backup" or "restore";
+        if (!copy && (args.Length != 3 || args[1] is not ("migrate" or "create" or "read")))
         {
-            Console.Error.WriteLine("Usage: storage migrate|create|read <absolute-database-path>");
+            Console.Error.WriteLine("Usage: storage migrate|create|read <absolute-path>, or storage backup|restore <source> <new-destination>");
             return 2;
         }
         try
         {
             var database = new SqliteDatabase(args[2]);
             var actor = new ExampleCurrentActor(ActorId);
-            if (args[1] == "migrate")
+            if (copy)
+            {
+                await database.CreateVerifiedCopyAsync(args[3]);
+                Console.WriteLine("Verified copy created; source preserved. Verify expected records before switching paths.");
+            }
+            else if (args[1] == "migrate")
             {
                 await database.MigrateAsync();
                 Console.WriteLine("Explicit schema migration completed.");
