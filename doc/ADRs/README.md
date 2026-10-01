@@ -44,6 +44,13 @@ Core API, first Vault/Asset journey, and explicit HV-22 dependency boundary.
 Accepted 2026-10-01. UI implementation is parked in Todo until HV-22 authentication
 and authorization is addressed.
 
+## Accepted authentication decision
+
+[ADR-0020](0020-local-accounts-vault-authorization.md): invitation-only local
+accounts, Identity/cookie recommendation, Vault permissions and staged operation
+coverage for HV-22. Accepted 2026-10-01; implementation tasks #69 through #72
+remain outstanding.
+
 ## Template
 
 - Title and ID
