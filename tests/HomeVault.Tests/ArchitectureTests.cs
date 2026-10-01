@@ -13,6 +13,7 @@ public sealed class ArchitectureTests
     [TestCase("src/HomeVault.Infrastructure/HomeVault.Infrastructure.csproj", new[] { "HomeVault.Application", "HomeVault.Domain" })]
     [TestCase("src/HomeVault.Playground/HomeVault.Playground.csproj", new[] { "HomeVault.Application", "HomeVault.Infrastructure", "HomeVault.Domain" })]
     [TestCase("tests/HomeVault.Tests/HomeVault.Tests.csproj", new[] { "HomeVault.Domain", "HomeVault.Application" })]
+    [TestCase("tests/HomeVault.Infrastructure.Tests/HomeVault.Infrastructure.Tests.csproj", new[] { "HomeVault.Domain", "HomeVault.Application", "HomeVault.Infrastructure" })]
     public void ProjectReferencesStayWithinApprovedBoundaries(string projectPath, string[] allowedDependencies)
     {
         var fullPath = Path.Combine(RepositoryRoot, projectPath);

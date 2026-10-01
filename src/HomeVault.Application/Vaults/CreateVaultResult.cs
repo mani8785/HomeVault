@@ -1,14 +1,14 @@
 namespace HomeVault.Application.Vaults;
 
 /// <summary>Contains an immutable created-Vault view or a safe application error.</summary>
-/// <remarks>Success means domain creation only, not persistence.</remarks>
+/// <remarks>Success means repository acceptance; durability depends on the adapter.</remarks>
 public sealed class CreateVaultResult
 {
     internal CreateVaultResult(CreatedVault vault) => Vault = vault;
 
     internal CreateVaultResult(CreateVaultError error) => Error = error;
 
-    /// <summary>Gets whether transient creation succeeded.</summary>
+    /// <summary>Gets whether the repository accepted the new Vault.</summary>
     public bool IsSuccess => Vault is not null;
 
     /// <summary>Gets the immutable view on success, or null on failure.</summary>

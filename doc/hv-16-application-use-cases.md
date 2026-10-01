@@ -1,5 +1,7 @@
 # HV-16: First application use case
 
+HV-18 replaces this step's transient synchronous call with async repository-backed creation; see [the current implementation](hv-18-in-memory-infrastructure.md). The original HV-16 record below describes its historical scope.
+
 Issue: [#20](https://github.com/mani8785/HomeVault/issues/20).
 Contract: accepted [ADR-0012](ADRs/0012-first-application-use-case.md).
 

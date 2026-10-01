@@ -1,5 +1,7 @@
 # HomeVault documentation
 
+See [HV-18: In-memory infrastructure](hv-18-in-memory-infrastructure.md) for async application creation, adapter lifetime, isolation, and terminal verification.
+
 See [HV-17: Repository contracts](hv-17-repository-contracts.md) for the storage-independent Vault insertion boundary and planned follow-ups.
 
 See [HV-16: First application use case](hv-16-application-use-cases.md) for actor-bound transient Vault creation and verification.

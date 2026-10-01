@@ -1,6 +1,6 @@
 # ADR-0012: Create a Vault for the current actor
 
-Status: Accepted
+Status: Accepted; transient-success semantics and synchronous entry point superseded by [ADR-0014](0014-in-memory-vault-infrastructure.md) on 2026-10-01
 Created: 2026-09-29
 Accepted: 2026-09-29
 Issue: [HV-16 / #20](https://github.com/mani8785/HomeVault/issues/20)
