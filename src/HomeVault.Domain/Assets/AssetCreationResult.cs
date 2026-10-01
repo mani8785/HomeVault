@@ -2,7 +2,7 @@ namespace HomeVault.Domain.Assets;
 
 /// <summary>Reports the outcome of creating an Asset without throwing for invalid input.</summary>
 /// <remarks>
-/// Instances are produced by <see cref="Asset.Create"/>. A success contains an
+/// Instances are produced by Asset creation factories. A success contains an
 /// Asset and no error; a failure contains an error and no partially valid Asset.
 /// This concrete result does not introduce a generic domain result framework.
 /// </remarks>

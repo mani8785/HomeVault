@@ -3,12 +3,23 @@ using HomeVault.Domain.Vaults;
 
 namespace HomeVault.Infrastructure.Vaults;
 
-/// <summary>Stores creation snapshots for the lifetime of this repository instance.</summary>
-/// <remarks>Share an instance to share its store. Data is not durable; no authentication or public read API is provided.</remarks>
+/// <summary>Stores creation snapshots for the lifetime of its backing in-memory store.</summary>
+/// <remarks>Share an explicit store across adapters, or use a private store through the default constructor. Data is not durable; no authentication or public read API is provided.</remarks>
 public sealed class InMemoryVaultRepository : IVaultRepository
 {
-    private readonly object _gate = new();
-    private readonly Dictionary<Guid, StoredVault> _vaults = new();
+    private readonly InMemoryHomeVaultStore _store;
+
+    /// <summary>Creates a repository with a private empty store.</summary>
+    public InMemoryVaultRepository() : this(new InMemoryHomeVaultStore()) { }
+
+    /// <summary>Creates a repository sharing an explicitly supplied store.</summary>
+    /// <param name="store">The process-local store shared with other adapters.</param>
+    /// <exception cref="ArgumentNullException">The store is null.</exception>
+    public InMemoryVaultRepository(InMemoryHomeVaultStore store)
+    {
+        ArgumentNullException.ThrowIfNull(store);
+        _store = store;
+    }
 
     /// <inheritdoc />
     public Task<VaultAddOutcome> AddAsync(Vault vault, CancellationToken cancellationToken)
@@ -21,26 +32,21 @@ public sealed class InMemoryVaultRepository : IVaultRepository
             throw new ArgumentException("Expected an Active Vault with one Owner membership.", nameof(vault));
         }
 
-        var snapshot = new StoredVault(vault.Id, vault.Name, vault.Type, vault.Status, memberships[0].ActorId);
-        lock (_gate)
+        var snapshot = InMemoryHomeVaultStore.Snapshot(vault);
+        lock (_store.Gate)
         {
             cancellationToken.ThrowIfCancellationRequested();
-            return Task.FromResult(_vaults.TryAdd(vault.Id, snapshot)
+            return Task.FromResult(_store.Vaults.TryAdd(vault.Id, snapshot)
                 ? VaultAddOutcome.Added
                 : VaultAddOutcome.IdentityConflict);
         }
     }
 
-    internal StoredVault? Inspect(Guid id)
+    internal InMemoryHomeVaultStore.StoredVault? Inspect(Guid id)
     {
-        lock (_gate)
+        lock (_store.Gate)
         {
-            return _vaults.GetValueOrDefault(id);
+            return _store.Vaults.GetValueOrDefault(id);
         }
-    }
-
-    internal sealed record StoredVault(Guid Id, string Name, VaultType Type, VaultStatus Status, Guid OwnerId)
-    {
-        public override string ToString() => nameof(StoredVault);
     }
 }

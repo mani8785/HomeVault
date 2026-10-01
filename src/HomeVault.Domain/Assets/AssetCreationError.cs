@@ -10,5 +10,8 @@ public enum AssetCreationError
     EmptyIdentity,
 
     /// <summary>The supplied name was null, empty, or consisted entirely of whitespace.</summary>
-    BlankName
+    BlankName,
+
+    /// <summary>The supplied owning Vault identity was an empty Guid.</summary>
+    EmptyVaultIdentity
 }
