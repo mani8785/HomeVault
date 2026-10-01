@@ -1,5 +1,9 @@
 # HomeVault documentation
 
+See [ADR-0020: Local accounts and authorization](ADRs/0020-local-accounts-vault-authorization.md)
+for the active HV-22 proposal. Local invitation-only accounts are confirmed;
+authentication implementation awaits acceptance of the detailed design.
+
 See [ADR-0019: Browser UI](ADRs/0019-browser-ui-first-journey.md) for the accepted
 HV-23 Angular/API separation, first journey, and authentication dependency boundary.
 UI implementation is parked while HV-22 authentication takes priority.
