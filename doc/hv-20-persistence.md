@@ -13,6 +13,18 @@ Tests upgrade a populated first schema and reopen it with the latest model.
 Normal application operations never migrate automatically. SqliteDatabase's
 explicit migration entry point refuses unknown/non-prefix histories.
 
+## Durable adapters (#53)
+
+SqliteVaultRepository and SqliteAssetRegistrationStore implement the existing
+contracts with one context per call. Non-deferred SQLite transactions reserve
+the write lock before duplicate or access checks. Existing records are never
+overwritten. Registration checks membership, role, and archive state before
+global identity conflicts; other database failures propagate. Foreign keys are
+enabled on every connection. A five-second provider lock timeout bounds waits;
+there is no automatic application retry. Cancellation is checked before opening
+and after acquiring the write reservation; provider operations may block until
+the bounded lock wait ends. Future state changes must use compatible transactions.
+
 From the repository root:
 
 ```powershell
