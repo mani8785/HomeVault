@@ -78,7 +78,7 @@ public sealed class InMemoryVaultRepositoryTests
 
     [TestCase(false)]
     [TestCase(true)]
-    public void InvalidCreationStateDoesNotWrite(bool archived)
+    public async Task InvalidCreationStateDoesNotWrite(bool archived)
     {
         var vault = NewVault();
         if (archived)
@@ -86,14 +86,14 @@ public sealed class InMemoryVaultRepositoryTests
         else
             vault.AddMember(Guid.NewGuid(), VaultRole.Editor);
         var repository = new InMemoryVaultRepository();
-        Assert.ThrowsAsync<ArgumentException>(async () => await repository.AddAsync(vault, default));
+        await Assert.ThrowsAsync<ArgumentException>(async () => await repository.AddAsync(vault, default));
         Assert.That(repository.Inspect(vault.Id), Is.Null);
     }
 
     [Test]
-    public void NullIsRejected()
+    public async Task NullIsRejected()
     {
-        Assert.ThrowsAsync<ArgumentNullException>(async () => await new InMemoryVaultRepository().AddAsync(null!, default));
+        await Assert.ThrowsAsync<ArgumentNullException>(async () => await new InMemoryVaultRepository().AddAsync(null!, default));
     }
 
     [Test]
@@ -101,7 +101,7 @@ public sealed class InMemoryVaultRepositoryTests
     {
         var repository = new InMemoryVaultRepository();
         var vault = NewVault();
-        Assert.ThrowsAsync<OperationCanceledException>(async () => await repository.AddAsync(vault, new CancellationToken(true)));
+        await Assert.ThrowsAsync<OperationCanceledException>(async () => await repository.AddAsync(vault, new CancellationToken(true)));
         Assert.That(repository.Inspect(vault.Id), Is.Null);
         Assert.That(await repository.AddAsync(vault, default), Is.EqualTo(VaultAddOutcome.Added));
     }

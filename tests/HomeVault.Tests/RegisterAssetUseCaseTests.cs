@@ -83,28 +83,28 @@ public sealed class RegisterAssetUseCaseTests
     }
 
     [Test]
-    public void NullInputsAndPreCancellationAvoidWork()
+    public async Task NullInputsAndPreCancellationAvoidWork()
     {
         var actor = new Actor { Id = Guid.NewGuid() };
         var store = new Store();
         Assert.Throws<ArgumentNullException>(() => new RegisterAssetUseCase(null!, store));
         Assert.Throws<ArgumentNullException>(() => new RegisterAssetUseCase(actor, null!));
         var useCase = new RegisterAssetUseCase(actor, store);
-        Assert.ThrowsAsync<ArgumentNullException>(() => useCase.ExecuteAsync(null!));
-        Assert.ThrowsAsync<OperationCanceledException>(() => useCase.ExecuteAsync(Request(), new CancellationToken(true)));
+        await Assert.ThrowsAsync<ArgumentNullException>(() => useCase.ExecuteAsync(null!));
+        await Assert.ThrowsAsync<OperationCanceledException>(() => useCase.ExecuteAsync(Request(), new CancellationToken(true)));
         Assert.That(actor.Reads, Is.Zero);
         Assert.That(store.Calls, Is.Zero);
     }
 
     [TestCase(false)]
     [TestCase(true)]
-    public void StorageExceptionsPropagateWithoutRetry(bool cancellation)
+    public async Task StorageExceptionsPropagateWithoutRetry(bool cancellation)
     {
         var completion = new TaskCompletionSource<AssetRegistrationOutcome>();
         var failure = cancellation ? (Exception)new OperationCanceledException() : new IOException("Unavailable.");
         completion.SetException(failure);
         var store = new Store { Completion = completion };
-        var actual = Assert.CatchAsync<Exception>(() => new RegisterAssetUseCase(new Actor { Id = Guid.NewGuid() }, store).ExecuteAsync(Request()));
+        var actual = await Assert.CatchAsync<Exception>(() => new RegisterAssetUseCase(new Actor { Id = Guid.NewGuid() }, store).ExecuteAsync(Request()));
         Assert.That(actual, Is.SameAs(failure));
         Assert.That(store.Calls, Is.EqualTo(1));
     }

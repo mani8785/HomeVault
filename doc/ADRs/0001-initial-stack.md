@@ -1,6 +1,7 @@
 # ADR-0001: Initial language, runtime, and testing stack
 
 Status: Accepted
+NUnit version superseded by [ADR-0016](0016-nunit-5-upgrade.md) on 2026-10-01; the original specification below is preserved.
 Created: 2026-09-23
 Accepted: 2026-09-25 (NUnit initially confirmed 2026-09-23)
 
