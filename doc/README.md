@@ -1,8 +1,8 @@
 # HomeVault documentation
 
 See [ADR-0018: Sensitive-value encryption](ADRs/0018-sensitive-value-encryption.md)
-for the proposed HV-21 threat model, key recovery choices, and implementation test
-plan. Encryption is not implemented; the proposal awaits owner acceptance.
+for the accepted HV-21 threat model, key recovery choices, and implementation test
+plan. Encryption is not implemented; linked tasks track the remaining work.
 
 See [durable persistence implementation](hv-20-persistence.md) for reviewed migration tooling and terminal validation.
 

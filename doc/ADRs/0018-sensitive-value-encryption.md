@@ -1,7 +1,8 @@
 # ADR-0018: Sensitive-value encryption and key recovery
 
-Status: Proposed
+Status: Accepted
 Created: 2026-10-01
+Accepted: 2026-10-01
 Issue: [HV-21 / #25](https://github.com/mani8785/HomeVault/issues/25)
 
 ## Current state and scope
@@ -12,7 +13,7 @@ attribute values in Domain; deliberate ReadValue access remains possible.
 and Asset identity/VaultId/name. SqliteAssetRegistrationStore rejects Assets
 with attributes or Evidence. Neither the database nor its backups are encrypted.
 
-HV-21 is a decision issue with no existing implementation subtasks. This proposal
+HV-21 is a decision issue with the implementation subtasks linked below. This decision
 defines a future protection boundary and test plan; it does not add encryption,
 attribute persistence, authentication, packages, or migrations. Attribute storage
 needs a separately reviewed application operation and schema before integration.
@@ -130,7 +131,12 @@ connection-string setting to the current provider is not an encryption solution.
 
 ## Tasks after acceptance, in dependency order
 
-These are proposed slices, not yet tracker sub-issues or authorization to implement.
+Implementation slices created after acceptance:
+
+- [HV-21.1 / #63](https://github.com/mani8785/HomeVault/issues/63): envelope and key lifecycle contracts.
+- [HV-21.2 / #64](https://github.com/mani8785/HomeVault/issues/64): Windows custody and portable recovery; depends on #63.
+- [HV-21.3 / #65](https://github.com/mani8785/HomeVault/issues/65): authorized attribute persistence; depends on #63 and #64.
+- [HV-21.4 / #66](https://github.com/mani8785/HomeVault/issues/66): rotation and recovery; depends on the preceding slices.
 
 1. **Envelope and key lifecycle:** finalize encoding, nonce bounds, key-store and
    recovery interfaces, dependency versions, secure provisioning, and safe failures.
@@ -157,14 +163,14 @@ verification, and passing PR CI. Existing 259 tests exercise current behavior;
 they do not verify future encryption. No claim of secret-free diagnostics for the
 new design is established until its integration and failure-path tests execute.
 
-## Confirmation required
+## Confirmation
 
-Confirm the copied-file threat model and visible metadata, field encryption,
-initial Windows key custody, and rotation/retention responsibilities. Portable
-recovery with a separately stored recovery key is confirmed; the rest of this
-architecture remains Proposed.
-Issue #25 remains open until the decision is explicitly agreed. No merge is
-authorized by this proposal.
+The owner explicitly confirmed the remaining ADR choices on 2026-10-01,
+including the copied-file threat model, visible metadata, field encryption,
+Windows key custody, and rotation/retention responsibilities. Portable recovery
+with a separately stored recovery key was confirmed earlier the same day.
+This records architectural acceptance, not completed encryption or permission
+to merge. Detailed contracts and verification remain in the linked slices.
 
 ## References
 

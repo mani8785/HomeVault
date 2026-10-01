@@ -61,12 +61,12 @@ Infrastructure checks current membership, role, and lifecycle together with
 insertion under one lock. No public read/update API or authentication provider
 is implied. Future stored Vault mutations must serialize through this boundary.
 
-SQLite with EF Core is accepted for the local-first version under [ADR-0017](ADRs/0017-durable-local-persistence.md). Hosting, UI, authentication provider, encryption/key management, event dispatch, and a future server database remain undecided.
+SQLite with EF Core is accepted for the local-first version under [ADR-0017](ADRs/0017-durable-local-persistence.md). Hosting, UI, authentication provider, event dispatch, and a future server database remain undecided.
 
-[ADR-0018](ADRs/0018-sensitive-value-encryption.md) proposes Sensitive attribute
-encryption and key lifecycle rules. Portable backup recovery with a separately
-stored recovery key is confirmed; the overall design awaits acceptance and has
-no implementation yet.
+[ADR-0018](ADRs/0018-sensitive-value-encryption.md) accepts Sensitive attribute
+encryption, Windows key custody, and portable backup recovery with a separately
+stored recovery key. The design was accepted on 2026-10-01; implementation remains
+in the linked follow-up tasks.
 
 ## Accepted domain boundaries
 
