@@ -31,6 +31,12 @@ Use stable sequential IDs. Git history versions each document. Once accepted, pr
 
 [ADR-0017](0017-durable-local-persistence.md): SQLite with EF Core for durable local persistence, accepted 2026-10-01. Implementation slices are linked in the decision.
 
+## Accepted encryption decision
+
+[ADR-0018](0018-sensitive-value-encryption.md): Sensitive-value encryption,
+key custody, recovery, rotation, and verification plan for HV-21. Accepted
+2026-10-01; implementation slices #63 through #66 remain outstanding.
+
 ## Template
 
 - Title and ID
