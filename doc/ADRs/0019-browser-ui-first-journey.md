@@ -1,7 +1,8 @@
 # ADR-0019: Browser UI and first Vault/Asset journey
 
-Status: Proposed
+Status: Accepted
 Created: 2026-10-01
+Accepted: 2026-10-01
 Issue: [HV-23 / #27](https://github.com/mani8785/HomeVault/issues/27)
 
 ## Confirmed direction
@@ -10,8 +11,9 @@ The owner selected a browser-based application and deferred HV-21 implementation
 ADR-0018 is accepted and merged; its four implementation tasks remain parked.
 The owner subsequently selected Angular with an independent ASP.NET Core API
 so another frontend can replace Angular without rewriting business logic.
-This direction is confirmed. Detailed contracts and the prototype boundary below
-remain Proposed. Hosting and authentication providers are not selected here.
+The owner accepted the design on 2026-10-01 and directed that UI implementation
+wait for HV-22 authentication. Hosting and authentication providers are not
+selected here.
 
 ## Options and recommendation
 
@@ -72,8 +74,9 @@ introduce browser-stored bearer tokens or choose a cookie login provider here.
 
 ## Dependency on authentication
 
-HV-23 lists HV-22 as a dependency. Choosing the UI and building a fictional local
-prototype can proceed first only if the owner accepts this explicit scope:
+HV-23 lists HV-22 as a dependency. The owner chose to complete authentication
+first and park UI implementation in Todo. The following development-prototype
+constraints remain documented for test/demo use, not permission to bypass HV-22:
 
 - Development-only, loopback-only prototype with a fixed server-owned fictional
   actor and a dedicated fictional SQLite database outside the repository.
@@ -87,8 +90,9 @@ prototype can proceed first only if the owner accepts this explicit scope:
   Local-only binding alone is not proof of security against local processes or
   malicious browser requests; verify the development safeguards explicitly.
 
-Alternatively, complete HV-22 before any executable UI. No silent removal of its
-dependency is proposed. Encryption remains deferred; no sensitive fields are added.
+Complete HV-22 before the first executable UI. Its accepted identity mechanism
+must replace the fictional actor for the user journey. Encryption remains
+deferred; no sensitive fields are added.
 
 ## First journey
 
@@ -168,13 +172,14 @@ blanket approval to add scripts. Review generated template files before committi
 Document terminal setup/run/stop commands and expected URLs after implementation.
 No scripts, UI host, new packages, or schema changes are introduced by this ADR.
 
-## Acceptance needed
+## Confirmation and sequencing
 
-Angular with an independent ASP.NET Core API is confirmed by the owner. The
-updated transport contract, built-in host DI, three-operation journey, and
-fictional prototype preceding HV-22 are presented for review. Keep the overall
-ADR Proposed until these remaining boundaries are confirmed. No implementation
-or scaffolding is included in this revision.
+The owner accepted Angular with an independent ASP.NET Core API, the transport
+contract, built-in host DI and three-operation journey on 2026-10-01, authorized
+merging this decision PR, and explicitly parked HV-23 implementation in Todo.
+HV-22 authentication and authorization is the next active requirement; the
+earlier option to deliver the fictional UI first is not the selected sequence.
+No implementation or scaffolding is included in this decision.
 
 ## References
 
