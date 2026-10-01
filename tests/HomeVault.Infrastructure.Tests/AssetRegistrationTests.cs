@@ -126,14 +126,14 @@ public sealed class AssetRegistrationTests
     [TestCase(0)]
     [TestCase(1)]
     [TestCase(2)]
-    public void RejectsUnboundOrPrepopulatedAssets(int kind)
+    public async Task RejectsUnboundOrPrepopulatedAssets(int kind)
     {
         var memory = new InMemoryHomeVaultStore();
         var adapter = new InMemoryAssetRegistrationStore(memory);
         var asset = kind == 0 ? Asset.Create(Guid.NewGuid(), "Example").Asset! : Asset.Create(Guid.NewGuid(), Guid.NewGuid(), "Example").Asset!;
         if (kind == 1) asset.AddAttribute("Material", "Steel", AttributeSensitivity.Ordinary);
         if (kind == 2) asset.AddEvidence(Guid.NewGuid(), "Note", EvidenceKind.Note, "Example");
-        Assert.ThrowsAsync<ArgumentException>(async () => await adapter.RegisterAsync(asset, Guid.NewGuid(), default));
+        await Assert.ThrowsAsync<ArgumentException>(async () => await adapter.RegisterAsync(asset, Guid.NewGuid(), default));
         Assert.That(adapter.Inspect(asset.Id), Is.Null);
     }
 
@@ -148,9 +148,9 @@ public sealed class AssetRegistrationTests
         var asset = Asset.Create(Guid.NewGuid(), vault.Id, "Example").Asset!;
         Assert.Throws<ArgumentNullException>(() => new InMemoryAssetRegistrationStore(null!));
         Assert.Throws<ArgumentNullException>(() => new InMemoryVaultRepository(null!));
-        Assert.ThrowsAsync<ArgumentNullException>(async () => await adapter.RegisterAsync(null!, owner, default));
-        Assert.ThrowsAsync<ArgumentException>(async () => await adapter.RegisterAsync(asset, Guid.Empty, default));
-        Assert.ThrowsAsync<OperationCanceledException>(async () => await adapter.RegisterAsync(asset, owner, new CancellationToken(true)));
+        await Assert.ThrowsAsync<ArgumentNullException>(async () => await adapter.RegisterAsync(null!, owner, default));
+        await Assert.ThrowsAsync<ArgumentException>(async () => await adapter.RegisterAsync(asset, Guid.Empty, default));
+        await Assert.ThrowsAsync<OperationCanceledException>(async () => await adapter.RegisterAsync(asset, owner, new CancellationToken(true)));
         Assert.That(adapter.Inspect(asset.Id), Is.Null);
         Assert.That(await adapter.RegisterAsync(asset, owner, default), Is.EqualTo(AssetRegistrationOutcome.Added));
     }
@@ -185,7 +185,7 @@ public sealed class AssetRegistrationTests
             }
         }
         if (cancel)
-            Assert.CatchAsync<OperationCanceledException>(async () => await pending);
+            await Assert.CatchAsync<OperationCanceledException>(async () => await pending);
         else
             Assert.That(await pending, Is.EqualTo(AssetRegistrationOutcome.VaultArchived));
         Assert.That(adapter.Inspect(asset.Id), Is.Null);
