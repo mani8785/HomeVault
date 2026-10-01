@@ -1,6 +1,6 @@
 # HomeVault documentation
 
-Review [ADR-0017: Durable local persistence](ADRs/0017-durable-local-persistence.md) for the proposed SQLite/EF Core choice, migration/backup policy, and validation scope. No provider is accepted yet.
+See [ADR-0017: Durable local persistence](ADRs/0017-durable-local-persistence.md) for the accepted SQLite/EF Core choice, migration/backup policy, and implementation slices. Durable storage is not implemented yet.
 
 See [HV-19: Connected Playground journey](hv-19-playground-scenario.md) for Vault-bound Asset registration, atomic access checks, and executable verification.
 

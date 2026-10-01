@@ -1,7 +1,8 @@
 # ADR-0017: Durable local persistence and migration strategy
 
-Status: Proposed
+Status: Accepted
 Created: 2026-10-01
+Accepted: 2026-10-01
 Issue: [HV-20 / #24](https://github.com/mani8785/HomeVault/issues/24)
 
 ## Context and confirmed target
@@ -9,7 +10,7 @@ Issue: [HV-20 / #24](https://github.com/mani8785/HomeVault/issues/24)
 The owner selected local single-user Playground first, shared/server use later.
 HV-19 already creates Vaults and registers Assets through storage-independent
 Application contracts. Data currently disappears with the in-memory store.
-The usage target is confirmed; the provider and ORM below await acceptance.
+The owner confirmed the full decision after reviewing the Redis comparison.
 
 ## Alternatives and recommendation
 
@@ -53,16 +54,15 @@ it does not replace a durability policy.
 
 For the current modest local journey, these operational and consistency costs
 outweigh a demonstrated benefit. Redis can be reconsidered for a concrete future
-requirement; adding a cache or second service now is not proposed. This feedback
-endorses the recommendation, while the full migration/backup/reload decision
-remains Proposed pending its review.
+requirement; adding a cache or second service now is not proposed. The owner
+subsequently confirmed the full migration/backup/reload decision on 2026-10-01.
 
 Sources: [Redis JSON](https://redis.io/docs/latest/develop/data-types/json/),
 [transactions](https://redis.io/docs/latest/develop/using-commands/transactions/),
 [persistence](https://redis.io/docs/latest/operate/oss_and_stack/management/persistence/),
 and [eviction](https://redis.io/docs/latest/develop/reference/eviction/).
 
-## Proposed boundaries and first schema
+## Accepted boundaries and first schema
 
 1. Use SQLite with EF Core in Infrastructure only. Keep Domain and Application
    free of provider types, DbContext, mapping attributes, and ORM dependencies.
@@ -166,15 +166,20 @@ Reference: [EF Core testing strategy](https://learn.microsoft.com/ef/core/testin
 
 ## Acceptance and subsequent scope
 
-This PR delivers the decision proposal only and references, rather than closes,
-HV-20. After explicit acceptance, create concrete implementation slices for:
-schema/tooling and migrations; durable contract adapters and concurrency tests;
-actor-scoped inspection and two-process Playground; backup/restore validation.
-These are candidate work areas, not created or authorized implementation tasks.
+This PR records the accepted decision and references, rather than closes, HV-20.
+The following implementation slices were created after acceptance:
+
+- [HV-20.1 / #52](https://github.com/mani8785/HomeVault/issues/52): schema, tooling, and migrations.
+- [HV-20.2 / #53](https://github.com/mani8785/HomeVault/issues/53): durable adapters and concurrency tests; depends on #52.
+- [HV-20.3 / #54](https://github.com/mani8785/HomeVault/issues/54): actor-scoped inspection and two-process reload; depends on #53.
+- [HV-20.4 / #55](https://github.com/mani8785/HomeVault/issues/55): backup/restore validation; depends on #52 and #54.
+
+HV-20 remains open until save/reload and ownership isolation are verified.
 Each slice needs concrete criteria and review; no database deployment, new
 script, server hosting, or production authentication is implied.
 
 ## Confirmation
 
-Only the local single-user usage target is confirmed. SQLite, EF Core, the
-transaction protocol, migration/backup policy, and reload scope remain Proposed.
+The owner explicitly confirmed SQLite with EF Core, the transaction protocol,
+migration/backup policy, and reload scope on 2026-10-01 after the Redis comparison.
+This records acceptance, not completed implementation or permission to merge.
