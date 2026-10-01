@@ -1,5 +1,7 @@
 # HV-07: Register and inspect an Asset
 
+The original domain-only scope below is extended by [HV-19](hv-19-playground-scenario.md), which registers Vault-bound Assets through Application and shared in-memory storage.
+
 Issue: [#11](https://github.com/mani8785/HomeVault/issues/11)
 
 ## Scope and completed tasks

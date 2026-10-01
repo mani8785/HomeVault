@@ -54,6 +54,13 @@ Do not infer that Vault loads or owns every Asset as an in-memory aggregate chil
 
 ## Deferred decisions
 
+Under [ADR-0015](ADRs/0015-vault-bound-asset-registration.md), Playground shares
+one InMemoryHomeVaultStore between the Vault repository and Asset registration
+adapter. Application owns the purpose-specific atomic registration contract;
+Infrastructure checks current membership, role, and lifecycle together with
+insertion under one lock. No public read/update API or authentication provider
+is implied. Future stored Vault mutations must serialize through this boundary.
+
 Database engine, ORM adoption, hosting, UI framework, authentication provider, encryption/key management, and event dispatch are undecided. The prior EF Core + SQL Server roadmap is context, not acceptance for this restart.
 
 ## Accepted domain boundaries
