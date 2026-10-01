@@ -45,7 +45,8 @@ DI container, or event-dispatch library merely because an older plan mentioned i
   .NET base libraries and the explicitly approved Ardalis.GuardClauses utility are allowed. Encryption and storage belong in Infrastructure.
 - Follow the accepted dependency direction: Application references
   Domain; Infrastructure references Application/Domain; Playground composes them;
-  initial tests reference Domain/Application. Never introduce reverse dependencies.
+  HomeVault.Tests references Domain/Application; the separate HomeVault.Infrastructure.Tests
+  may also reference Infrastructure under ADR-0014. Never introduce reverse dependencies.
 - Use constructor injection where explicit collaborators improve clarity or tests.
   Add interfaces only for a concrete boundary or substitution need. Application
   owns technical contracts and Infrastructure implements them. Prefer manual wiring

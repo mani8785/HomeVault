@@ -97,7 +97,7 @@ jobs:
           if ($reports.Count -eq 0) { throw 'No TRX reports produced. Add NUnit tests and a compatible test adapter.' }
           $executed = 0
           foreach ($report in $reports) {
-              [xml]$xml = Get-Content $report.FullName -Raw
+              [xml]$xml = Get-Content -LiteralPath $report.FullName -Raw
               $executed += [int]$xml.TestRun.ResultSummary.Counters.executed
           }
           if ($executed -eq 0) { throw 'No tests executed.' }

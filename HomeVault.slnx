@@ -6,6 +6,7 @@
     <Project Path="src/HomeVault.Playground/HomeVault.Playground.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/HomeVault.Infrastructure.Tests/HomeVault.Infrastructure.Tests.csproj" />
     <Project Path="tests/HomeVault.Tests/HomeVault.Tests.csproj" />
   </Folder>
 </Solution>
