@@ -37,6 +37,13 @@ Use stable sequential IDs. Git history versions each document. Once accepted, pr
 key custody, recovery, rotation, and verification plan for HV-21. Accepted
 2026-10-01; implementation slices #63 through #66 remain outstanding.
 
+## Accepted browser UI decision
+
+[ADR-0019](0019-browser-ui-first-journey.md): Angular with an independent ASP.NET
+Core API, first Vault/Asset journey, and explicit HV-22 dependency boundary.
+Accepted 2026-10-01. UI implementation is parked in Todo until HV-22 authentication
+and authorization is addressed.
+
 ## Template
 
 - Title and ID
