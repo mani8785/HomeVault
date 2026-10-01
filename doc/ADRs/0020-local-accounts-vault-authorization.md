@@ -1,7 +1,8 @@
 # ADR-0020: Invitation-only local accounts and Vault authorization
 
-Status: Proposed
+Status: Accepted
 Created: 2026-10-01
+Accepted: 2026-10-01
 Issue: [HV-22 / #26](https://github.com/mani8785/HomeVault/issues/26)
 
 ## Confirmed direction and current coverage
@@ -146,19 +147,27 @@ ADR-0017. Recheck authorization on every read; no cached view is a permission gr
    Sensitive operations remain blocked until their policy/encryption dependency
    is resolved. Keep the parent open while any required operation is outstanding.
 
-Create linked task issues after architectural acceptance. Each implementation PR
+Linked implementation tasks, in dependency order:
+
+- [HV-22.1 / #69](https://github.com/mani8785/HomeVault/issues/69): Identity storage and session keys.
+- [HV-22.2 / #70](https://github.com/mani8785/HomeVault/issues/70): invitation-only accounts and cookies; depends on #69.
+- [HV-22.3 / #71](https://github.com/mani8785/HomeVault/issues/71): authenticated Vault/Asset API; depends on #69 and #70.
+- [HV-22.4 / #72](https://github.com/mani8785/HomeVault/issues/72): remaining application operations; depends on #71 and needs bounded subtask refinement.
+
+Each implementation PR
 needs NUnit integration tests with real SQLite and HTTP cookies, safe fictional
 fixtures, restore/format/Release build, and passing CI. Add Windows checks for
 actual OS key protection. Keep host DI in composition, no new helper scripts
 without separate approval, and no authentication bypass in the normal API host.
 
-## Acceptance needed
+## Confirmation
 
-Local invitation-only accounts are confirmed. Identity with secure cookie sessions,
-operator-only invitation/recovery, proposed session/password/lockout limits,
-Identity schema placement and phased operation coverage remain Proposed. Confirm
-these details before adding dependencies or authentication code. This ADR neither
-implements authentication nor authorizes public hosting or secret storage.
+The owner explicitly accepted the detailed design on 2026-10-01: local
+invitation-only accounts, Identity with secure cookie sessions, operator-only
+invitation/recovery, the proposed session/password/lockout limits, Identity schema
+placement and phased operation coverage. This records architectural acceptance;
+the linked tasks track implementation and verification still required. No public
+hosting, secret storage, or merge permission is implied by this acceptance.
 
 ## References
 
