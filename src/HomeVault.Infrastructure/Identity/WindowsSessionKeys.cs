@@ -56,7 +56,8 @@ public sealed class WindowsSessionKeys : IDataProtectionProvider, IDisposable
             using (var services = Build(temporary))
             {
                 var now = DateTimeOffset.UtcNow;
-                services.GetRequiredService<IKeyManager>().CreateNewKey(now, now.AddDays(90));
+                var key = services.GetRequiredService<IKeyManager>().CreateNewKey(now, now.AddDays(90));
+                SecureNewKey(temporary, key);
                 ValidateRing(temporary, services, requireActive: true);
             }
             Directory.Move(staging, directory.FullName);
@@ -115,7 +116,8 @@ public sealed class WindowsSessionKeys : IDataProtectionProvider, IDisposable
             using var services = Build(directory);
             ValidateRing(directory, services, requireActive: false);
             var now = DateTimeOffset.UtcNow;
-            services.GetRequiredService<IKeyManager>().CreateNewKey(now, now.AddDays(90));
+            var key = services.GetRequiredService<IKeyManager>().CreateNewKey(now, now.AddDays(90));
+            SecureNewKey(directory, key);
             ValidateRing(directory, services, requireActive: true);
         }
         catch (Exception exception) when (IsConfigurationFailure(exception))
@@ -140,6 +142,19 @@ public sealed class WindowsSessionKeys : IDataProtectionProvider, IDisposable
             .PersistKeysToFileSystem(directory).ProtectKeysWithDpapi(protectToLocalMachine: false)
             .DisableAutomaticKeyGeneration();
         return services.BuildServiceProvider();
+    }
+
+    [SupportedOSPlatform("windows")]
+    private static void SecureNewKey(DirectoryInfo directory, IKey key)
+    {
+        // Elevated Windows processes can otherwise create files owned by Administrators.
+        // Normalize only the key just created; never repair an untrusted existing ring.
+        using var identity = WindowsIdentity.GetCurrent();
+        var security = new FileSecurity();
+        security.SetOwner(identity.User!);
+        security.SetAccessRuleProtection(true, false);
+        security.AddAccessRule(new FileSystemAccessRule(identity.User!, FileSystemRights.FullControl, AccessControlType.Allow));
+        new FileInfo(Path.Combine(directory.FullName, $"key-{key.KeyId:D}.xml")).SetAccessControl(security);
     }
 
     private static DirectoryInfo ValidatePath(string path)

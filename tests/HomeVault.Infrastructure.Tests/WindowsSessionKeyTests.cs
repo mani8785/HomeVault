@@ -42,6 +42,7 @@ public sealed class WindowsSessionKeyTests
     [Platform("Win")]
     public void ProtectedKeysReopenAndRenewWithoutLosingOldPayloads()
     {
+        if (!OperatingSystem.IsWindows()) return;
         WindowsSessionKeys.Initialize(_keys);
         string payload;
         using (var first = WindowsSessionKeys.Open(_keys))
@@ -55,6 +56,17 @@ public sealed class WindowsSessionKeyTests
         Assert.That(File.ReadAllBytes(keyFile), Is.EqualTo(before));
         WindowsSessionKeys.Renew(_keys);
         Assert.That(Directory.GetFiles(_keys, "key-*.xml").Length, Is.EqualTo(2));
+        using var identity = WindowsIdentity.GetCurrent();
+        foreach (var file in new DirectoryInfo(_keys).GetFiles("key-*.xml"))
+        {
+            var security = file.GetAccessControl();
+            Assert.That(security.GetOwner(typeof(SecurityIdentifier)), Is.EqualTo(identity.User));
+            Assert.That(security.AreAccessRulesProtected, Is.True);
+            var grants = new List<IdentityReference>();
+            foreach (FileSystemAccessRule rule in security.GetAccessRules(true, true, typeof(SecurityIdentifier)))
+                if (rule.AccessControlType == AccessControlType.Allow) grants.Add(rule.IdentityReference);
+            Assert.That(grants, Is.EquivalentTo(new[] { identity.User }));
+        }
         using var reopened = WindowsSessionKeys.Open(_keys);
         Assert.That(reopened.CreateProtector("test-session").Unprotect(payload), Is.EqualTo("Fictional session"));
         Assert.Catch<System.Security.Cryptography.CryptographicException>(() => reopened.CreateProtector("different-purpose").Unprotect(payload));

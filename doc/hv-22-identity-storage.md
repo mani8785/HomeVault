@@ -32,6 +32,9 @@ WindowsSessionKeys implements IDataProtectionProvider for eventual host composit
 It uses ASP.NET Core Data Protection and DPAPI CurrentUser. Initialize provisions a
 new ring with a current-user-only directory ACL in a staging directory, then moves
 it into a new destination without overwriting. The parent must already exist.
+Each newly generated key file receives an explicit current-user owner and private
+ACL, including when provisioning or renewal runs from an elevated Windows process.
+Existing ring permissions are validated, never silently repaired.
 Open requires an existing ring, validates owner/permissions and protected XML,
 decrypts all non-revoked keys, and requires an active unexpired key. Missing,
 corrupt, plaintext, inaccessible or expired rings fail safely without replacement.
