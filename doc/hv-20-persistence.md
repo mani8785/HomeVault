@@ -25,6 +25,28 @@ there is no automatic application retry. Cancellation is checked before opening
 and after acquiring the write reservation; provider operations may block until
 the bounded lock wait ends. Future state changes must use compatible transactions.
 
+## Inspection and cross-process verification (#54)
+
+InspectAssetUseCase reads a trusted actor once and returns an immutable view or
+one unavailable (null) result. SqliteAssetInspectionStore joins Asset and current
+membership in one SQL query; all members, including Viewers, may read archived
+Vaults. A prior result does not grant permission for a later read.
+
+Use a fresh fictional database and run each command as a separate process after
+a successful Release build. Create the parent directory first:
+
+```powershell
+$databasePath = "$env:LOCALAPPDATA/HomeVault/fresh-demo.db"
+dotnet run --project src/HomeVault.Playground --configuration Release --no-build -- storage migrate $databasePath
+dotnet run --project src/HomeVault.Playground --configuration Release --no-build -- storage create $databasePath
+dotnet run --project src/HomeVault.Playground --configuration Release --no-build -- storage read $databasePath
+```
+
+Expect `Durable reload and nonmember isolation verified.` The CLI uses fixed
+fictional identities; it is not an authentication provider or general user CLI.
+Repeated create deliberately fails with nonzero exit instead of overwriting data.
+Normal create/read never applies migrations. Errors omit database paths and values.
+
 From the repository root:
 
 ```powershell

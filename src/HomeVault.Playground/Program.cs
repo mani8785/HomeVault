@@ -9,6 +9,18 @@ using HomeVault.Infrastructure;
 using HomeVault.Infrastructure.Assets;
 using HomeVault.Application.Assets;
 
+if (args.Length > 0)
+{
+    if (args[0] != "storage")
+    {
+        Console.Error.WriteLine("Unknown command.");
+        Environment.ExitCode = 2;
+        return;
+    }
+    Environment.ExitCode = await DurableJourney.RunAsync(args);
+    return;
+}
+
 Console.WriteLine("Standalone domain examples (not stored).");
 var result = Asset.Create(Guid.Parse("74128a99-4eb5-4b75-8ad1-6bf2d2c8453d"), "Example bicycle");
 Console.WriteLine($"Valid Asset creation: {result.IsSuccess}");
