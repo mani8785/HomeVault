@@ -5,7 +5,11 @@ using HomeVault.Domain.Reminders;
 using HomeVault.Domain.Vaults;
 using HomeVault.Playground;
 using HomeVault.Infrastructure.Vaults;
+using HomeVault.Infrastructure;
+using HomeVault.Infrastructure.Assets;
+using HomeVault.Application.Assets;
 
+Console.WriteLine("Standalone domain examples (not stored).");
 var result = Asset.Create(Guid.Parse("74128a99-4eb5-4b75-8ad1-6bf2d2c8453d"), "Example bicycle");
 Console.WriteLine($"Valid Asset creation: {result.IsSuccess}");
 if (result.Asset is { } asset)
@@ -71,12 +75,46 @@ if (reminderResult.Reminder is { } reminder)
     Console.WriteLine($"Update completed Reminder: {reminder.Update("Another example", exampleDue)}");
 }
 
-var repository = new InMemoryVaultRepository();
-var createVault = new CreateVaultUseCase(new ExampleCurrentActor(Guid.NewGuid()), repository);
+Console.WriteLine("Connected journey: create a Vault, then register an Asset in it.");
+var store = new InMemoryHomeVaultStore();
+var repository = new InMemoryVaultRepository(store);
+var currentActor = new ExampleCurrentActor(Guid.NewGuid());
+var createVault = new CreateVaultUseCase(currentActor, repository);
 var request = new CreateVaultRequest(Guid.NewGuid(), "Example application Vault", VaultType.Personal);
 var applicationResult = await createVault.ExecuteAsync(request);
 Console.WriteLine($"Application Vault creation: {applicationResult.IsSuccess}; state: {applicationResult.Vault?.Status}");
-Console.WriteLine($"Application duplicate identity: {(await createVault.ExecuteAsync(request)).Error}");
-Console.WriteLine($"Application invalid name: {(await createVault.ExecuteAsync(new CreateVaultRequest(Guid.NewGuid(), " ", VaultType.Personal))).Error}");
+var duplicateVault = await createVault.ExecuteAsync(request);
+Console.WriteLine($"Application duplicate identity: {duplicateVault.Error}");
+var invalidVaultName = await createVault.ExecuteAsync(new CreateVaultRequest(Guid.NewGuid(), " ", VaultType.Personal));
+Console.WriteLine($"Application invalid name: {invalidVaultName.Error}");
 var anonymousCreateVault = new CreateVaultUseCase(new ExampleCurrentActor(null), repository);
-Console.WriteLine($"Application missing actor: {(await anonymousCreateVault.ExecuteAsync(new CreateVaultRequest(Guid.NewGuid(), "Example", VaultType.Personal))).Error}");
+var anonymousVault = await anonymousCreateVault.ExecuteAsync(new CreateVaultRequest(Guid.NewGuid(), "Example", VaultType.Personal));
+Console.WriteLine($"Application missing actor: {anonymousVault.Error}");
+if (!applicationResult.IsSuccess || applicationResult.Vault!.Status != VaultStatus.Active ||
+    duplicateVault.Error != CreateVaultError.IdentityConflict || duplicateVault.Vault is not null ||
+    invalidVaultName.Error != CreateVaultError.BlankName || invalidVaultName.Vault is not null ||
+    anonymousVault.Error != CreateVaultError.Unauthenticated || anonymousVault.Vault is not null)
+    throw new InvalidOperationException("Unexpected Vault journey outcome.");
+var registerAsset = new RegisterAssetUseCase(currentActor, new InMemoryAssetRegistrationStore(store));
+var assetRequest = new RegisterAssetRequest(Guid.NewGuid(), applicationResult.Vault!.Id, "Example bicycle");
+var registration = await registerAsset.ExecuteAsync(assetRequest);
+Console.WriteLine($"Vault-bound Asset registration: {registration.IsSuccess}");
+if (!registration.IsSuccess || registration.Asset!.VaultId != applicationResult.Vault.Id)
+    throw new InvalidOperationException("Expected registration in the created Vault.");
+await ExpectRegistration(assetRequest, RegisterAssetError.IdentityConflict);
+await ExpectRegistration(new RegisterAssetRequest(Guid.NewGuid(), request.Id, " "), RegisterAssetError.BlankName);
+await ExpectRegistration(new RegisterAssetRequest(Guid.NewGuid(), Guid.NewGuid(), "Example"), RegisterAssetError.VaultUnavailable);
+var anonymousRegistration = await new RegisterAssetUseCase(new ExampleCurrentActor(null), new InMemoryAssetRegistrationStore(store))
+    .ExecuteAsync(assetRequest);
+Console.WriteLine($"Asset missing actor: {anonymousRegistration.Error}");
+if (anonymousRegistration.Error != RegisterAssetError.Unauthenticated)
+    throw new InvalidOperationException("Expected missing actor rejection.");
+Console.WriteLine("Connected journey checks passed; storage lasts only for this process.");
+
+async Task ExpectRegistration(RegisterAssetRequest proposed, RegisterAssetError expected)
+{
+    var actual = await registerAsset.ExecuteAsync(proposed);
+    Console.WriteLine($"Asset registration outcome: {actual.Error}");
+    if (actual.Error != expected || actual.Asset is not null)
+        throw new InvalidOperationException("Unexpected registration outcome.");
+}

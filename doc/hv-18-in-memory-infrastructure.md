@@ -1,5 +1,7 @@
 # HV-18: In-memory Vault storage
 
+[HV-19](hv-19-playground-scenario.md) extends this initial delivery with an explicitly shared backing store and Vault-bound Asset registration. The original default constructor still supplies an independent store.
+
 [ADR-0014](ADRs/0014-in-memory-vault-infrastructure.md) was accepted on 2026-10-01.
 CreateVaultUseCase now requires ICurrentActor and IVaultRepository and exposes
 ExecuteAsync(request, cancellationToken). Existing synchronous callers must await

@@ -7,7 +7,8 @@ namespace HomeVault.Domain.Assets;
 /// </summary>
 /// <remarks>
 /// Supports creation, inspection, text attributes, and evidence metadata. Creation does not
-/// persist the record, establish Vault ownership, or authorize access.
+/// persist the record or authorize access. The Vault-bound factory records immutable
+/// ownership; the original factory creates unbound domain-only objects.
 /// </remarks>
 public sealed class Asset
 {
@@ -20,6 +21,42 @@ public sealed class Asset
     {
         _id = new AssetId(id);
         _name = new AssetName(name);
+    }
+
+    private Asset(Guid id, Guid vaultId, string? name)
+    {
+        _id = new AssetId(id);
+        VaultId = Guard.Against.NullOrEmpty(vaultId, nameof(vaultId));
+        _name = new AssetName(name);
+    }
+
+    /// <summary>Gets the immutable owning Vault identity, or null for an unbound domain-only Asset.</summary>
+    /// <remarks>Creation does not verify Vault existence or access. Storage must reject unbound Assets.</remarks>
+    public Guid? VaultId { get; }
+
+    /// <summary>Creates an Asset bound to one Vault, without verifying access or storing it.</summary>
+    /// <param name="id">The non-empty Asset identity.</param>
+    /// <param name="vaultId">The non-empty owning Vault identity, immutable after creation.</param>
+    /// <param name="name">A nonblank name preserved exactly.</param>
+    /// <returns>A complete Asset or safe failure; validates Asset identity, Vault identity, then name.</returns>
+    public static AssetCreationResult Create(Guid id, Guid vaultId, string? name)
+    {
+        try
+        {
+            return new AssetCreationResult(new Asset(id, vaultId, name));
+        }
+        catch (ArgumentException exception) when (exception.ParamName == nameof(id))
+        {
+            return new AssetCreationResult(AssetCreationError.EmptyIdentity);
+        }
+        catch (ArgumentException exception) when (exception.ParamName == nameof(vaultId))
+        {
+            return new AssetCreationResult(AssetCreationError.EmptyVaultIdentity);
+        }
+        catch (ArgumentException exception) when (exception.ParamName == nameof(name))
+        {
+            return new AssetCreationResult(AssetCreationError.BlankName);
+        }
     }
 
     /// <summary>Gets the non-empty identity supplied when the Asset was created.</summary>

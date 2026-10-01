@@ -24,6 +24,7 @@ Use stable sequential IDs. Git history versions each document. Once accepted, pr
 | [0012](0012-first-application-use-case.md) | Create a Vault for the current actor | Accepted 2026-09-29; transient success and synchronous API superseded by ADR-0014 |
 | [0013](0013-vault-repository-contract.md) | Atomic Vault creation repository contract | Accepted 2026-10-01 |
 | [0014](0014-in-memory-vault-infrastructure.md) | In-memory Vault storage and application integration | Accepted 2026-10-01 |
+| [0015](0015-vault-bound-asset-registration.md) | Vault-bound Asset registration in Playground | Accepted 2026-10-01 |
 
 ## Template
 
