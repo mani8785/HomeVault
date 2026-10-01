@@ -1,5 +1,7 @@
 # HV-17: Repository contract for Vault creation
 
+HV-18 now implements this contract and integrates it with Application; see [the current implementation](hv-18-in-memory-infrastructure.md). This record preserves the HV-17 contract-only delivery scope.
+
 [ADR-0013](ADRs/0013-vault-repository-contract.md) was accepted on 2026-10-01.
 Application now owns `IVaultRepository.AddAsync` and `VaultAddOutcome`, using
 only Domain and base-library types. Infrastructure will implement the contract

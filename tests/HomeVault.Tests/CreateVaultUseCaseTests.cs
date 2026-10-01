@@ -11,12 +11,12 @@ public sealed class CreateVaultUseCaseTests
     [TestCase(VaultType.Personal)]
     [TestCase(VaultType.Household)]
     [TestCase(VaultType.Organization)]
-    public void CreatesVaultForCurrentActorAndPreservesMetadata(VaultType type)
+    public async Task CreatesVaultForCurrentActorAndPreservesMetadata(VaultType type)
     {
         var actor = new TestActor { Identity = Guid.NewGuid() };
-        var useCase = new CreateVaultUseCase(actor);
+        var useCase = new CreateVaultUseCase(actor, new TestRepository());
         var id = Guid.NewGuid();
-        var result = useCase.Execute(new CreateVaultRequest(id, "  Example – København  ", type));
+        var result = await useCase.ExecuteAsync(new CreateVaultRequest(id, "  Example – København  ", type));
         Assert.That(result.IsSuccess, Is.True);
         Assert.That(result.Error, Is.EqualTo(CreateVaultError.None));
         Assert.That(result.Vault!.Id, Is.EqualTo(id));
@@ -29,52 +29,60 @@ public sealed class CreateVaultUseCaseTests
 
     [TestCase(false)]
     [TestCase(true)]
-    public void MissingIdentityPrecedesInvalidRequestFields(bool empty)
+    public async Task MissingIdentityPrecedesInvalidRequestFields(bool empty)
     {
         var actor = new TestActor { Identity = empty ? Guid.Empty : null };
-        var result = new CreateVaultUseCase(actor).Execute(new CreateVaultRequest(Guid.Empty, null, (VaultType)99));
+        var repository = new TestRepository();
+        var result = await new CreateVaultUseCase(actor, repository).ExecuteAsync(new CreateVaultRequest(Guid.Empty, null, (VaultType)99));
+        Assert.That(repository.Calls, Is.Zero);
         AssertFailure(result, CreateVaultError.Unauthenticated);
         Assert.That(actor.Reads, Is.EqualTo(1));
     }
 
     [Test]
-    public void EmptyVaultIdentityPrecedesOtherDomainFailures()
+    public async Task EmptyVaultIdentityPrecedesOtherDomainFailures()
     {
-        var useCase = new CreateVaultUseCase(new TestActor { Identity = Guid.NewGuid() });
-        AssertFailure(useCase.Execute(new CreateVaultRequest(Guid.Empty, null, (VaultType)99)), CreateVaultError.EmptyIdentity);
+        var repository = new TestRepository();
+        var useCase = new CreateVaultUseCase(new TestActor { Identity = Guid.NewGuid() }, repository);
+        AssertFailure(await useCase.ExecuteAsync(new CreateVaultRequest(Guid.Empty, null, (VaultType)99)), CreateVaultError.EmptyIdentity);
+        Assert.That(repository.Calls, Is.Zero);
     }
 
     [TestCase(null)]
     [TestCase("")]
     [TestCase(" \t\r\n")]
     [TestCase("\u2003")]
-    public void InvalidNamePrecedesInvalidType(string? name)
+    public async Task InvalidNamePrecedesInvalidType(string? name)
     {
-        var useCase = new CreateVaultUseCase(new TestActor { Identity = Guid.NewGuid() });
-        AssertFailure(useCase.Execute(new CreateVaultRequest(Guid.NewGuid(), name, (VaultType)99)), CreateVaultError.BlankName);
+        var repository = new TestRepository();
+        var useCase = new CreateVaultUseCase(new TestActor { Identity = Guid.NewGuid() }, repository);
+        AssertFailure(await useCase.ExecuteAsync(new CreateVaultRequest(Guid.NewGuid(), name, (VaultType)99)), CreateVaultError.BlankName);
+        Assert.That(repository.Calls, Is.Zero);
     }
 
     [TestCase(-1)]
     [TestCase(3)]
-    public void InvalidTypeMapsToApplicationError(int type)
+    public async Task InvalidTypeMapsToApplicationError(int type)
     {
-        var useCase = new CreateVaultUseCase(new TestActor { Identity = Guid.NewGuid() });
-        AssertFailure(useCase.Execute(new CreateVaultRequest(Guid.NewGuid(), "Example", (VaultType)type)), CreateVaultError.InvalidType);
+        var repository = new TestRepository();
+        var useCase = new CreateVaultUseCase(new TestActor { Identity = Guid.NewGuid() }, repository);
+        AssertFailure(await useCase.ExecuteAsync(new CreateVaultRequest(Guid.NewGuid(), "Example", (VaultType)type)), CreateVaultError.InvalidType);
+        Assert.That(repository.Calls, Is.Zero);
     }
 
     [Test]
-    public void IdentityIsReadOncePerExecutionAndNeverCachedAcrossCalls()
+    public async Task IdentityIsReadOncePerExecutionAndNeverCachedAcrossCalls()
     {
         var firstId = Guid.NewGuid();
         var secondId = Guid.NewGuid();
         var actor = new TestActor { Identity = firstId };
-        var useCase = new CreateVaultUseCase(actor);
+        var useCase = new CreateVaultUseCase(actor, new TestRepository());
         var request = new CreateVaultRequest(Guid.NewGuid(), "Example", VaultType.Personal);
-        var first = useCase.Execute(request);
+        var first = await useCase.ExecuteAsync(request);
         actor.Identity = secondId;
-        var second = useCase.Execute(request);
+        var second = await useCase.ExecuteAsync(new CreateVaultRequest(Guid.NewGuid(), "Example", VaultType.Personal));
         actor.Identity = null;
-        AssertFailure(useCase.Execute(request), CreateVaultError.Unauthenticated);
+        AssertFailure(await useCase.ExecuteAsync(request), CreateVaultError.Unauthenticated);
         Assert.That(first.Vault!.InitialOwnerId, Is.EqualTo(firstId));
         Assert.That(second.Vault!.InitialOwnerId, Is.EqualTo(secondId));
         Assert.That(actor.Reads, Is.EqualTo(3));
@@ -83,17 +91,18 @@ public sealed class CreateVaultUseCaseTests
     [Test]
     public void NullProgrammingInputsAreRejectedExplicitly()
     {
-        Assert.Throws<ArgumentNullException>(() => new CreateVaultUseCase(null!));
+        Assert.Throws<ArgumentNullException>(() => new CreateVaultUseCase(null!, new TestRepository()));
         var actor = new TestActor();
-        Assert.Throws<ArgumentNullException>(() => new CreateVaultUseCase(actor).Execute(null!));
+        Assert.Throws<ArgumentNullException>(() => new CreateVaultUseCase(actor, null!));
+        Assert.ThrowsAsync<ArgumentNullException>(() => new CreateVaultUseCase(actor, new TestRepository()).ExecuteAsync(null!));
         Assert.That(actor.Reads, Is.Zero);
     }
 
     [Test]
-    public void DiagnosticsDoNotFormatRequestOrResultMetadata()
+    public async Task DiagnosticsDoNotFormatRequestOrResultMetadata()
     {
         var request = new CreateVaultRequest(Guid.NewGuid(), "Private fictional label", VaultType.Personal);
-        var result = new CreateVaultUseCase(new TestActor { Identity = Guid.NewGuid() }).Execute(request);
+        var result = await new CreateVaultUseCase(new TestActor { Identity = Guid.NewGuid() }, new TestRepository()).ExecuteAsync(request);
         Assert.That(request.ToString(), Is.EqualTo("CreateVaultRequest"));
         Assert.That(result.ToString(), Is.EqualTo("CreateVaultResult"));
         Assert.That(result.Vault!.ToString(), Is.EqualTo("CreatedVault"));
@@ -104,6 +113,76 @@ public sealed class CreateVaultUseCaseTests
         Assert.That(result.IsSuccess, Is.False);
         Assert.That(result.Vault, Is.Null);
         Assert.That(result.Error, Is.EqualTo(error));
+    }
+
+    private sealed class TestRepository : IVaultRepository
+    {
+        public int Calls { get; private set; }
+        public Vault? Received { get; private set; }
+        public CancellationToken Token { get; private set; }
+        public TaskCompletionSource<VaultAddOutcome>? Completion { get; init; }
+        public Task<VaultAddOutcome> AddAsync(Vault vault, CancellationToken cancellationToken)
+        {
+            Calls++;
+            Received = vault;
+            Token = cancellationToken;
+            return Completion?.Task ?? Task.FromResult(VaultAddOutcome.Added);
+        }
+    }
+
+    [Test]
+    public async Task SuccessWaitsForStorageAndPassesOwnerAndCancellation()
+    {
+        var completion = new TaskCompletionSource<VaultAddOutcome>(TaskCreationOptions.RunContinuationsAsynchronously);
+        var repository = new TestRepository { Completion = completion };
+        var actor = new TestActor { Identity = Guid.NewGuid() };
+        using var cancellation = new CancellationTokenSource();
+        var request = new CreateVaultRequest(Guid.NewGuid(), "Example", VaultType.Household);
+        var pending = new CreateVaultUseCase(actor, repository).ExecuteAsync(request, cancellation.Token);
+        Assert.That(pending.IsCompleted, Is.False);
+        Assert.That(repository.Calls, Is.EqualTo(1));
+        Assert.That(repository.Received!.Id, Is.EqualTo(request.Id));
+        Assert.That(repository.Received.Memberships.Single().ActorId, Is.EqualTo(actor.Identity));
+        Assert.That(repository.Token, Is.EqualTo(cancellation.Token));
+        completion.SetResult(VaultAddOutcome.Added);
+        Assert.That((await pending).IsSuccess, Is.True);
+    }
+
+    [Test]
+    public async Task ConflictDoesNotReturnCreatedView()
+    {
+        var completion = new TaskCompletionSource<VaultAddOutcome>();
+        completion.SetResult(VaultAddOutcome.IdentityConflict);
+        var repository = new TestRepository { Completion = completion };
+        var result = await new CreateVaultUseCase(new TestActor { Identity = Guid.NewGuid() }, repository)
+            .ExecuteAsync(new CreateVaultRequest(Guid.NewGuid(), "Example", VaultType.Personal));
+        AssertFailure(result, CreateVaultError.IdentityConflict);
+        Assert.That(repository.Calls, Is.EqualTo(1));
+    }
+
+    [Test]
+    public void PreCancellationDoesNotReadActorOrCallStorage()
+    {
+        var actor = new TestActor { Identity = Guid.NewGuid() };
+        var repository = new TestRepository();
+        Assert.ThrowsAsync<OperationCanceledException>(() => new CreateVaultUseCase(actor, repository)
+            .ExecuteAsync(new CreateVaultRequest(Guid.NewGuid(), "Example", VaultType.Personal), new CancellationToken(true)));
+        Assert.That(actor.Reads, Is.Zero);
+        Assert.That(repository.Calls, Is.Zero);
+    }
+
+    [TestCase(false)]
+    [TestCase(true)]
+    public void StorageFailurePropagatesWithoutRetry(bool cancelled)
+    {
+        var completion = new TaskCompletionSource<VaultAddOutcome>();
+        var failure = cancelled ? (Exception)new OperationCanceledException() : new IOException("Storage unavailable.");
+        completion.SetException(failure);
+        var repository = new TestRepository { Completion = completion };
+        var caught = Assert.CatchAsync<Exception>(() => new CreateVaultUseCase(new TestActor { Identity = Guid.NewGuid() }, repository)
+            .ExecuteAsync(new CreateVaultRequest(Guid.NewGuid(), "Example", VaultType.Personal)));
+        Assert.That(caught, Is.SameAs(failure));
+        Assert.That(repository.Calls, Is.EqualTo(1));
     }
 
     private sealed class TestActor : ICurrentActor

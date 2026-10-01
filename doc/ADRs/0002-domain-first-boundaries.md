@@ -1,5 +1,7 @@
 # ADR-0002: Domain-first DDD-lite and project boundaries
 
+The initial test boundary is supplemented by [ADR-0014](0014-in-memory-vault-infrastructure.md), accepted 2026-10-01, adding a separate Infrastructure test project. The original decision below is preserved.
+
 Status: Superseded in part by [ADR-0005](0005-guard-clauses.md) on 2026-09-28; all other decisions remain accepted
 Created: 2026-09-23
 Accepted: 2026-09-25

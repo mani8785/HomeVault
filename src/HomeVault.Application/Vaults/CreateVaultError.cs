@@ -3,7 +3,7 @@ namespace HomeVault.Application.Vaults;
 /// <summary>Safe failures from the create-Vault use case.</summary>
 public enum CreateVaultError
 {
-    /// <summary>Transient creation succeeded.</summary>
+    /// <summary>The repository accepted the new Vault.</summary>
     None,
     /// <summary>The trusted identity context supplied no non-empty actor identity.</summary>
     Unauthenticated,
@@ -12,5 +12,7 @@ public enum CreateVaultError
     /// <summary>The proposed name is null, empty, or entirely whitespace.</summary>
     BlankName,
     /// <summary>The proposed Vault type is unsupported.</summary>
-    InvalidType
+    InvalidType,
+    /// <summary>The Vault identity already exists; no existing metadata is exposed or overwritten.</summary>
+    IdentityConflict
 }
