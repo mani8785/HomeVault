@@ -1,5 +1,9 @@
 # HomeVault documentation
 
+See [ADR-0018: Sensitive-value encryption](ADRs/0018-sensitive-value-encryption.md)
+for the proposed HV-21 threat model, key recovery choices, and implementation test
+plan. Encryption is not implemented; the proposal awaits owner acceptance.
+
 See [durable persistence implementation](hv-20-persistence.md) for reviewed migration tooling and terminal validation.
 
 See [ADR-0017: Durable local persistence](ADRs/0017-durable-local-persistence.md) for the accepted SQLite/EF Core choice, migration/backup policy, and implementation slices. Durable storage is not implemented yet.

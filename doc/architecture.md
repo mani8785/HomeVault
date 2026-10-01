@@ -63,6 +63,11 @@ is implied. Future stored Vault mutations must serialize through this boundary.
 
 SQLite with EF Core is accepted for the local-first version under [ADR-0017](ADRs/0017-durable-local-persistence.md). Hosting, UI, authentication provider, encryption/key management, event dispatch, and a future server database remain undecided.
 
+[ADR-0018](ADRs/0018-sensitive-value-encryption.md) proposes Sensitive attribute
+encryption and key lifecycle rules. Portable backup recovery with a separately
+stored recovery key is confirmed; the overall design awaits acceptance and has
+no implementation yet.
+
 ## Accepted domain boundaries
 
 [ADR-0004](ADRs/0004-domain-language-and-boundaries.md) records separate Vault,
