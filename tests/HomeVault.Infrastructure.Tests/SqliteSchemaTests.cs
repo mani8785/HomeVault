@@ -52,7 +52,7 @@ public sealed class SqliteSchemaTests
         await _database.MigrateAsync();
         await using var context = _database.CreateContext();
         Assert.That(context.Database.HasPendingModelChanges(), Is.False);
-        Assert.That((await context.Database.GetAppliedMigrationsAsync()).Count(), Is.EqualTo(2));
+        Assert.That(await context.Database.GetAppliedMigrationsAsync(), Is.EqualTo(context.Database.GetMigrations()));
         Assert.That(await context.Assets.CountAsync(), Is.Zero);
     }
 

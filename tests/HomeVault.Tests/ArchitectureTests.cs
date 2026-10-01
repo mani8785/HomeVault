@@ -55,6 +55,14 @@ public sealed class ArchitectureTests
     }
 
     [Test]
+    public void ApplicationHasNoInfrastructureOrWebPackageDependencies()
+    {
+        var application = XDocument.Load(Path.Combine(RepositoryRoot, "src/HomeVault.Application/HomeVault.Application.csproj"));
+        Assert.That(application.Descendants().Where(element =>
+            element.Name.LocalName is "PackageReference" or "FrameworkReference" or "Reference"), Is.Empty);
+    }
+
+    [Test]
     public void SolutionIncludesEverySourceAndTestProject()
     {
         var solution = XDocument.Load(Path.Combine(RepositoryRoot, "HomeVault.slnx"));

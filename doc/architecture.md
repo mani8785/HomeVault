@@ -68,6 +68,12 @@ encryption, Windows key custody, and portable backup recovery with a separately
 stored recovery key. The design was accepted on 2026-10-01; implementation remains
 in the linked follow-up tasks.
 
+Under [ADR-0020](ADRs/0020-local-accounts-vault-authorization.md), Infrastructure
+owns ASP.NET Core Identity storage and Windows-protected session keys. Domain and
+Application remain independent of Identity and web frameworks. The first storage
+slice does not authenticate callers; invitation/login and HTTP composition follow
+in separate tasks. See [HV-22.1](hv-22-identity-storage.md).
+
 ## Accepted domain boundaries
 
 [ADR-0004](ADRs/0004-domain-language-and-boundaries.md) records separate Vault,

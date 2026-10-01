@@ -1,5 +1,8 @@
 # HomeVault documentation
 
+See [HV-22.1: Identity storage](hv-22-identity-storage.md) for the account schema,
+Windows session keys, validation scope and terminal commands.
+
 See [ADR-0020: Local accounts and authorization](ADRs/0020-local-accounts-vault-authorization.md)
 for the accepted HV-22 design. Local invitation-only authentication and Vault
 authorization implementation are tracked in the linked tasks.
