@@ -37,6 +37,12 @@ Use stable sequential IDs. Git history versions each document. Once accepted, pr
 key custody, recovery, rotation, and verification plan for HV-21. Accepted
 2026-10-01; implementation slices #63 through #66 remain outstanding.
 
+## Proposed browser UI decision
+
+[ADR-0019](0019-browser-ui-first-journey.md): Razor Pages recommendation,
+first Vault/Asset journey, and explicit HV-22 dependency boundary. Browser-based
+delivery is confirmed; framework and local prototype scope remain Proposed.
+
 ## Template
 
 - Title and ID
