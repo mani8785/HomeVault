@@ -25,7 +25,6 @@ Use stable sequential IDs. Git history versions each document. Once accepted, pr
 | [0013](0013-vault-repository-contract.md) | Atomic Vault creation repository contract | Accepted 2026-10-01 |
 | [0014](0014-in-memory-vault-infrastructure.md) | In-memory Vault storage and application integration | Accepted 2026-10-01 |
 | [0015](0015-vault-bound-asset-registration.md) | Vault-bound Asset registration in Playground | Accepted 2026-10-01 |
-
 | [0016](0016-nunit-5-upgrade.md) | NUnit 5 in both test projects | Accepted 2026-10-01; supersedes initial NUnit pin |
 
 ## Template
