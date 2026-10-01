@@ -8,6 +8,19 @@ identities, foreign keys, membership uniqueness, and valid enum states.
 
 ## Schema and migrations (#52)
 
+The schema uses code-first EF Core migrations. `Persistence/Models` contains
+the internal storage records; their existing namespace is retained to preserve
+the model identities in migration snapshots. `Persistence/Configurations`
+contains one `IEntityTypeConfiguration<T>` per record. HomeVaultDbContext
+discovers these mappings with `ApplyConfigurationsFromAssembly`. Add future
+mapping rules to the relevant configuration; extract shared mapping extensions
+only when concrete repeated rules need them. Moving the existing mappings does
+not change the schema or require a migration.
+
+The CLI workflow uses Microsoft.EntityFrameworkCore.Design and the local
+dotnet-ef tool. Microsoft.EntityFrameworkCore.Tools is for Visual Studio Package
+Manager Console commands and is not required for this terminal workflow.
+
 InitialVaults creates Vaults and memberships; AddAssets adds Vault-bound Assets.
 Tests upgrade a populated first schema and reopen it with the latest model.
 Normal application operations never migrate automatically. SqliteDatabase's
