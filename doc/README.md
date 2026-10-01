@@ -1,5 +1,7 @@
 # HomeVault documentation
 
+See [HV-16: First application use case](hv-16-application-use-cases.md) for actor-bound transient Vault creation and verification.
+
 See [HV-15: Reminder domain operations](hv-15-reminders.md) for UTC due times, lifecycle rules, and validation.
 
 See [HV-14: Evidence domain slice](hv-14-evidence.md) for URL/note metadata, removal, and deferred file/document resolution.

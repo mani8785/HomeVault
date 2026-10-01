@@ -1,7 +1,9 @@
+using HomeVault.Application.Vaults;
 using HomeVault.Domain.Assets;
 using HomeVault.Domain.Relationships;
 using HomeVault.Domain.Reminders;
 using HomeVault.Domain.Vaults;
+using HomeVault.Playground;
 
 var result = Asset.Create(Guid.Parse("74128a99-4eb5-4b75-8ad1-6bf2d2c8453d"), "Example bicycle");
 Console.WriteLine($"Valid Asset creation: {result.IsSuccess}");
@@ -56,7 +58,7 @@ if (relationshipResult.Relationship is { } relationship)
     relationship.Remove();
     Console.WriteLine($"Relationship state after removal: {relationship.Status}");
 }
-Console.WriteLine("Domain-only demonstration: nothing is persisted and Vault access is not implemented.");
+Console.WriteLine("Transient demonstration: nothing is persisted and real authentication/Vault access is not implemented.");
 var exampleDue = new DateTimeOffset(2026, 10, 1, 12, 0, 0, TimeSpan.Zero);
 var reminderResult = Reminder.Create(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), "Example insurance review", exampleDue);
 Console.WriteLine($"Valid Reminder creation: {reminderResult.IsSuccess}");
@@ -67,3 +69,10 @@ if (reminderResult.Reminder is { } reminder)
     Console.WriteLine($"Complete Reminder: {reminder.Complete()}; state: {reminder.Status}");
     Console.WriteLine($"Update completed Reminder: {reminder.Update("Another example", exampleDue)}");
 }
+
+var createVault = new CreateVaultUseCase(new ExampleCurrentActor(Guid.NewGuid()));
+var applicationResult = createVault.Execute(new CreateVaultRequest(Guid.NewGuid(), "Example application Vault", VaultType.Personal));
+Console.WriteLine($"Application Vault creation: {applicationResult.IsSuccess}; state: {applicationResult.Vault?.Status}");
+Console.WriteLine($"Application invalid name: {createVault.Execute(new CreateVaultRequest(Guid.NewGuid(), " ", VaultType.Personal)).Error}");
+var anonymousCreateVault = new CreateVaultUseCase(new ExampleCurrentActor(null));
+Console.WriteLine($"Application missing actor: {anonymousCreateVault.Execute(new CreateVaultRequest(Guid.NewGuid(), "Example", VaultType.Personal)).Error}");
