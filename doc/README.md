@@ -1,5 +1,7 @@
 # HomeVault documentation
 
+See [durable persistence implementation](hv-20-persistence.md) for reviewed migration tooling and terminal validation.
+
 See [ADR-0017: Durable local persistence](ADRs/0017-durable-local-persistence.md) for the accepted SQLite/EF Core choice, migration/backup policy, and implementation slices. Durable storage is not implemented yet.
 
 See [HV-19: Connected Playground journey](hv-19-playground-scenario.md) for Vault-bound Asset registration, atomic access checks, and executable verification.

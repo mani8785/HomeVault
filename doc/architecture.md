@@ -61,7 +61,7 @@ Infrastructure checks current membership, role, and lifecycle together with
 insertion under one lock. No public read/update API or authentication provider
 is implied. Future stored Vault mutations must serialize through this boundary.
 
-Database engine, ORM adoption, hosting, UI framework, authentication provider, encryption/key management, and event dispatch are undecided. The prior EF Core + SQL Server roadmap is context, not acceptance for this restart.
+SQLite with EF Core is accepted for the local-first version under [ADR-0017](ADRs/0017-durable-local-persistence.md). Hosting, UI, authentication provider, encryption/key management, event dispatch, and a future server database remain undecided.
 
 ## Accepted domain boundaries
 
