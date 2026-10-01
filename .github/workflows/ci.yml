@@ -18,14 +18,51 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  windows-session-keys:
+    name: Windows session keys
+    runs-on: windows-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-dotnet@v6
+        with:
+          global-json-file: global.json
+      - name: Verify Windows key protection and storage
+        shell: pwsh
+        run: |
+          dotnet restore
+          if ($LASTEXITCODE -ne 0) { throw 'Restore failed.' }
+          dotnet test tests/HomeVault.Infrastructure.Tests --configuration Release --no-restore --logger trx --results-directory TestResults/windows
+          if ($LASTEXITCODE -ne 0) { throw 'Windows integration tests failed.' }
+          $report = Get-ChildItem TestResults/windows -Filter '*.trx' | Select-Object -First 1
+          if (-not $report) { throw 'Windows test report missing.' }
+          [xml]$results = Get-Content -LiteralPath $report.FullName -Raw
+          if ([int]$results.TestRun.ResultSummary.Counters.executed -eq 0 -or
+              [int]$results.TestRun.ResultSummary.Counters.notExecuted -ne 0) {
+              throw 'Windows integration tests must execute without skipped cases.'
+          }
+      - name: Upload Windows test results
+        if: always()
+        uses: actions/upload-artifact@v7
+        with:
+          name: windows-test-results
+          path: TestResults/windows/*.trx
+          if-no-files-found: error
   validate:
     name: Validate
+    needs: windows-session-keys
+    if: always()
     runs-on: ubuntu-latest
     timeout-minutes: 15
     defaults:
       run:
         shell: pwsh
     steps:
+      - name: Require successful Windows checks
+        if: needs.windows-session-keys.result != 'success'
+        run: throw 'Windows integration checks must pass.'
       - uses: actions/checkout@v7
         with:
           persist-credentials: false

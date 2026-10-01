@@ -171,6 +171,10 @@ hosting, secret storage, or merge permission is implied by this acceptance.
 
 ## References
 
+Implementation record: [HV-22.1 storage and session keys](../hv-22-identity-storage.md).
+This first slice adds Identity tables and explicit Windows session-key provisioning;
+the later account and authorization operations remain outstanding.
+
 - [ASP.NET Core Identity](https://learn.microsoft.com/en-us/aspnet/core/security/authentication/identity)
 - [Identity for SPA backends and cookie authentication](https://learn.microsoft.com/en-us/aspnet/core/security/authentication/identity-api-authorization)
 - [Antiforgery protection](https://learn.microsoft.com/en-us/aspnet/core/security/anti-request-forgery)
