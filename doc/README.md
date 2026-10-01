@@ -1,7 +1,7 @@
 # HomeVault documentation
 
 See [ADR-0019: Browser UI](ADRs/0019-browser-ui-first-journey.md) for the proposed
-HV-23 framework, first journey, and authentication dependency boundary.
+HV-23 Angular/API separation, first journey, and authentication dependency boundary.
 
 See [ADR-0018: Sensitive-value encryption](ADRs/0018-sensitive-value-encryption.md)
 for the accepted HV-21 threat model, key recovery choices, and implementation test

@@ -39,9 +39,10 @@ key custody, recovery, rotation, and verification plan for HV-21. Accepted
 
 ## Proposed browser UI decision
 
-[ADR-0019](0019-browser-ui-first-journey.md): Razor Pages recommendation,
-first Vault/Asset journey, and explicit HV-22 dependency boundary. Browser-based
-delivery is confirmed; framework and local prototype scope remain Proposed.
+[ADR-0019](0019-browser-ui-first-journey.md): Angular with an independent ASP.NET
+Core API, first Vault/Asset journey, and explicit HV-22 dependency boundary.
+Frontend/API separation is confirmed; detailed contracts and prototype scope
+remain Proposed.
 
 ## Template
 
