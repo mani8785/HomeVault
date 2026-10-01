@@ -22,6 +22,7 @@ Use stable sequential IDs. Git history versions each document. Once accepted, pr
 | [0010](0010-asset-evidence.md) | Initial Asset evidence contract | Accepted 2026-09-29 |
 | [0011](0011-asset-reminders.md) | Initial Asset reminder contract | Accepted 2026-09-29 |
 | [0012](0012-first-application-use-case.md) | Create a Vault for the current actor | Accepted 2026-09-29 |
+| [0013](0013-vault-repository-contract.md) | Atomic Vault creation repository contract | Accepted 2026-10-01 |
 
 ## Template
 
