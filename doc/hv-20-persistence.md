@@ -77,3 +77,34 @@ migration, or destructive Down migration as a substitute for verified recovery.
 Database paths and backup contents may be private. Do not log connections, enable
 sensitive EF logging, commit database files, or put real secrets in demonstrations.
 Encryption, production authentication, and hosting remain separate work.
+
+## Backup, restore, and migration recovery (#55)
+
+Stop application writers before migration or restore. The explicit backup/restore
+commands use SQLite BackupDatabase with a read-only source. They stage a new
+destination, verify integrity, foreign keys, and known schema history, then
+publish without overwriting. An existing destination is rejected. Backup and
+restore preserve the source; protect all files using appropriate OS permissions.
+
+```powershell
+$backupPath = "$env:LOCALAPPDATA/HomeVault/before-upgrade.db"
+$restoredPath = "$env:LOCALAPPDATA/HomeVault/restored-demo.db"
+dotnet run --project src/HomeVault.Playground --configuration Release --no-build -- storage backup $databasePath $backupPath
+dotnet run --project src/HomeVault.Playground --configuration Release --no-build -- storage restore $backupPath $restoredPath
+dotnet run --project src/HomeVault.Playground --configuration Release --no-build -- storage read $restoredPath
+```
+
+Use new destination names for every run. Verify the expected fictional records
+and membership isolation before switching the configured path. For real data,
+verify the expected records through an authorized read interface; the fixed-ID
+demo command is not a general recovery auditor. Older recognized backups retain
+their schema version. Use a compatible application, or explicitly migrate the
+restored copy after preserving the original backup. Never downgrade the only
+known-good database with Down migrations.
+
+Tests rehearse backup/restore and recovery of a populated prior schema after an
+upgrade. Cancellation, corrupt input, unknown schema, and destination collisions
+must not publish an invalid copy. The backup API is synchronous; cancellation is
+checked around it, not claimed to interrupt native copying. Automatic schedules,
+retention, encryption/key recovery, and production recovery-time objectives are
+not implemented. No personal database is used in tests.
