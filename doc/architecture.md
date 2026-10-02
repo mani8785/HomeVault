@@ -83,7 +83,11 @@ antiforgery and local operator commands. Infrastructure owns Identity operations
 credential storage. HomeVault.Api.Tests references the API and uses framework TestHost
 with real SQLite, separate from the Domain/Application-only tests. Microsoft DI stays
 at the host/Infrastructure boundary; no web dependencies enter Domain/Application.
-See [HV-22.2](hv-22-accounts.md). Vault/Asset HTTP endpoints remain in #71.
+See [HV-22.2](hv-22-accounts.md). Under [HV-22.3](hv-22-authorized-api.md), the API
+also references Application explicitly, supplies request-scoped ICurrentActor from
+validated cookie identity, and calls the three existing use cases through SQLite
+adapters. Versioned transport DTOs and the embedded OpenAPI contract belong to the
+API boundary. No Domain/Application dependency or persistence schema changes.
 
 ## Accepted domain boundaries
 

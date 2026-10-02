@@ -175,8 +175,10 @@ Implementation record: [HV-22.1 storage and session keys](../hv-22-identity-stor
 The first slice adds Identity tables and explicit Windows session-key provisioning.
 [ADR-0021](0021-operator-invitations-recovery.md) supplements the operator workflow
 and anonymous recovery-redemption allowlist. [HV-22.2](../hv-22-accounts.md) adds
-invitation/recovery operations and the cookie API; Vault authorization endpoints
-and remaining operations stay in #71 and #72.
+invitation/recovery operations and the cookie API. [HV-22.3](../hv-22-authorized-api.md)
+binds authenticated actors to CreateVault, RegisterAsset and InspectAsset, with
+current SQLite role/lifecycle checks. Remaining operations stay in #72; this does
+not mark the entire HV-22 story complete.
 
 - [ASP.NET Core Identity](https://learn.microsoft.com/en-us/aspnet/core/security/authentication/identity)
 - [Identity for SPA backends and cookie authentication](https://learn.microsoft.com/en-us/aspnet/core/security/authentication/identity-api-authorization)

@@ -3,6 +3,8 @@
     <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <ProjectReference Include="../HomeVault.Application/HomeVault.Application.csproj" />
     <ProjectReference Include="../HomeVault.Infrastructure/HomeVault.Infrastructure.csproj" />
+    <EmbeddedResource Include="../../doc/openapi/homevault-v1.json" LogicalName="HomeVault.Api.homevault-v1.json" />
   </ItemGroup>
 </Project>
