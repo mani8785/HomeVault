@@ -183,6 +183,10 @@ No implementation or scaffolding is included in this decision.
 
 ## References
 
+Implementation checkpoint: [HV-22.3 authenticated API](../hv-22-authorized-api.md)
+implements the three HTTP operations using accepted Identity cookies, not the
+earlier fictional prototype option. The Angular/UI phase remains parked for review.
+
 - [Angular version compatibility](https://angular.dev/reference/versions)
 - [Angular security and HttpClient XSRF](https://angular.dev/best-practices/security)
 - [ASP.NET Core OpenAPI support](https://learn.microsoft.com/en-us/aspnet/core/fundamentals/openapi/overview)

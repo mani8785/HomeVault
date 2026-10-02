@@ -48,8 +48,8 @@ and authorization is addressed.
 
 [ADR-0020](0020-local-accounts-vault-authorization.md): invitation-only local
 accounts, Identity/cookie recommendation, Vault permissions and staged operation
-coverage for HV-22. Accepted 2026-10-01; #69 is merged. Tasks #70 through #72
-track the remaining account and authorization delivery.
+coverage for HV-22. Accepted 2026-10-01; #69 and #70 are merged. Tasks #71 and #72
+track the remaining authorization delivery.
 
 ## Accepted operator workflow
 

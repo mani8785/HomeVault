@@ -1,0 +1,118 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "HomeVault authenticated Vault and Asset API",
+    "version": "1.0.0",
+    "description": "Three-operation contract. Sign in through /auth/login after /auth/antiforgery bootstrap. Refresh antiforgery after identity changes. Submit the XSRF-TOKEN cookie value in X-XSRF-TOKEN with both HttpOnly cookies on POST. All responses are no-store. Names are private. Requests are limited to 16 KiB. Unknown JSON fields (including actor/owner/id) are rejected. No automatic POST retry or idempotency guarantee. No membership, sensitive attribute or list endpoints."
+  },
+  "servers": [{ "url": "https://localhost:7443" }],
+  "security": [{ "cookieAuth": [] }],
+  "paths": {
+    "/api/v1/vaults": {
+      "post": {
+        "operationId": "createVault",
+        "description": "Creates a Vault with a server-generated ID and the authenticated account as sole Owner. No Location header: no Vault-read route exists.",
+        "security": [{ "cookieAuth": [], "antiforgeryCookie": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/Antiforgery" }],
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/VaultInput" } } } },
+        "responses": {
+          "201": { "description": "Created; no Location header.", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Vault" } } } },
+          "400": { "$ref": "#/components/responses/Problem" },
+          "401": { "$ref": "#/components/responses/Problem" },
+          "409": { "$ref": "#/components/responses/Problem" },
+          "413": { "$ref": "#/components/responses/Problem" },
+          "415": { "$ref": "#/components/responses/Problem" },
+          "429": { "$ref": "#/components/responses/Problem" },
+          "500": { "$ref": "#/components/responses/Problem" }
+        }
+      }
+    },
+    "/api/v1/vaults/{vaultId}/assets": {
+      "post": {
+        "operationId": "registerAsset",
+        "description": "Owner, Administrator or Editor may write an Active Vault. Current membership and lifecycle checks serialize with insertion. Viewer yields 403 even when archived. Missing and inaccessible Vaults both yield identical 404. Server generates the Asset ID.",
+        "security": [{ "cookieAuth": [], "antiforgeryCookie": [] }],
+        "parameters": [
+          { "name": "vaultId", "in": "path", "required": true, "schema": { "$ref": "#/components/schemas/Identity" } },
+          { "$ref": "#/components/parameters/Antiforgery" }
+        ],
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AssetInput" } } } },
+        "responses": {
+          "201": {
+            "description": "Created Asset.",
+            "headers": { "Location": { "description": "Relative /api/v1/assets/{server-generated-id} URL.", "schema": { "type": "string" } } },
+            "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Asset" } } }
+          },
+          "400": { "$ref": "#/components/responses/Problem" },
+          "401": { "$ref": "#/components/responses/Problem" },
+          "403": { "$ref": "#/components/responses/Problem" },
+          "404": { "$ref": "#/components/responses/Problem" },
+          "409": { "$ref": "#/components/responses/Problem" },
+          "413": { "$ref": "#/components/responses/Problem" },
+          "415": { "$ref": "#/components/responses/Problem" },
+          "429": { "$ref": "#/components/responses/Problem" },
+          "500": { "$ref": "#/components/responses/Problem" }
+        }
+      }
+    },
+    "/api/v1/assets/{assetId}": {
+      "get": {
+        "operationId": "inspectAsset",
+        "description": "Any current Vault member may read, including from an Archived Vault. Missing and inaccessible records both yield identical 404. Permissions are queried again on every request.",
+        "parameters": [{ "name": "assetId", "in": "path", "required": true, "schema": { "$ref": "#/components/schemas/Identity" } }],
+        "responses": {
+          "200": { "description": "Authorized metadata.", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Asset" } } } },
+          "400": { "$ref": "#/components/responses/Problem" },
+          "401": { "$ref": "#/components/responses/Problem" },
+          "404": { "$ref": "#/components/responses/Problem" },
+          "429": { "$ref": "#/components/responses/Problem" },
+          "500": { "$ref": "#/components/responses/Problem" }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "cookieAuth": { "type": "apiKey", "in": "cookie", "name": "__Host-HomeVault" },
+      "antiforgeryCookie": { "type": "apiKey", "in": "cookie", "name": "__Host-HomeVault-Antiforgery" }
+    },
+    "parameters": {
+      "Antiforgery": { "name": "X-XSRF-TOKEN", "in": "header", "required": true, "schema": { "type": "string" }, "description": "Request token paired with current antiforgery cookie and identity; never log it." }
+    },
+    "responses": {
+      "Problem": { "description": "Safe failure; no input values or exception text. Status matches HTTP. Access checks precede conflict checks.", "content": { "application/problem+json": { "schema": { "$ref": "#/components/schemas/Problem" } } } }
+    },
+    "schemas": {
+      "Identity": { "type": "string", "format": "uuid", "description": "Nonzero Guid in hyphenated D format. Response IDs use lowercase hex; either hex case is accepted in routes.", "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$" },
+      "Name": { "type": "string", "minLength": 1, "pattern": "\\S", "description": "Nonblank private name; whitespace around the name is preserved exactly. Bounded by the total request-byte limit, not truncated." },
+      "VaultInput": {
+        "type": "object", "additionalProperties": false, "required": ["name", "type"],
+        "properties": { "name": { "$ref": "#/components/schemas/Name" }, "type": { "type": "string", "enum": ["personal", "household", "organization"] } }
+      },
+      "AssetInput": {
+        "type": "object", "additionalProperties": false, "required": ["name"],
+        "properties": { "name": { "$ref": "#/components/schemas/Name" } }
+      },
+      "Vault": {
+        "type": "object", "additionalProperties": false, "required": ["id", "name", "type", "status"],
+        "properties": {
+          "id": { "$ref": "#/components/schemas/Identity" }, "name": { "$ref": "#/components/schemas/Name" },
+          "type": { "type": "string", "enum": ["personal", "household", "organization"] }, "status": { "type": "string", "enum": ["active"] }
+        }
+      },
+      "Asset": {
+        "type": "object", "additionalProperties": false, "required": ["id", "vaultId", "name"],
+        "properties": { "id": { "$ref": "#/components/schemas/Identity" }, "vaultId": { "$ref": "#/components/schemas/Identity" }, "name": { "$ref": "#/components/schemas/Name" } }
+      },
+      "Problem": {
+        "type": "object", "additionalProperties": false, "required": ["type", "title", "status", "code", "errors"],
+        "properties": {
+          "type": { "type": "string", "enum": ["about:blank"] }, "title": { "type": "string", "enum": ["Request failed."] },
+          "status": { "type": "integer" },
+          "code": { "type": "string", "enum": ["invalid_request", "unauthenticated", "forbidden", "unavailable", "conflict", "request_too_large", "unsupported_media_type", "rate_limited", "request_failed", "blank_name", "invalid_type", "identity_conflict", "vault_archived", "invalid_identity"] },
+          "errors": { "type": "object", "description": "Field names mapped to safe error codes. Empty for non-field failures.", "additionalProperties": { "type": "array", "items": { "type": "string" } } }
+        }
+      }
+    }
+  }
+}

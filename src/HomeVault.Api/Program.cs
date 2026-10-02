@@ -20,10 +20,12 @@ try
         builder.WebHost.ConfigureKestrel(options => options.ListenLocalhost(7443, endpoint => endpoint.UseHttps()));
         builder.Logging.ClearProviders();
         AuthenticationHost.Configure(builder.Services, args[1], keys);
+        RecordsApi.Configure(builder.Services, args[1]);
         await using var app = builder.Build();
         using (var scope = app.Services.CreateScope())
             await scope.ServiceProvider.GetRequiredService<AccountOperations>().ValidateStorageAsync();
         AuthenticationHost.Map(app);
+        RecordsApi.Map(app);
         Console.WriteLine("HomeVault listening at https://localhost:7443. Press Ctrl+C to stop.");
         await app.RunAsync();
         return 0;

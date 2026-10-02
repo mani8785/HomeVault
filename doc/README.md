@@ -1,5 +1,8 @@
 # HomeVault documentation
 
+See [HV-22.3: Authorized Vault/Asset API](hv-22-authorized-api.md) for the three
+authenticated operations, OpenAPI contract, permission checks and terminal guide.
+
 See [ADR-0021: Operator invitations and recovery](ADRs/0021-operator-invitations-recovery.md)
 for the accepted protected operator workflow. See [HV-22.2 account operations](hv-22-accounts.md)
 for invitation-only authentication, terminal setup and validation.

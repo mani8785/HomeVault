@@ -12,7 +12,7 @@ namespace HomeVault.Api;
 /// <summary>Configures the reviewed cookie API without public signup or fictional actors.</summary>
 public static class AuthenticationHost
 {
-    private const string Scheme = "HomeVault";
+    internal const string Scheme = "HomeVault";
     private const string Stamp = "homevault:stamp";
 
     /// <summary>Registers framework authentication, antiforgery, rate limits and account services.</summary>
@@ -68,6 +68,11 @@ public static class AuthenticationHost
     /// <param name="app">Built application; call once before running.</param>
     public static void Map(WebApplication app)
     {
+        app.UseStatusCodePages(async context =>
+        {
+            if (context.HttpContext.Request.Path.StartsWithSegments("/api/v1"))
+                await ApiProblems.Result(context.HttpContext.Response.StatusCode).ExecuteAsync(context.HttpContext);
+        });
         app.Use(async (context, next) =>
         {
             context.Response.Headers.CacheControl = "no-store";
@@ -90,8 +95,17 @@ public static class AuthenticationHost
                 else await next(context);
             }
             catch (AntiforgeryValidationException) { context.Response.StatusCode = 400; }
-            catch (BadHttpRequestException) { context.Response.StatusCode = 400; }
-            catch { if (!context.Response.HasStarted) { context.Response.Clear(); context.Response.StatusCode = 503; } else context.Abort(); }
+            catch (BadHttpRequestException error) { context.Response.StatusCode = error.StatusCode is 413 or 415 ? error.StatusCode : 400; }
+            catch
+            {
+                if (!context.Response.HasStarted)
+                {
+                    context.Response.Clear();
+                    context.Response.Headers.CacheControl = "no-store";
+                    context.Response.StatusCode = context.Request.Path.StartsWithSegments("/api/v1") ? 500 : 503;
+                }
+                else context.Abort();
+            }
         });
         app.UseRouting();
         app.UseRateLimiter();
