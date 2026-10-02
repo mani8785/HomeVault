@@ -6,7 +6,7 @@ using HomeVault.Infrastructure.Persistence;
 
 namespace HomeVault.Api;
 
-/// <summary>Composes the three authenticated Vault/Asset use cases and their versioned HTTP contract.</summary>
+/// <summary>Composes authenticated Vault/Asset use cases and their versioned HTTP contract.</summary>
 public static class RecordsApi
 {
     /// <summary>Registers scoped use cases and actor context with the existing SQLite adapters.</summary>
@@ -24,6 +24,8 @@ public static class RecordsApi
         services.AddScoped<CreateVaultUseCase>();
         services.AddScoped<RegisterAssetUseCase>();
         services.AddScoped<InspectAssetUseCase>();
+        services.AddScoped<IVaultArchiveStore, SqliteVaultArchiveStore>();
+        services.AddScoped<ArchiveVaultUseCase>();
     }
 
     /// <summary>Maps authenticated endpoints; use after AuthenticationHost.Map to retain antiforgery and safe failures.</summary>
@@ -31,6 +33,21 @@ public static class RecordsApi
     public static void Map(WebApplication app)
     {
         var group = app.MapGroup("/api/v1").RequireAuthorization();
+        group.MapPost("/vaults/{vaultId}/archive", async (string vaultId, HttpContext context, ArchiveVaultUseCase useCase, CancellationToken token) =>
+        {
+            // There is no business body; reject payloads rather than silently accepting identity fields.
+            if (await context.Request.Body.ReadAsync(new byte[1], token) != 0) return ApiProblems.Result(400);
+            if (!Guid.TryParseExact(vaultId, "D", out var id) || id == Guid.Empty) return ApiProblems.Result(400, "invalid_identity", "vaultId");
+            return await useCase.ExecuteAsync(id, token) switch
+            {
+                ArchiveVaultOutcome.Archived => Results.NoContent(),
+                ArchiveVaultOutcome.Unauthenticated => ApiProblems.Result(401),
+                ArchiveVaultOutcome.InvalidIdentity => ApiProblems.Result(400, "invalid_identity", "vaultId"),
+                ArchiveVaultOutcome.Unavailable => ApiProblems.Result(404),
+                ArchiveVaultOutcome.Forbidden => ApiProblems.Result(403),
+                _ => ApiProblems.Result(500)
+            };
+        });
         group.MapPost("/vaults", async (VaultInput input, CreateVaultUseCase useCase, CancellationToken token) =>
         {
             var type = input.Type switch

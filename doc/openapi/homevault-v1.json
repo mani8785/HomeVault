@@ -2,12 +2,33 @@
   "openapi": "3.0.3",
   "info": {
     "title": "HomeVault authenticated Vault and Asset API",
-    "version": "1.0.0",
-    "description": "Three-operation contract. Sign in through /auth/login after /auth/antiforgery bootstrap. Refresh antiforgery after identity changes. Submit the XSRF-TOKEN cookie value in X-XSRF-TOKEN with both HttpOnly cookies on POST. All responses are no-store. Names are private. Requests are limited to 16 KiB. Unknown JSON fields (including actor/owner/id) are rejected. No automatic POST retry or idempotency guarantee. No membership, sensitive attribute or list endpoints."
+    "version": "1.1.0",
+    "description": "Create Vault, register/inspect Asset and archive Vault. Sign in through /auth/login after /auth/antiforgery bootstrap. Refresh antiforgery after identity changes. Submit the XSRF-TOKEN cookie value in X-XSRF-TOKEN with both HttpOnly cookies on POST. All responses are no-store. Names are private. Requests are limited to 16 KiB. Unknown JSON fields (including actor/owner/id) are rejected. Creation POSTs have no automatic retry or idempotency guarantee; authorized repeated archival succeeds without changing stored records. No membership, sensitive attribute or list endpoints."
   },
   "servers": [{ "url": "https://localhost:7443" }],
   "security": [{ "cookieAuth": [] }],
   "paths": {
+    "/api/v1/vaults/{vaultId}/archive": {
+      "post": {
+        "operationId": "archiveVault",
+        "description": "Archives a Vault for its current Owner. Repeated Owner archival succeeds; other members receive 403 even when already archived. Missing and nonmember receive identical 404. No request body is accepted. Access checks and archival serialize with record writes. No unarchive operation.",
+        "security": [{ "cookieAuth": [], "antiforgeryCookie": [] }],
+        "parameters": [
+          { "name": "vaultId", "in": "path", "required": true, "schema": { "$ref": "#/components/schemas/Identity" } },
+          { "$ref": "#/components/parameters/Antiforgery" }
+        ],
+        "responses": {
+          "204": { "description": "Archived, including an authorized repeat; empty body." },
+          "400": { "$ref": "#/components/responses/Problem" },
+          "401": { "$ref": "#/components/responses/Problem" },
+          "403": { "$ref": "#/components/responses/Problem" },
+          "404": { "$ref": "#/components/responses/Problem" },
+          "413": { "$ref": "#/components/responses/Problem" },
+          "429": { "$ref": "#/components/responses/Problem" },
+          "500": { "$ref": "#/components/responses/Problem" }
+        }
+      }
+    },
     "/api/v1/vaults": {
       "post": {
         "operationId": "createVault",
