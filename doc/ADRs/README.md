@@ -57,12 +57,12 @@ track the remaining authorization delivery.
 exports, recovery lifetime and offline operator actions for #70. Accepted
 2026-10-02. See the [implementation guide](../hv-22-accounts.md).
 
-## Proposed remaining-operation contracts
+## Accepted remaining-operation contracts
 
-[ADR-0022](0022-remaining-authorized-operations.md) proposes durable Vault archive
+[ADR-0022](0022-remaining-authorized-operations.md) accepts durable Vault archive
 and membership contracts, real-account targets and validated Domain restoration.
 The [task plan](../hv-22-remaining-operations.md) splits #72 into reviewable slices.
-No implementation acceptance is recorded yet.
+Accepted 2026-10-02; ArchiveVault (#76) is the first authorized implementation.
 
 ## Template
 

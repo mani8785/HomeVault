@@ -5,7 +5,7 @@ which remains In Progress under [#26](https://github.com/mani8785/HomeVault/issu
 The prerequisite [#71](https://github.com/mani8785/HomeVault/issues/71) is complete
 through merged [PR #75](https://github.com/mani8785/HomeVault/pull/75).
 
-[ADR-0022](ADRs/0022-remaining-authorized-operations.md) is Proposed. This document
+[ADR-0022](ADRs/0022-remaining-authorized-operations.md) was accepted on 2026-10-02. This document
 is an implementation sequence, not a claim that the operations below exist.
 
 ## Task sequence

@@ -1,7 +1,8 @@
 # ADR-0022: Durable authorization for remaining operations
 
-Status: Proposed
+Status: Accepted
 Created: 2026-10-02
+Accepted: 2026-10-02
 Issue: [HV-22.4 / #72](https://github.com/mani8785/HomeVault/issues/72)
 
 ## Context
@@ -129,6 +130,7 @@ coverage is delivered; Sensitive policy/encryption remains an explicit dependenc
 
 ## Confirmation
 
-Awaiting owner confirmation of the proposed operation contracts, real-account
-membership target policy and restoration approach. No runtime changes or migration
-are included in this proposal. Existing accepted decisions remain in force.
+The owner explicitly confirmed the operation contracts, real-account membership
+target policy and validated restoration approach on 2026-10-02. ArchiveVault (#76)
+is authorized as the first implementation slice. Later schemas/contracts still
+require their stated review. Existing accepted decisions remain in force.
