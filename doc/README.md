@@ -1,5 +1,8 @@
 # HomeVault documentation
 
+See [ADR-0021: Operator invitations and recovery](ADRs/0021-operator-invitations-recovery.md)
+for the proposed protected operator workflow required before implementing HV-22.2.
+
 See [HV-22.1: Identity storage](hv-22-identity-storage.md) for the account schema,
 Windows session keys, validation scope and terminal commands.
 

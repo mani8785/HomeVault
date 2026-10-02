@@ -51,6 +51,12 @@ accounts, Identity/cookie recommendation, Vault permissions and staged operation
 coverage for HV-22. Accepted 2026-10-01; implementation tasks #69 through #72
 remain outstanding.
 
+## Proposed operator workflow
+
+[ADR-0021](0021-operator-invitations-recovery.md) specifies protected invitation
+exports, recovery lifetime and offline operator actions for #70. Proposed
+2026-10-02; implementation awaits acceptance of the remaining workflow choices.
+
 ## Template
 
 - Title and ID
