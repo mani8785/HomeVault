@@ -1,5 +1,9 @@
 # HV-22.3: Authenticated Vault and Asset API
 
+Subsequent [HV-22.4.1](hv-22-vault-archive.md) adds Owner-only Vault archival to
+the versioned contract. The three-operation description below records HV-22.3;
+membership changes and other record operations remain later work.
+
 Implements [#71](https://github.com/mani8785/HomeVault/issues/71), following accepted
 [ADR-0019](ADRs/0019-browser-ui-first-journey.md) and
 [ADR-0020](ADRs/0020-local-accounts-vault-authorization.md).
