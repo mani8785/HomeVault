@@ -25,8 +25,8 @@ CI checks live directly in the GitHub Actions workflow. There are no standalone
 helper scripts. Creating scripts requires prior explicit user approval with a
 clear reason; see [agent instructions](../AGENTS.md).
 
-Under HV-22.1, a Windows job runs Infrastructure integration tests including real
-DPAPI session-key tests. The required Validate job waits for it and explicitly
+Under HV-22.1 and HV-22.2, a Windows job runs the full suite including real
+DPAPI session-key and HTTP cookie restart tests. The required Validate job waits for it and explicitly
 fails if it does not succeed; Linux still verifies repository links, formatting,
 build and the full suite. Windows-specific tests are skipped on Linux and run on
 Windows, while unsupported-platform rejection is covered on Linux. Separate TRX
