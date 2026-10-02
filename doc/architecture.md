@@ -34,7 +34,13 @@ Domain has no project dependencies or framework-specific business logic. .NET ba
 
 Use constructor injection where explicit collaborators improve clarity or testing. Application owns contracts for the technical capabilities its use cases need; Infrastructure implements them. Add interfaces only for a concrete boundary or substitution need.
 
-Playground is the initial composition root and manually wires implementations while that remains simple. No DI container or package is selected. Domain remains independent of DI frameworks, containers, registration APIs, and framework attributes; any justified domain collaboration uses ordinary C#. Entities and value objects use domain constructors or factories. Do not use a service locator in Domain or Application. See [ADR-0003](ADRs/0003-selective-dependency-injection.md) for rationale and tradeoffs.
+Playground manually wires implementations while that remains simple. The accepted
+Identity/API composition uses Microsoft's built-in host services under ADR-0020;
+no third-party container is selected. Domain remains independent of DI frameworks,
+containers, registration APIs and framework attributes; justified domain
+collaboration uses ordinary C#. Construct entities/value objects through their
+constructors or factories. Do not use a service locator in Domain or Application.
+See [ADR-0003](ADRs/0003-selective-dependency-injection.md).
 
 ## Conceptual domain map
 
@@ -71,8 +77,13 @@ in the linked follow-up tasks.
 Under [ADR-0020](ADRs/0020-local-accounts-vault-authorization.md), Infrastructure
 owns ASP.NET Core Identity storage and Windows-protected session keys. Domain and
 Application remain independent of Identity and web frameworks. The first storage
-slice does not authenticate callers; invitation/login and HTTP composition follow
-in separate tasks. See [HV-22.1](hv-22-identity-storage.md).
+slice is extended by HomeVault.Api under [ADR-0021](ADRs/0021-operator-invitations-recovery.md):
+the API composition root references Infrastructure and owns HTTP cookie authentication,
+antiforgery and local operator commands. Infrastructure owns Identity operations and
+credential storage. HomeVault.Api.Tests references the API and uses framework TestHost
+with real SQLite, separate from the Domain/Application-only tests. Microsoft DI stays
+at the host/Infrastructure boundary; no web dependencies enter Domain/Application.
+See [HV-22.2](hv-22-accounts.md). Vault/Asset HTTP endpoints remain in #71.
 
 ## Accepted domain boundaries
 

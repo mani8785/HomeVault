@@ -1,7 +1,8 @@
 # ADR-0021: Protected operator invitations and account recovery
 
-Status: Proposed
+Status: Accepted
 Created: 2026-10-02
+Accepted: 2026-10-02
 Issue: [HV-22.2 / #70](https://github.com/mani8785/HomeVault/issues/70)
 
 ## Context
@@ -116,9 +117,9 @@ Run restore, format, Release build, NUnit and both GitHub validation jobs.
 
 ## Confirmation
 
-Awaiting explicit owner acceptance of the protected plaintext export workflow,
-30-minute recovery lifetime, immediate sign-out on recovery issuance and offline
-operator/restore workflow. No implementation is claimed by this document.
+The owner explicitly confirmed this proposal on 2026-10-02, including protected
+plaintext exports, the 30-minute recovery lifetime, immediate sign-out on recovery
+issuance and offline operator/restore workflow. Implementation is tracked in #70.
 
 ## References
 

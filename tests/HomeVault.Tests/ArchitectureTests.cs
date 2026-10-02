@@ -10,6 +10,8 @@ public sealed class ArchitectureTests
 
     [TestCase("src/HomeVault.Domain/HomeVault.Domain.csproj", new string[] { })]
     [TestCase("src/HomeVault.Application/HomeVault.Application.csproj", new[] { "HomeVault.Domain" })]
+    [TestCase("src/HomeVault.Api/HomeVault.Api.csproj", new[] { "HomeVault.Infrastructure", "HomeVault.Application" })]
+    [TestCase("tests/HomeVault.Api.Tests/HomeVault.Api.Tests.csproj", new[] { "HomeVault.Api" })]
     [TestCase("src/HomeVault.Infrastructure/HomeVault.Infrastructure.csproj", new[] { "HomeVault.Application", "HomeVault.Domain" })]
     [TestCase("src/HomeVault.Playground/HomeVault.Playground.csproj", new[] { "HomeVault.Application", "HomeVault.Infrastructure", "HomeVault.Domain" })]
     [TestCase("tests/HomeVault.Tests/HomeVault.Tests.csproj", new[] { "HomeVault.Domain", "HomeVault.Application" })]

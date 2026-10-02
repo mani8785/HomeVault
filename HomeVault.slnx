@@ -1,11 +1,13 @@
 <Solution>
   <Folder Name="/src/">
+    <Project Path="src/HomeVault.Api/HomeVault.Api.csproj" />
     <Project Path="src/HomeVault.Application/HomeVault.Application.csproj" />
     <Project Path="src/HomeVault.Domain/HomeVault.Domain.csproj" />
     <Project Path="src/HomeVault.Infrastructure/HomeVault.Infrastructure.csproj" />
     <Project Path="src/HomeVault.Playground/HomeVault.Playground.csproj" />
   </Folder>
   <Folder Name="/tests/">
+    <Project Path="tests/HomeVault.Api.Tests/HomeVault.Api.Tests.csproj" />
     <Project Path="tests/HomeVault.Infrastructure.Tests/HomeVault.Infrastructure.Tests.csproj" />
     <Project Path="tests/HomeVault.Tests/HomeVault.Tests.csproj" />
   </Folder>
