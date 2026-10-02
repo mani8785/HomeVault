@@ -8,11 +8,15 @@ public sealed class Vault
 {
     private readonly Dictionary<Guid, VaultMembership> _memberships = new();
 
-    private Vault(Guid id, string? name, VaultType type, Guid initialOwnerId)
+    private Vault(Guid id, string? name, VaultType type)
     {
         Id = Guard.Against.NullOrEmpty(id, nameof(id));
         Name = Guard.Against.NullOrWhiteSpace(name, nameof(name));
         Type = Guard.Against.EnumOutOfRange(type, nameof(type));
+    }
+
+    private Vault(Guid id, string? name, VaultType type, Guid initialOwnerId) : this(id, name, type)
+    {
         var ownerId = Guard.Against.NullOrEmpty(initialOwnerId, nameof(initialOwnerId));
         _memberships.Add(ownerId, new VaultMembership(ownerId, VaultRole.Owner));
     }
@@ -28,6 +32,40 @@ public sealed class Vault
 
     /// <summary>Gets the lifecycle state, initially Active; archival is irreversible through this API.</summary>
     public VaultStatus Status { get; private set; } = VaultStatus.Active;
+
+    /// <summary>Restores a complete validated snapshot without creating membership or loading Assets.</summary>
+    /// <param name="id">Stored non-empty identity.</param>
+    /// <param name="name">Stored nonblank name, preserved exactly.</param>
+    /// <param name="type">Stored ownership context.</param>
+    /// <param name="status">Stored lifecycle state.</param>
+    /// <param name="memberships">Complete actor/role pairs, copied into private state.</param>
+    /// <returns>A restored Vault with at least one Owner.</returns>
+    /// <exception cref="InvalidOperationException">The snapshot violates a Vault invariant; the message omits stored values.</exception>
+    /// <remarks>This is not an authorization boundary. No creation behavior or events are replayed.</remarks>
+    public static Vault Restore(Guid id, string? name, VaultType type, VaultStatus status,
+        IEnumerable<KeyValuePair<Guid, VaultRole>> memberships)
+    {
+        try
+        {
+            var vault = new Vault(id, name, type);
+            vault.Status = Guard.Against.EnumOutOfRange(status, nameof(status));
+            Guard.Against.Null(memberships, nameof(memberships));
+            foreach (var member in memberships)
+            {
+                Guard.Against.NullOrEmpty(member.Key, nameof(memberships));
+                Guard.Against.EnumOutOfRange(member.Value, nameof(memberships));
+                if (!vault._memberships.TryAdd(member.Key, new VaultMembership(member.Key, member.Value)))
+                    throw new InvalidOperationException("Invalid stored Vault state.");
+            }
+            if (!vault._memberships.Values.Any(member => member.Role == VaultRole.Owner))
+                throw new InvalidOperationException("Invalid stored Vault state.");
+            return vault;
+        }
+        catch (ArgumentException)
+        {
+            throw new InvalidOperationException("Invalid stored Vault state.");
+        }
+    }
 
     /// <summary>Archives this Vault when the supplied actor is a current Owner.</summary>
     /// <param name="requestingActorId">The authenticated actor identity supplied by the application boundary.</param>

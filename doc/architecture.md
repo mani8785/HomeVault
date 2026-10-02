@@ -91,6 +91,12 @@ API boundary. No Domain/Application dependency or persistence schema changes.
 
 ## Accepted domain boundaries
 
+Under accepted [ADR-0022](ADRs/0022-remaining-authorized-operations.md),
+[ArchiveVault](hv-22-vault-archive.md) restores validated Vault/membership state
+and invokes Domain archival inside the same SQLite write transaction as current
+Owner checks. Application owns IVaultArchiveStore; HTTP exposes no raw storage
+or restoration API. Existing schema and Asset read access remain unchanged.
+
 [ADR-0004](ADRs/0004-domain-language-and-boundaries.md) records separate Vault,
 Asset, Relationship, and Reminder roots, with attributes and Evidence metadata
 owned by Asset. It details cross-aggregate ownership and archive consistency,

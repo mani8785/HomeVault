@@ -1,5 +1,11 @@
 # HomeVault documentation
 
+See [HV-22.4.1: Owner-only Vault archival](hv-22-vault-archive.md) for the
+authenticated archive operation, transactional guarantees and terminal journey.
+
+See [HV-22.4: Remaining authorized operations](hv-22-remaining-operations.md)
+for the bounded task sequence and accepted operation/restoration decisions.
+
 See [HV-22.3: Authorized Vault/Asset API](hv-22-authorized-api.md) for the three
 authenticated operations, OpenAPI contract, permission checks and terminal guide.
 

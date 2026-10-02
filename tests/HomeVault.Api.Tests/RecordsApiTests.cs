@@ -3,6 +3,7 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using HomeVault.Application.Assets;
+using HomeVault.Application.Vaults;
 using HomeVault.Domain.Assets;
 using HomeVault.Infrastructure.Identity;
 using HomeVault.Infrastructure.Persistence;
@@ -32,6 +33,7 @@ public sealed class RecordsApiTests
     private const string Vaults = "/api/v1/vaults";
     private const string Registration = "/api/v1/vaults/{vaultId}/assets";
     private const string Inspection = "/api/v1/assets/{assetId}";
+    private const string Archival = "/api/v1/vaults/{vaultId}/archive";
     private const string Password = "fictional records passphrase";
 
     [SetUp]
@@ -64,6 +66,8 @@ public sealed class RecordsApiTests
         // Test-only barrier, delegating to the real SQLite adapter; no actor substitution.
         builder.Services.AddScoped<IAssetRegistrationStore>(services => new GatedRegistrationStore(
             new SqliteAssetRegistrationStore(services.GetRequiredService<SqliteDatabase>()), _gate));
+        builder.Services.AddScoped<IVaultArchiveStore>(services => new GatedArchiveStore(
+            new SqliteVaultArchiveStore(services.GetRequiredService<SqliteDatabase>()), _gate));
         _app = builder.Build();
         AuthenticationHost.Map(_app);
         RecordsApi.Map(_app);
@@ -240,6 +244,86 @@ public sealed class RecordsApiTests
         Assert.That(failure.GetRawText(), Does.Not.Contain("private").IgnoreCase.And.Not.Contain(_path));
     }
 
+    [TestCase(0, 204)]
+    [TestCase(1, 403)]
+    [TestCase(2, 403)]
+    [TestCase(3, 403)]
+    public async Task ArchiveUsesCurrentOwnerAndRetainsReadableAssetsAfterRestart(int role, int status)
+    {
+        var vault = await CreateVault();
+        var asset = await CreateAsset(vault);
+        await Sql($"INSERT INTO Memberships (VaultId, ActorId, Role) VALUES ({vault}, {_otherId}, {role})");
+        var route = $"{Vaults}/{vault:D}/archive";
+        await Contract(await _other.Send("POST", route), Archival, "post", status);
+        await Contract(await _owner.Send("POST", route), Archival, "post", 204);
+        await Contract(await _other.Send("POST", route), Archival, "post", status);
+        await _app.DisposeAsync();
+        await Start();
+        _owner.Replace(_app.GetTestClient());
+        _other.Replace(_app.GetTestClient());
+        await Contract(await _owner.Send("POST", route), Archival, "post", 204);
+        await Contract(await _other.Send("GET", $"/api/v1/assets/{asset:D}"), Inspection, "get", 200);
+        await Contract(await _owner.Send("POST", $"{Vaults}/{vault:D}/assets", new { name = "Denied" }), Registration, "post", 409);
+        Assert.That(await AssetCount(), Is.EqualTo(1));
+    }
+
+    [Test]
+    public async Task ArchiveRejectsForgedIdentityBodiesMissingAntiforgeryAndRevokedSessions()
+    {
+        var vault = await CreateVault();
+        var route = $"{Vaults}/{vault:D}/archive";
+        using var anonymous = new Browser(_app.GetTestClient());
+        await Contract(await anonymous.Send("POST", route), Archival, "post", 401);
+        await Contract(await _owner.Send("POST", route, csrf: false), Archival, "post", 400);
+        await Contract(await _owner.Send("POST", route, new { actorId = _otherId }), Archival, "post", 400);
+        await Contract(await _owner.Send("POST", $"{Vaults}/bad-id/archive"), Archival, "post", 400);
+        var denied = await Contract(await _other.Send("POST", route + $"?actorId={_ownerId}", actorHeader: _ownerId), Archival, "post", 404);
+        var missing = await Contract(await _other.Send("POST", $"{Vaults}/{Guid.NewGuid():D}/archive"), Archival, "post", 404);
+        Assert.That(denied.GetRawText(), Is.EqualTo(missing.GetRawText()));
+        using (var scope = _app.Services.CreateScope())
+            Assert.That(await scope.ServiceProvider.GetRequiredService<HomeVaultDbContext>().Database.SqlQuery<int>(
+                $"SELECT Status AS Value FROM Vaults WHERE Id = {vault}").SingleAsync(), Is.Zero);
+        using (var scope = _app.Services.CreateScope())
+            await scope.ServiceProvider.GetRequiredService<AccountOperations>().RevokeAsync(_ownerId);
+        await Contract(await _owner.Send("POST", route), Archival, "post", 401);
+    }
+
+    [Test]
+    public async Task ArchiveRechecksRoleWithoutReloginAndHidesStorageFailure()
+    {
+        var vault = await CreateVault();
+        var route = $"{Vaults}/{vault:D}/archive";
+        await Sql($"INSERT INTO Memberships (VaultId, ActorId, Role) VALUES ({vault}, {_otherId}, {0})");
+        await Sql($"UPDATE Memberships SET Role = {2} WHERE VaultId = {vault} AND ActorId = {_ownerId}");
+        await Contract(await _owner.Send("POST", route), Archival, "post", 403);
+        await Sql($"DELETE FROM Memberships WHERE VaultId = {vault} AND ActorId = {_ownerId}");
+        await Contract(await _owner.Send("POST", route), Archival, "post", 404);
+        await Sql($"CREATE TRIGGER FailArchive BEFORE UPDATE ON Vaults BEGIN SELECT RAISE(ABORT, 'private archive failure'); END;");
+        var failure = await Contract(await _other.Send("POST", route), Archival, "post", 500);
+        Assert.That(failure.GetRawText(), Does.Not.Contain("private").And.Not.Contain(_path));
+    }
+
+    [TestCase(false)]
+    [TestCase(true)]
+    public async Task ArchiveRejectsPermissionChangeCommittedAfterAuthentication(bool remove)
+    {
+        var vault = await CreateVault();
+        await Sql($"INSERT INTO Memberships (VaultId, ActorId, Role) VALUES ({vault}, {_otherId}, {0})");
+        _gate.Enabled = true;
+        var pending = _owner.Send("POST", $"{Vaults}/{vault:D}/archive");
+        await _gate.Entered.Task.WaitAsync(TimeSpan.FromSeconds(10));
+        try
+        {
+            if (remove) await Sql($"DELETE FROM Memberships WHERE VaultId = {vault} AND ActorId = {_ownerId}");
+            else await Sql($"UPDATE Memberships SET Role = {2} WHERE VaultId = {vault} AND ActorId = {_ownerId}");
+        }
+        finally { _gate.Release.TrySetResult(); }
+        await Contract(await pending, Archival, "post", remove ? 404 : 403);
+        using var scope = _app.Services.CreateScope();
+        Assert.That(await scope.ServiceProvider.GetRequiredService<HomeVaultDbContext>().Database.SqlQuery<int>(
+            $"SELECT Status AS Value FROM Vaults WHERE Id = {vault}").SingleAsync(), Is.Zero);
+    }
+
     private async Task<Guid> EnrollAndLogin(Browser browser, string login)
     {
         AccountCredential credential;
@@ -279,6 +363,12 @@ public sealed class RecordsApiTests
         var documented = _contract.RootElement.GetProperty("paths").GetProperty(path).GetProperty(method)
             .GetProperty("responses").GetProperty(status.ToString());
         documented = Resolve(documented);
+        if (status == 204)
+        {
+            Assert.That(documented.TryGetProperty("content", out _), Is.False);
+            Assert.That(await response.Content.ReadAsStringAsync(), Is.Empty);
+            return default;
+        }
         var mediaType = status >= 400 ? "application/problem+json" : "application/json";
         Assert.That(response.Content.Headers.ContentType?.MediaType, Is.EqualTo(mediaType));
         var body = await response.Content.ReadFromJsonAsync<JsonElement>();
@@ -380,6 +470,19 @@ public sealed class RecordsApiTests
                 await gate.Release.Task.WaitAsync(TimeSpan.FromSeconds(10), cancellationToken);
             }
             return await inner.RegisterAsync(asset, actorId, cancellationToken);
+        }
+    }
+
+    private sealed class GatedArchiveStore(IVaultArchiveStore inner, RegistrationGate gate) : IVaultArchiveStore
+    {
+        public async Task<ArchiveVaultOutcome> ArchiveAsync(Guid vaultId, Guid actorId, CancellationToken cancellationToken)
+        {
+            if (gate.Enabled)
+            {
+                gate.Entered.TrySetResult();
+                await gate.Release.Task.WaitAsync(TimeSpan.FromSeconds(10), cancellationToken);
+            }
+            return await inner.ArchiveAsync(vaultId, actorId, cancellationToken);
         }
     }
 }
