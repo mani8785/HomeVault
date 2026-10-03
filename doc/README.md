@@ -1,5 +1,9 @@
 # HomeVault documentation
 
+See [ADR-0023: Durable ordinary attributes](ADRs/0023-durable-ordinary-attributes.md)
+for the proposed API/schema contract for #78. This is awaiting approval; ordinary
+attribute persistence is not implemented yet.
+
 See [HV-22.4.2: Authorized Vault membership](hv-22-vault-membership.md) for
 add/change-role/remove operations, concurrency rules and terminal verification.
 

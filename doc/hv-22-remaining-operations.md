@@ -16,8 +16,10 @@ Tracked sub-issues: [archive #76](https://github.com/mani8785/HomeVault/issues/7
 [Evidence #79](https://github.com/mani8785/HomeVault/issues/79),
 [Relationships #80](https://github.com/mani8785/HomeVault/issues/80), and
 [Reminders #81](https://github.com/mani8785/HomeVault/issues/81).
-Archive #76 is merged. [Membership #77](hv-22-vault-membership.md) is implemented
-for PR review. Tasks #78–#81 remain planned work under the stated review gates.
+Archive #76 and [membership #77](hv-22-vault-membership.md) are merged through
+PRs #83 and #84. Task #78 is In Progress with its concrete API/schema proposal in
+[ADR-0023](ADRs/0023-durable-ordinary-attributes.md), awaiting explicit acceptance
+before code. Tasks #79–#81 remain planned work under the stated review gates.
 
 | Order | Bounded outcome | Dependencies | Required evidence |
 | --- | --- | --- | --- |
