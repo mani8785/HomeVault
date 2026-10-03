@@ -1,7 +1,8 @@
 # ADR-0024: Durable URL and Note Evidence
 
-Status: Proposed
+Status: Accepted
 Created: 2026-10-03
+Accepted: 2026-10-03
 Issue: [HV-22.4.4 / #79](https://github.com/mani8785/HomeVault/issues/79)
 
 ## Context
@@ -146,7 +147,7 @@ that an unsuccessful HTTP response proves no commit occurred.
 
 ## Confirmation
 
-Awaiting explicit owner approval of the routes, schema and plaintext limitation.
-This proposal implements no runtime behavior and does not complete #79. Keep
-#79, #72 and #26 open. File uploads, document resolution, encryption, UI and the
-subsequent Relationship/Reminder slices remain outside this step.
+The owner explicitly confirmed the routes, schema and plaintext limitation on
+2026-10-03 and authorized implementation. Close #79 only after its implementation
+merges; keep #72 and #26 open. File uploads, document resolution, encryption, UI
+and subsequent Relationship/Reminder slices remain outside this step.

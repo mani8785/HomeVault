@@ -1,8 +1,9 @@
 # HomeVault documentation
 
 See [ADR-0024: Durable URL/Note Evidence](ADRs/0024-durable-url-note-evidence.md)
-for #79's proposed API/schema and plaintext limitation. Implementation awaits
-owner confirmation.
+for #79's accepted API/schema and plaintext limitation. The
+[Evidence implementation guide](hv-22-evidence.md) covers behavior, validation,
+database upgrade and terminal examples.
 
 See [HV-22.4.3: Ordinary attributes](hv-22-ordinary-attributes.md) for durable
 add/change/remove/list operations and terminal verification under accepted
