@@ -1,5 +1,8 @@
 # HomeVault documentation
 
+See [HV-22.4.2: Authorized Vault membership](hv-22-vault-membership.md) for
+add/change-role/remove operations, concurrency rules and terminal verification.
+
 See [HV-22.4.1: Owner-only Vault archival](hv-22-vault-archive.md) for the
 authenticated archive operation, transactional guarantees and terminal journey.
 

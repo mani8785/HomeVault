@@ -16,8 +16,8 @@ Tracked sub-issues: [archive #76](https://github.com/mani8785/HomeVault/issues/7
 [Evidence #79](https://github.com/mani8785/HomeVault/issues/79),
 [Relationships #80](https://github.com/mani8785/HomeVault/issues/80), and
 [Reminders #81](https://github.com/mani8785/HomeVault/issues/81).
-Archive #76 is implemented in the [archive slice](hv-22-vault-archive.md), pending
-PR review. Tasks #77–#81 remain planned work under the stated review gates.
+Archive #76 is merged. [Membership #77](hv-22-vault-membership.md) is implemented
+for PR review. Tasks #78–#81 remain planned work under the stated review gates.
 
 | Order | Bounded outcome | Dependencies | Required evidence |
 | --- | --- | --- | --- |

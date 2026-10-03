@@ -18,7 +18,7 @@ using NUnit.Framework;
 namespace HomeVault.Api.Tests;
 
 [TestFixture]
-public sealed class RecordsApiTests
+public sealed partial class RecordsApiTests
 {
     private string _directory = null!;
     private string _path = null!;
@@ -68,6 +68,8 @@ public sealed class RecordsApiTests
             new SqliteAssetRegistrationStore(services.GetRequiredService<SqliteDatabase>()), _gate));
         builder.Services.AddScoped<IVaultArchiveStore>(services => new GatedArchiveStore(
             new SqliteVaultArchiveStore(services.GetRequiredService<SqliteDatabase>()), _gate));
+        builder.Services.AddScoped<IVaultMembershipStore>(services => new GatedMembershipStore(
+            new SqliteVaultMembershipStore(services.GetRequiredService<SqliteDatabase>()), _gate));
         _app = builder.Build();
         AuthenticationHost.Map(_app);
         RecordsApi.Map(_app);

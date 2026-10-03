@@ -1,5 +1,8 @@
 # HV-22.4.1: Owner-only durable Vault archival
 
+Subsequent [HV-22.4.2](hv-22-vault-membership.md) adds membership management.
+The limitations below describe the archive slice at its delivery checkpoint.
+
 Implements [#76](https://github.com/mani8785/HomeVault/issues/76) under accepted
 [ADR-0022](ADRs/0022-remaining-authorized-operations.md). Parent #72 and story #26
 remain open for the remaining operations. No schema migration or package is added.

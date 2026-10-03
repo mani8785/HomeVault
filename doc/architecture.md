@@ -91,6 +91,11 @@ API boundary. No Domain/Application dependency or persistence schema changes.
 
 ## Accepted domain boundaries
 
+[Vault membership operations](hv-22-vault-membership.md) use an Application-owned
+IVaultMembershipStore for atomic current-role checks, real-account addition and
+Domain mutation through validated restoration. SQLite serializes membership,
+archival and Asset writes; the existing schema and project dependencies remain.
+
 Under accepted [ADR-0022](ADRs/0022-remaining-authorized-operations.md),
 [ArchiveVault](hv-22-vault-archive.md) restores validated Vault/membership state
 and invokes Domain archival inside the same SQLite write transaction as current
