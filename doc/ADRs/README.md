@@ -70,6 +70,13 @@ Accepted 2026-10-02; ArchiveVault (#76) is the first authorized implementation.
 ordinary-only schema, atomic writes and fail-closed sensitivity boundary for #78.
 Accepted 2026-10-03; see the [implementation guide](../hv-22-ordinary-attributes.md).
 
+## Accepted durable Evidence contract
+
+[ADR-0024](0024-durable-url-note-evidence.md) accepts Asset-owned URL/Note
+storage, separate metadata/content reads and exact HTTP/schema contracts for #79.
+Plaintext content storage was explicitly accepted on 2026-10-03; see the
+[implementation guide](../hv-22-evidence.md).
+
 ## Template
 
 - Title and ID

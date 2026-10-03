@@ -34,6 +34,26 @@ public sealed class Asset
     /// <remarks>Creation does not verify Vault existence or access. Storage must reject unbound Assets.</remarks>
     public Guid? VaultId { get; }
 
+    /// <summary>Restores Asset identity and the supplied Evidence state without creation events or attribute loading.</summary>
+    /// <param name="id">Stored nonempty Asset identity.</param>
+    /// <param name="vaultId">Stored nonempty owning Vault identity.</param>
+    /// <param name="name">Stored nonblank Asset name.</param>
+    /// <param name="evidence">Stored Evidence needed by the operation; writers supply the complete collection. Never log or serialize these content-bearing inputs.</param>
+    /// <returns>An independent validated Asset with immutable Evidence snapshots.</returns>
+    /// <exception cref="InvalidOperationException">Stored state is invalid; the message contains no supplied data.</exception>
+    /// <remarks>Does not authorize access, fetch resources or restore attributes. Never save this partial snapshot as a whole aggregate.</remarks>
+    public static Asset RestoreEvidence(Guid id, Guid vaultId, string? name,
+        IEnumerable<(Guid Id, string Label, EvidenceKind Kind, string Content)> evidence)
+    {
+        var created = Create(id, vaultId, name);
+        if (created.Asset is not { } asset || evidence is null)
+            throw new InvalidOperationException("Invalid stored Evidence state.");
+        foreach (var entry in evidence)
+            if (asset.AddEvidence(entry.Id, entry.Label, entry.Kind, entry.Content) != EvidenceError.None)
+                throw new InvalidOperationException("Invalid stored Evidence state.");
+        return asset;
+    }
+
     /// <summary>Restores a Vault-bound Asset's ordinary attributes without creation events.</summary>
     /// <param name="id">Stored nonempty Asset identity.</param>
     /// <param name="vaultId">Stored nonempty owning Vault identity.</param>
