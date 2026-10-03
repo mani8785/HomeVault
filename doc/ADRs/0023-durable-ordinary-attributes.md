@@ -1,7 +1,8 @@
 # ADR-0023: Durable ordinary Asset attributes
 
-Status: Proposed
+Status: Accepted
 Created: 2026-10-03
+Accepted: 2026-10-03
 Issue: [HV-22.4.3 / #78](https://github.com/mani8785/HomeVault/issues/78)
 
 ## Context
@@ -146,10 +147,11 @@ No automatic business retries or exactly-once HTTP guarantee is introduced.
    backup/restore. Update terminal instructions and XML documentation; run restore,
    format, Release build, NUnit, pending-model check and Windows/Linux PR CI.
 
-This proposal does not complete #78. Keep #78, #72 and #26 open. Deliver the
-implementation in its own review step after explicit acceptance of this ADR.
+The proposal alone does not complete #78. The owner accepted it before code;
+the [implementation guide](../hv-22-ordinary-attributes.md) records the resulting
+review step. Close #78 only when its implementation merges; keep #72 and #26 open.
 
 ## Confirmation
 
-Awaiting owner confirmation. No new API, table or migration is implemented by
-this proposal. Existing accepted authorization and Domain decisions remain in force.
+The owner explicitly confirmed this contract on 2026-10-03 and requested
+implementation of #78. Existing accepted authorization and Domain decisions remain in force.

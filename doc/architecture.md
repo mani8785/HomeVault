@@ -91,6 +91,13 @@ API boundary. No Domain/Application dependency or persistence schema changes.
 
 ## Accepted domain boundaries
 
+[Ordinary attribute operations](hv-22-ordinary-attributes.md) use an
+Application-owned IOrdinaryAttributeStore. SQLite checks access and classification
+before validated Domain restoration, serializes writes with membership/archive
+changes and persists only the affected row. Separate EF configuration maps the
+ordinary-only AssetAttributes table under accepted ADR-0023. Sensitive storage
+remains blocked on the encryption implementation.
+
 [Vault membership operations](hv-22-vault-membership.md) use an Application-owned
 IVaultMembershipStore for atomic current-role checks, real-account addition and
 Domain mutation through validated restoration. SQLite serializes membership,

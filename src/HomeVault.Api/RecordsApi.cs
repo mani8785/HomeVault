@@ -28,6 +28,8 @@ public static class RecordsApi
         services.AddScoped<ArchiveVaultUseCase>();
         services.AddScoped<IVaultMembershipStore, SqliteVaultMembershipStore>();
         services.AddScoped<VaultMembershipUseCases>();
+        services.AddScoped<IOrdinaryAttributeStore, SqliteOrdinaryAttributeStore>();
+        services.AddScoped<OrdinaryAttributeUseCases>();
     }
 
     /// <summary>Maps authenticated endpoints; use after AuthenticationHost.Map to retain antiforgery and safe failures.</summary>
@@ -35,6 +37,7 @@ public static class RecordsApi
     public static void Map(WebApplication app)
     {
         MembershipApi.Map(app);
+        AttributeApi.Map(app);
         var group = app.MapGroup("/api/v1").RequireAuthorization();
         group.MapPost("/vaults/{vaultId}/archive", async (string vaultId, HttpContext context, ArchiveVaultUseCase useCase, CancellationToken token) =>
         {

@@ -2,12 +2,78 @@
   "openapi": "3.0.3",
   "info": {
     "title": "HomeVault authenticated Vault and Asset API",
-    "version": "1.2.0",
-    "description": "Create/archive Vault, register/inspect Asset and manage Vault memberships. Sign in through /auth/login after /auth/antiforgery bootstrap. Refresh antiforgery after identity changes. Submit the XSRF-TOKEN cookie value in X-XSRF-TOKEN with both HttpOnly cookies on POST, PUT and DELETE. All responses are no-store. Names are private. Requests are limited to 16 KiB. Unknown JSON fields (including requesting actor/owner/id) are rejected. Creation POSTs have no automatic retry or idempotency guarantee; authorized repeated archival succeeds. No account search, Sensitive attribute or list endpoints."
+    "version": "1.3.0",
+    "description": "Create/archive Vault, register/inspect Asset, manage Vault memberships and add/change/remove/list ordinary Asset attributes. Sign in through /auth/login after /auth/antiforgery bootstrap. Refresh antiforgery after identity changes. Submit the XSRF-TOKEN cookie value in X-XSRF-TOKEN with both HttpOnly cookies on POST, PUT and DELETE. All responses are no-store. Requests are limited to 16 KiB. Unknown JSON fields are rejected. Creation POSTs have no automatic retry or idempotency guarantee; authorized repeated archival succeeds. No account search, global lists or Sensitive attribute operations."
   },
   "servers": [{ "url": "https://localhost:7443" }],
   "security": [{ "cookieAuth": [] }],
   "paths": {
+    "/api/v1/assets/{assetId}/attributes": {
+      "get": {
+        "operationId": "listOrdinaryAttributes",
+        "description": "Current members may read ordinary attributes, including Archived Vaults. No ordering guarantee. Unsupported stored classifications fail closed before values are read.",
+        "parameters": [{ "$ref": "#/components/parameters/AssetIdentity" }],
+        "responses": {
+          "200": { "description": "Immutable ordinary snapshot, possibly empty.", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/OrdinaryAttributes" } } } },
+          "400": { "$ref": "#/components/responses/Problem" },
+          "401": { "$ref": "#/components/responses/Problem" },
+          "404": { "$ref": "#/components/responses/Problem" },
+          "429": { "$ref": "#/components/responses/Problem" },
+          "500": { "$ref": "#/components/responses/Problem" }
+        }
+      }
+    },
+    "/api/v1/assets/{assetId}/attributes/add": {
+      "post": {
+        "operationId": "addOrdinaryAttribute",
+        "description": "Owner/Administrator/Editor on Active Vault only. Check access, role, archive, stored state, name, value, explicit ordinary classification, then duplicate. Names trimmed and matched with .NET OrdinalIgnoreCase; value whitespace preserved. Sensitive input rejected. No automatic retry.",
+        "security": [{ "cookieAuth": [], "antiforgeryCookie": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/AssetIdentity" }, { "$ref": "#/components/parameters/Antiforgery" }],
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AddAttributeInput" } } } },
+        "responses": {
+          "204": { "description": "Attribute committed; empty body." },
+          "400": { "$ref": "#/components/responses/Problem" }, "401": { "$ref": "#/components/responses/Problem" },
+          "403": { "$ref": "#/components/responses/Problem" }, "404": { "$ref": "#/components/responses/Problem" },
+          "409": { "$ref": "#/components/responses/Problem" }, "413": { "$ref": "#/components/responses/Problem" },
+          "415": { "$ref": "#/components/responses/Problem" }, "429": { "$ref": "#/components/responses/Problem" },
+          "500": { "$ref": "#/components/responses/Problem" }
+        }
+      }
+    },
+    "/api/v1/assets/{assetId}/attributes/change": {
+      "post": {
+        "operationId": "changeOrdinaryAttribute",
+        "description": "Same atomic access checks as add. Change existing value only, preserving name spelling and classification. Identical replacement succeeds after access/lifecycle checks. Missing attribute shares unavailable. Never upserts or overwrites Sensitive data.",
+        "security": [{ "cookieAuth": [], "antiforgeryCookie": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/AssetIdentity" }, { "$ref": "#/components/parameters/Antiforgery" }],
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ChangeAttributeInput" } } } },
+        "responses": {
+          "204": { "description": "Value committed; empty body." },
+          "400": { "$ref": "#/components/responses/Problem" }, "401": { "$ref": "#/components/responses/Problem" },
+          "403": { "$ref": "#/components/responses/Problem" }, "404": { "$ref": "#/components/responses/Problem" },
+          "409": { "$ref": "#/components/responses/Problem" }, "413": { "$ref": "#/components/responses/Problem" },
+          "415": { "$ref": "#/components/responses/Problem" }, "429": { "$ref": "#/components/responses/Problem" },
+          "500": { "$ref": "#/components/responses/Problem" }
+        }
+      }
+    },
+    "/api/v1/assets/{assetId}/attributes/remove": {
+      "post": {
+        "operationId": "removeOrdinaryAttribute",
+        "description": "Same atomic access checks as add. Remove by trimmed ordinal-ignore-case name. Missing attribute shares unavailable. Earlier snapshots are not revoked.",
+        "security": [{ "cookieAuth": [], "antiforgeryCookie": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/AssetIdentity" }, { "$ref": "#/components/parameters/Antiforgery" }],
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RemoveAttributeInput" } } } },
+        "responses": {
+          "204": { "description": "Removal committed; empty body." },
+          "400": { "$ref": "#/components/responses/Problem" }, "401": { "$ref": "#/components/responses/Problem" },
+          "403": { "$ref": "#/components/responses/Problem" }, "404": { "$ref": "#/components/responses/Problem" },
+          "409": { "$ref": "#/components/responses/Problem" }, "413": { "$ref": "#/components/responses/Problem" },
+          "415": { "$ref": "#/components/responses/Problem" }, "429": { "$ref": "#/components/responses/Problem" },
+          "500": { "$ref": "#/components/responses/Problem" }
+        }
+      }
+    },
     "/api/v1/vaults/{vaultId}/members": {
       "post": {
         "operationId": "addVaultMember",
@@ -159,6 +225,7 @@
       "antiforgeryCookie": { "type": "apiKey", "in": "cookie", "name": "__Host-HomeVault-Antiforgery" }
     },
     "parameters": {
+      "AssetIdentity": { "name": "assetId", "in": "path", "required": true, "schema": { "$ref": "#/components/schemas/Identity" } },
       "VaultIdentity": { "name": "vaultId", "in": "path", "required": true, "schema": { "$ref": "#/components/schemas/Identity" } },
       "TargetActorIdentity": { "name": "targetActorId", "in": "path", "required": true, "schema": { "$ref": "#/components/schemas/Identity" } },
       "Antiforgery": { "name": "X-XSRF-TOKEN", "in": "header", "required": true, "schema": { "type": "string" }, "description": "Request token paired with current antiforgery cookie and identity; never log it." }
@@ -167,6 +234,22 @@
       "Problem": { "description": "Safe failure; no input values or exception text. Status matches HTTP. Access checks precede conflict checks.", "content": { "application/problem+json": { "schema": { "$ref": "#/components/schemas/Problem" } } } }
     },
     "schemas": {
+      "AddAttributeInput": {
+        "type": "object", "additionalProperties": false, "required": ["name", "value", "sensitivity"],
+        "properties": { "name": { "$ref": "#/components/schemas/Name" }, "value": { "$ref": "#/components/schemas/Name" }, "sensitivity": { "type": "string", "enum": ["ordinary"] } }
+      },
+      "ChangeAttributeInput": {
+        "type": "object", "additionalProperties": false, "required": ["name", "value"],
+        "properties": { "name": { "$ref": "#/components/schemas/Name" }, "value": { "$ref": "#/components/schemas/Name" } }
+      },
+      "RemoveAttributeInput": {
+        "type": "object", "additionalProperties": false, "required": ["name"],
+        "properties": { "name": { "$ref": "#/components/schemas/Name" } }
+      },
+      "OrdinaryAttributes": {
+        "type": "object", "additionalProperties": false, "required": ["attributes"],
+        "properties": { "attributes": { "type": "array", "items": { "$ref": "#/components/schemas/AddAttributeInput" } } }
+      },
       "VaultRole": { "type": "string", "enum": ["owner", "administrator", "editor", "viewer"] },
       "AddMemberInput": {
         "type": "object", "additionalProperties": false, "required": ["targetActorId", "role"],
@@ -202,7 +285,7 @@
         "properties": {
           "type": { "type": "string", "enum": ["about:blank"] }, "title": { "type": "string", "enum": ["Request failed."] },
           "status": { "type": "integer" },
-          "code": { "type": "string", "enum": ["invalid_request", "unauthenticated", "forbidden", "unavailable", "conflict", "request_too_large", "unsupported_media_type", "rate_limited", "request_failed", "blank_name", "invalid_type", "identity_conflict", "vault_archived", "invalid_identity", "invalid_role", "duplicate_member", "last_owner"] },
+          "code": { "type": "string", "enum": ["invalid_request", "unauthenticated", "forbidden", "unavailable", "conflict", "request_too_large", "unsupported_media_type", "rate_limited", "request_failed", "blank_name", "invalid_type", "identity_conflict", "vault_archived", "invalid_identity", "invalid_role", "duplicate_member", "last_owner", "invalid_name", "invalid_value", "unsupported_sensitivity", "attribute_exists"] },
           "errors": { "type": "object", "description": "Field names mapped to safe error codes. Empty for non-field failures.", "additionalProperties": { "type": "array", "items": { "type": "string" } } }
         }
       }

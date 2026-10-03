@@ -34,6 +34,28 @@ public sealed class Asset
     /// <remarks>Creation does not verify Vault existence or access. Storage must reject unbound Assets.</remarks>
     public Guid? VaultId { get; }
 
+    /// <summary>Restores a Vault-bound Asset's ordinary attributes without creation events.</summary>
+    /// <param name="id">Stored nonempty Asset identity.</param>
+    /// <param name="vaultId">Stored nonempty owning Vault identity.</param>
+    /// <param name="name">Stored Asset name.</param>
+    /// <param name="attributes">Complete ordinary attribute names and values, already classified by the storage boundary.</param>
+    /// <returns>A validated independent instance with immutable attribute snapshots.</returns>
+    /// <exception cref="InvalidOperationException">Stored state is invalid; the message contains no supplied data.</exception>
+    /// <remarks>Does not authorize access or restore Evidence. Never use this factory to load Sensitive values.</remarks>
+    public static Asset RestoreOrdinaryAttributes(Guid id, Guid vaultId, string? name, IEnumerable<KeyValuePair<string, string>> attributes)
+    {
+        var created = Create(id, vaultId, name);
+        if (created.Asset is not { } asset || attributes is null)
+            throw new InvalidOperationException("Invalid stored Asset state.");
+        foreach (var entry in attributes)
+        {
+            if (entry.Key is null || entry.Key != entry.Key.Trim() ||
+                asset.AddAttribute(entry.Key, entry.Value, AttributeSensitivity.Ordinary) != AssetAttributeError.None)
+                throw new InvalidOperationException("Invalid stored Asset state.");
+        }
+        return asset;
+    }
+
     /// <summary>Creates an Asset bound to one Vault, without verifying access or storing it.</summary>
     /// <param name="id">The non-empty Asset identity.</param>
     /// <param name="vaultId">The non-empty owning Vault identity, immutable after creation.</param>

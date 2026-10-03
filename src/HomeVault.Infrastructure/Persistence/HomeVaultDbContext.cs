@@ -13,6 +13,7 @@ public sealed class HomeVaultDbContext(DbContextOptions<HomeVaultDbContext> opti
     internal DbSet<VaultRow> Vaults => Set<VaultRow>();
     internal DbSet<MembershipRow> Memberships => Set<MembershipRow>();
     internal DbSet<AssetRow> Assets => Set<AssetRow>();
+    internal DbSet<AssetAttributeRow> AssetAttributes => Set<AssetAttributeRow>();
 
     /// <summary>Applies the storage model configurations defined in Infrastructure.</summary>
     /// <param name="modelBuilder">The EF model builder.</param>
