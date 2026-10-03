@@ -64,6 +64,12 @@ and membership contracts, real-account targets and validated Domain restoration.
 The [task plan](../hv-22-remaining-operations.md) splits #72 into reviewable slices.
 Accepted 2026-10-02; ArchiveVault (#76) is the first authorized implementation.
 
+## Accepted ordinary attribute contract
+
+[ADR-0023](0023-durable-ordinary-attributes.md) accepts the HTTP operations,
+ordinary-only schema, atomic writes and fail-closed sensitivity boundary for #78.
+Accepted 2026-10-03; see the [implementation guide](../hv-22-ordinary-attributes.md).
+
 ## Template
 
 - Title and ID

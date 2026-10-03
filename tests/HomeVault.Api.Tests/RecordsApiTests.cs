@@ -70,6 +70,8 @@ public sealed partial class RecordsApiTests
             new SqliteVaultArchiveStore(services.GetRequiredService<SqliteDatabase>()), _gate));
         builder.Services.AddScoped<IVaultMembershipStore>(services => new GatedMembershipStore(
             new SqliteVaultMembershipStore(services.GetRequiredService<SqliteDatabase>()), _gate));
+        builder.Services.AddScoped<IOrdinaryAttributeStore>(services => new GatedAttributeStore(
+            new SqliteOrdinaryAttributeStore(services.GetRequiredService<SqliteDatabase>()), _gate));
         _app = builder.Build();
         AuthenticationHost.Map(_app);
         RecordsApi.Map(_app);

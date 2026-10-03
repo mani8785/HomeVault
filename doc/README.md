@@ -1,5 +1,9 @@
 # HomeVault documentation
 
+See [HV-22.4.3: Ordinary attributes](hv-22-ordinary-attributes.md) for durable
+add/change/remove/list operations and terminal verification under accepted
+[ADR-0023](ADRs/0023-durable-ordinary-attributes.md).
+
 See [HV-22.4.2: Authorized Vault membership](hv-22-vault-membership.md) for
 add/change-role/remove operations, concurrency rules and terminal verification.
 
