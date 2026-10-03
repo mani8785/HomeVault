@@ -2,12 +2,73 @@
   "openapi": "3.0.3",
   "info": {
     "title": "HomeVault authenticated Vault and Asset API",
-    "version": "1.1.0",
-    "description": "Create Vault, register/inspect Asset and archive Vault. Sign in through /auth/login after /auth/antiforgery bootstrap. Refresh antiforgery after identity changes. Submit the XSRF-TOKEN cookie value in X-XSRF-TOKEN with both HttpOnly cookies on POST. All responses are no-store. Names are private. Requests are limited to 16 KiB. Unknown JSON fields (including actor/owner/id) are rejected. Creation POSTs have no automatic retry or idempotency guarantee; authorized repeated archival succeeds without changing stored records. No membership, sensitive attribute or list endpoints."
+    "version": "1.2.0",
+    "description": "Create/archive Vault, register/inspect Asset and manage Vault memberships. Sign in through /auth/login after /auth/antiforgery bootstrap. Refresh antiforgery after identity changes. Submit the XSRF-TOKEN cookie value in X-XSRF-TOKEN with both HttpOnly cookies on POST, PUT and DELETE. All responses are no-store. Names are private. Requests are limited to 16 KiB. Unknown JSON fields (including requesting actor/owner/id) are rejected. Creation POSTs have no automatic retry or idempotency guarantee; authorized repeated archival succeeds. No account search, Sensitive attribute or list endpoints."
   },
   "servers": [{ "url": "https://localhost:7443" }],
   "security": [{ "cookieAuth": [] }],
   "paths": {
+    "/api/v1/vaults/{vaultId}/members": {
+      "post": {
+        "operationId": "addVaultMember",
+        "description": "Owner may add any role. Administrator may add Editor/Viewer only and cannot target an existing privileged member. Requires an existing enabled target account; requesting actor comes only from the session. Check requester permission, Active state, target availability, then duplicates within one write transaction. Missing/disabled targets share unavailable. No invitation or account search.",
+        "security": [{ "cookieAuth": [], "antiforgeryCookie": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/VaultIdentity" }, { "$ref": "#/components/parameters/Antiforgery" }],
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AddMemberInput" } } } },
+        "responses": {
+          "204": { "description": "Membership committed; empty body." },
+          "400": { "$ref": "#/components/responses/Problem" },
+          "401": { "$ref": "#/components/responses/Problem" },
+          "403": { "$ref": "#/components/responses/Problem" },
+          "404": { "$ref": "#/components/responses/Problem" },
+          "409": { "$ref": "#/components/responses/Problem" },
+          "413": { "$ref": "#/components/responses/Problem" },
+          "415": { "$ref": "#/components/responses/Problem" },
+          "429": { "$ref": "#/components/responses/Problem" },
+          "500": { "$ref": "#/components/responses/Problem" }
+        }
+      }
+    },
+    "/api/v1/vaults/{vaultId}/members/{targetActorId}/role": {
+      "put": {
+        "operationId": "changeVaultMemberRole",
+        "description": "Owner may change roles while preserving the last Owner. Administrator requires both old and new roles to be Editor/Viewer. Current authorization precedes archive and target/conflict checks. Authorized unchanged role succeeds only on an Active Vault. Disabled target accounts remain manageable.",
+        "security": [{ "cookieAuth": [], "antiforgeryCookie": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/VaultIdentity" }, { "$ref": "#/components/parameters/TargetActorIdentity" }, { "$ref": "#/components/parameters/Antiforgery" }],
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ChangeMemberRoleInput" } } } },
+        "responses": {
+          "204": { "description": "Role committed, including authorized unchanged role; empty body." },
+          "400": { "$ref": "#/components/responses/Problem" },
+          "401": { "$ref": "#/components/responses/Problem" },
+          "403": { "$ref": "#/components/responses/Problem" },
+          "404": { "$ref": "#/components/responses/Problem" },
+          "409": { "$ref": "#/components/responses/Problem" },
+          "413": { "$ref": "#/components/responses/Problem" },
+          "415": { "$ref": "#/components/responses/Problem" },
+          "429": { "$ref": "#/components/responses/Problem" },
+          "500": { "$ref": "#/components/responses/Problem" }
+        }
+      }
+    },
+    "/api/v1/vaults/{vaultId}/members/{targetActorId}": {
+      "delete": {
+        "operationId": "removeVaultMember",
+        "description": "Owner may remove any member except the last Owner. Administrator may remove only Editor/Viewer. No body is accepted. Removing membership does not delete the account or Assets. Missing target returns unavailable, including repeats; archived writes fail after role checks. Disabled target accounts remain removable.",
+        "security": [{ "cookieAuth": [], "antiforgeryCookie": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/VaultIdentity" }, { "$ref": "#/components/parameters/TargetActorIdentity" }, { "$ref": "#/components/parameters/Antiforgery" }],
+        "responses": {
+          "204": { "description": "Membership removed; empty body." },
+          "400": { "$ref": "#/components/responses/Problem" },
+          "401": { "$ref": "#/components/responses/Problem" },
+          "403": { "$ref": "#/components/responses/Problem" },
+          "404": { "$ref": "#/components/responses/Problem" },
+          "409": { "$ref": "#/components/responses/Problem" },
+          "413": { "$ref": "#/components/responses/Problem" },
+          "429": { "$ref": "#/components/responses/Problem" },
+          "500": { "$ref": "#/components/responses/Problem" }
+        }
+      }
+    },
     "/api/v1/vaults/{vaultId}/archive": {
       "post": {
         "operationId": "archiveVault",
@@ -98,12 +159,23 @@
       "antiforgeryCookie": { "type": "apiKey", "in": "cookie", "name": "__Host-HomeVault-Antiforgery" }
     },
     "parameters": {
+      "VaultIdentity": { "name": "vaultId", "in": "path", "required": true, "schema": { "$ref": "#/components/schemas/Identity" } },
+      "TargetActorIdentity": { "name": "targetActorId", "in": "path", "required": true, "schema": { "$ref": "#/components/schemas/Identity" } },
       "Antiforgery": { "name": "X-XSRF-TOKEN", "in": "header", "required": true, "schema": { "type": "string" }, "description": "Request token paired with current antiforgery cookie and identity; never log it." }
     },
     "responses": {
       "Problem": { "description": "Safe failure; no input values or exception text. Status matches HTTP. Access checks precede conflict checks.", "content": { "application/problem+json": { "schema": { "$ref": "#/components/schemas/Problem" } } } }
     },
     "schemas": {
+      "VaultRole": { "type": "string", "enum": ["owner", "administrator", "editor", "viewer"] },
+      "AddMemberInput": {
+        "type": "object", "additionalProperties": false, "required": ["targetActorId", "role"],
+        "properties": { "targetActorId": { "$ref": "#/components/schemas/Identity" }, "role": { "$ref": "#/components/schemas/VaultRole" } }
+      },
+      "ChangeMemberRoleInput": {
+        "type": "object", "additionalProperties": false, "required": ["role"],
+        "properties": { "role": { "$ref": "#/components/schemas/VaultRole" } }
+      },
       "Identity": { "type": "string", "format": "uuid", "description": "Nonzero Guid in hyphenated D format. Response IDs use lowercase hex; either hex case is accepted in routes.", "pattern": "^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$" },
       "Name": { "type": "string", "minLength": 1, "pattern": "\\S", "description": "Nonblank private name; whitespace around the name is preserved exactly. Bounded by the total request-byte limit, not truncated." },
       "VaultInput": {
@@ -130,7 +202,7 @@
         "properties": {
           "type": { "type": "string", "enum": ["about:blank"] }, "title": { "type": "string", "enum": ["Request failed."] },
           "status": { "type": "integer" },
-          "code": { "type": "string", "enum": ["invalid_request", "unauthenticated", "forbidden", "unavailable", "conflict", "request_too_large", "unsupported_media_type", "rate_limited", "request_failed", "blank_name", "invalid_type", "identity_conflict", "vault_archived", "invalid_identity"] },
+          "code": { "type": "string", "enum": ["invalid_request", "unauthenticated", "forbidden", "unavailable", "conflict", "request_too_large", "unsupported_media_type", "rate_limited", "request_failed", "blank_name", "invalid_type", "identity_conflict", "vault_archived", "invalid_identity", "invalid_role", "duplicate_member", "last_owner"] },
           "errors": { "type": "object", "description": "Field names mapped to safe error codes. Empty for non-field failures.", "additionalProperties": { "type": "array", "items": { "type": "string" } } }
         }
       }
