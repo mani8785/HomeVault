@@ -91,6 +91,13 @@ API boundary. No Domain/Application dependency or persistence schema changes.
 
 ## Accepted domain boundaries
 
+[Evidence operations](hv-22-evidence.md) use an Application-owned IEvidenceStore
+for Asset-local add/remove, metadata inspection and deliberate content reads.
+SQLite serializes writes with current membership/archive checks and restores only
+the needed Evidence state before Domain mutations. Separate EF configuration maps
+AssetEvidence under ADR-0024. Metadata queries never load content; content is
+plaintext, and no URL fetching, document resolution or encryption is implied.
+
 [Ordinary attribute operations](hv-22-ordinary-attributes.md) use an
 Application-owned IOrdinaryAttributeStore. SQLite checks access and classification
 before validated Domain restoration, serializes writes with membership/archive
