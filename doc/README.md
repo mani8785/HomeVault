@@ -1,5 +1,9 @@
 # HomeVault documentation
 
+See [ADR-0027: Encryption envelope and write-key lifecycle](ADRs/0027-encryption-envelope-key-lifecycle.md)
+for the proposed #63 framing, nonce bounds and recovery/custody contracts.
+HV-21 is resumed; Sensitive persistence remains unavailable pending later slices.
+
 See [ADR-0026: Durable Reminder lifecycle](ADRs/0026-durable-reminder-lifecycle.md)
 for #81's accepted API, UTC storage, action privacy and concurrency contract.
 The [Reminder implementation guide](hv-22-reminders.md) covers validation,

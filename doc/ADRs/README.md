@@ -91,6 +91,10 @@ Accepted 2026-10-04; see the [implementation guide](../hv-22-reminders.md).
 
 ## Template
 
+[ADR-0027](0027-encryption-envelope-key-lifecycle.md): Proposed #63 envelope,
+fresh write-key sessions, nonce limits and key custody boundary. Created 2026-10-04;
+requires acceptance before implementation under ADR-0018.
+
 - Title and ID
 - Status: Proposed / Accepted / Rejected / Superseded
 - Created date; accepted date when applicable
