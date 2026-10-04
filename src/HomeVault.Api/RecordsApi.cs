@@ -1,5 +1,6 @@
 using HomeVault.Application.Assets;
 using HomeVault.Application.Identity;
+using HomeVault.Application.Relationships;
 using HomeVault.Application.Vaults;
 using HomeVault.Domain.Vaults;
 using HomeVault.Infrastructure.Persistence;
@@ -32,6 +33,8 @@ public static class RecordsApi
         services.AddScoped<OrdinaryAttributeUseCases>();
         services.AddScoped<IEvidenceStore, SqliteEvidenceStore>();
         services.AddScoped<EvidenceUseCases>();
+        services.AddScoped<IRelationshipStore, SqliteRelationshipStore>();
+        services.AddScoped<RelationshipUseCases>();
     }
 
     /// <summary>Maps authenticated endpoints; use after AuthenticationHost.Map to retain antiforgery and safe failures.</summary>
@@ -41,6 +44,7 @@ public static class RecordsApi
         MembershipApi.Map(app);
         AttributeApi.Map(app);
         EvidenceApi.Map(app);
+        RelationshipApi.Map(app);
         var group = app.MapGroup("/api/v1").RequireAuthorization();
         group.MapPost("/vaults/{vaultId}/archive", async (string vaultId, HttpContext context, ArchiveVaultUseCase useCase, CancellationToken token) =>
         {

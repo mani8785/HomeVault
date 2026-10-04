@@ -2,12 +2,55 @@
   "openapi": "3.0.3",
   "info": {
     "title": "HomeVault authenticated Vault and Asset API",
-    "version": "1.4.0",
-    "description": "Create/archive Vault, register/inspect Asset, manage memberships, ordinary attributes and URL/Note Evidence. Evidence metadata inspection is separate from deliberate content reads; Evidence content is plaintext, never fetched or encrypted. Sign in through /auth/login after /auth/antiforgery bootstrap. Refresh antiforgery after identity changes. Submit the XSRF-TOKEN cookie value in X-XSRF-TOKEN with both HttpOnly cookies on POST, PUT and DELETE. All responses are no-store. Requests are limited to 16 KiB. Unknown JSON fields are rejected. Creation POSTs have no automatic retry or idempotency guarantee; authorized repeated archival succeeds. No account search, global lists or Sensitive attribute operations."
+    "version": "1.5.0",
+    "description": "Create/archive Vault, register/inspect Asset, manage memberships, ordinary attributes, URL/Note Evidence and directed Covers Relationships. Relationship removal retains history and both endpoint Assets. Evidence metadata inspection is separate from deliberate content reads; Evidence content is plaintext, never fetched or encrypted. Sign in through /auth/login after /auth/antiforgery bootstrap. Refresh antiforgery after identity changes. Submit the XSRF-TOKEN cookie value in X-XSRF-TOKEN with both HttpOnly cookies on POST, PUT and DELETE. All responses are no-store. Requests are limited to 16 KiB. Unknown JSON fields are rejected. Creation POSTs have no automatic retry or idempotency guarantee; authorized repeated archival succeeds. No account search, global lists or Sensitive attribute operations."
   },
   "servers": [{ "url": "https://localhost:7443" }],
   "security": [{ "cookieAuth": [] }],
   "paths": {
+    "/api/v1/vaults/{vaultId}/relationships": {
+      "post": {
+        "operationId": "createRelationship",
+        "description": "Create directed Covers from source policy Asset to target Asset; categories remain caller responsibilities. Caller supplies global id. Within one write transaction check membership, role, Active Vault, both actual endpoint VaultIds, kind/self-link, identity conflict, then active tuple duplicate. Cross-Vault endpoints are unavailable even for members of both Vaults. No reverse link or retry guarantee.",
+        "security": [{ "cookieAuth": [], "antiforgeryCookie": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/VaultIdentity" }, { "$ref": "#/components/parameters/Antiforgery" }],
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CreateRelationshipInput" } } } },
+        "responses": {
+          "201": { "description": "Active Relationship committed.", "headers": { "Location": { "description": "Individual inspection route.", "schema": { "type": "string" } } }, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Relationship" } } } },
+          "400": { "$ref": "#/components/responses/Problem" }, "401": { "$ref": "#/components/responses/Problem" },
+          "403": { "$ref": "#/components/responses/Problem" }, "404": { "$ref": "#/components/responses/Problem" },
+          "409": { "$ref": "#/components/responses/Problem" }, "413": { "$ref": "#/components/responses/Problem" },
+          "415": { "$ref": "#/components/responses/Problem" }, "429": { "$ref": "#/components/responses/Problem" },
+          "500": { "$ref": "#/components/responses/Problem" }
+        }
+      }
+    },
+    "/api/v1/vaults/{vaultId}/relationships/{relationshipId}": {
+      "get": {
+        "operationId": "inspectRelationship",
+        "description": "Current members may inspect Active/Removed roots, including Archived Vaults. Verify actual endpoint ownership in a consistent read transaction. No Asset graph or content is returned. Missing/wrong-Vault roots and inaccessible Vaults share unavailable.",
+        "parameters": [{ "$ref": "#/components/parameters/VaultIdentity" }, { "$ref": "#/components/parameters/RelationshipIdentity" }],
+        "responses": {
+          "200": { "description": "Authorized retained metadata.", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Relationship" } } } },
+          "400": { "$ref": "#/components/responses/Problem" }, "401": { "$ref": "#/components/responses/Problem" },
+          "404": { "$ref": "#/components/responses/Problem" }, "429": { "$ref": "#/components/responses/Problem" },
+          "500": { "$ref": "#/components/responses/Problem" }
+        }
+      },
+      "delete": {
+        "operationId": "removeRelationship",
+        "description": "Owner/Administrator/Editor on Active Vault only, including repeated removal. Retains root identity/references as Removed; never deletes Assets. No request body. A new id may recreate the same active tuple after removal, but removed ids stay reserved. Missing/wrong-Vault roots share unavailable.",
+        "security": [{ "cookieAuth": [], "antiforgeryCookie": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/VaultIdentity" }, { "$ref": "#/components/parameters/RelationshipIdentity" }, { "$ref": "#/components/parameters/Antiforgery" }],
+        "responses": {
+          "204": { "description": "Removed, including authorized repeated removal; empty body." },
+          "400": { "$ref": "#/components/responses/Problem" }, "401": { "$ref": "#/components/responses/Problem" },
+          "403": { "$ref": "#/components/responses/Problem" }, "404": { "$ref": "#/components/responses/Problem" },
+          "409": { "$ref": "#/components/responses/Problem" }, "413": { "$ref": "#/components/responses/Problem" },
+          "429": { "$ref": "#/components/responses/Problem" }, "500": { "$ref": "#/components/responses/Problem" }
+        }
+      }
+    },
     "/api/v1/assets/{assetId}/evidence": {
       "post": {
         "operationId": "addEvidence",
@@ -281,6 +324,7 @@
       "antiforgeryCookie": { "type": "apiKey", "in": "cookie", "name": "__Host-HomeVault-Antiforgery" }
     },
     "parameters": {
+      "RelationshipIdentity": { "name": "relationshipId", "in": "path", "required": true, "schema": { "$ref": "#/components/schemas/Identity" } },
       "EvidenceIdentity": { "name": "evidenceId", "in": "path", "required": true, "schema": { "$ref": "#/components/schemas/Identity" } },
       "AssetIdentity": { "name": "assetId", "in": "path", "required": true, "schema": { "$ref": "#/components/schemas/Identity" } },
       "VaultIdentity": { "name": "vaultId", "in": "path", "required": true, "schema": { "$ref": "#/components/schemas/Identity" } },
@@ -291,6 +335,14 @@
       "Problem": { "description": "Safe failure; no input values or exception text. Status matches HTTP. Access checks precede conflict checks.", "content": { "application/problem+json": { "schema": { "$ref": "#/components/schemas/Problem" } } } }
     },
     "schemas": {
+      "CreateRelationshipInput": {
+        "type": "object", "additionalProperties": false, "required": ["id", "sourceAssetId", "targetAssetId", "kind"],
+        "properties": { "id": { "$ref": "#/components/schemas/Identity" }, "sourceAssetId": { "$ref": "#/components/schemas/Identity" }, "targetAssetId": { "$ref": "#/components/schemas/Identity" }, "kind": { "type": "string", "enum": ["covers"] } }
+      },
+      "Relationship": {
+        "type": "object", "additionalProperties": false, "required": ["id", "vaultId", "sourceAssetId", "targetAssetId", "kind", "status"],
+        "properties": { "id": { "$ref": "#/components/schemas/Identity" }, "vaultId": { "$ref": "#/components/schemas/Identity" }, "sourceAssetId": { "$ref": "#/components/schemas/Identity" }, "targetAssetId": { "$ref": "#/components/schemas/Identity" }, "kind": { "type": "string", "enum": ["covers"] }, "status": { "type": "string", "enum": ["active", "removed"] } }
+      },
       "AddEvidenceInput": {
         "type": "object", "additionalProperties": false, "required": ["id", "label", "kind", "content"],
         "properties": { "id": { "$ref": "#/components/schemas/Identity" }, "label": { "$ref": "#/components/schemas/Name" }, "kind": { "type": "string", "enum": ["url", "note"] }, "content": { "$ref": "#/components/schemas/Name" } }
@@ -358,7 +410,7 @@
         "properties": {
           "type": { "type": "string", "enum": ["about:blank"] }, "title": { "type": "string", "enum": ["Request failed."] },
           "status": { "type": "integer" },
-          "code": { "type": "string", "enum": ["invalid_request", "unauthenticated", "forbidden", "unavailable", "conflict", "request_too_large", "unsupported_media_type", "rate_limited", "request_failed", "blank_name", "invalid_type", "identity_conflict", "vault_archived", "invalid_identity", "invalid_role", "duplicate_member", "last_owner", "invalid_name", "invalid_value", "unsupported_sensitivity", "attribute_exists", "blank_label", "invalid_kind", "blank_content", "invalid_url", "evidence_exists"] },
+          "code": { "type": "string", "enum": ["invalid_request", "unauthenticated", "forbidden", "unavailable", "conflict", "request_too_large", "unsupported_media_type", "rate_limited", "request_failed", "blank_name", "invalid_type", "identity_conflict", "vault_archived", "invalid_identity", "invalid_role", "duplicate_member", "last_owner", "invalid_name", "invalid_value", "unsupported_sensitivity", "attribute_exists", "blank_label", "invalid_kind", "blank_content", "invalid_url", "evidence_exists", "self_reference", "relationship_exists"] },
           "errors": { "type": "object", "description": "Field names mapped to safe error codes. Empty for non-field failures.", "additionalProperties": { "type": "array", "items": { "type": "string" } } }
         }
       }

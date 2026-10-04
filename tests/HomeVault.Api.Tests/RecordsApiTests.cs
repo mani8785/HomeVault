@@ -3,6 +3,7 @@ using System.Net.Http.Json;
 using System.Text.Json;
 using System.Text.RegularExpressions;
 using HomeVault.Application.Assets;
+using HomeVault.Application.Relationships;
 using HomeVault.Application.Vaults;
 using HomeVault.Domain.Assets;
 using HomeVault.Infrastructure.Identity;
@@ -74,6 +75,8 @@ public sealed partial class RecordsApiTests
             new SqliteOrdinaryAttributeStore(services.GetRequiredService<SqliteDatabase>()), _gate));
         builder.Services.AddScoped<IEvidenceStore>(services => new GatedEvidenceStore(
             new SqliteEvidenceStore(services.GetRequiredService<SqliteDatabase>()), _gate));
+        builder.Services.AddScoped<IRelationshipStore>(services => new GatedRelationshipStore(
+            new SqliteRelationshipStore(services.GetRequiredService<SqliteDatabase>()), _gate));
         _app = builder.Build();
         AuthenticationHost.Map(_app);
         RecordsApi.Map(_app);

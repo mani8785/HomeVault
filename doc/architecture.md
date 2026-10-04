@@ -91,6 +91,13 @@ API boundary. No Domain/Application dependency or persistence schema changes.
 
 ## Accepted domain boundaries
 
+[Relationship operations](hv-22-relationships.md) use an Application-owned
+IRelationshipStore for atomic creation/removal and consistent inspection. The
+SQLite adapter verifies both actual Asset VaultIds; membership in multiple Vaults
+does not permit cross-Vault links. Domain restoration preserves retained lifecycle
+state. Separate EF mapping and a filtered unique index enforce one active directed
+tuple under ADR-0025; removing a Relationship never deletes either Asset.
+
 [Evidence operations](hv-22-evidence.md) use an Application-owned IEvidenceStore
 for Asset-local add/remove, metadata inspection and deliberate content reads.
 SQLite serializes writes with current membership/archive checks and restores only
