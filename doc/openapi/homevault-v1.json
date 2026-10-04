@@ -2,12 +2,77 @@
   "openapi": "3.0.3",
   "info": {
     "title": "HomeVault authenticated Vault and Asset API",
-    "version": "1.5.0",
-    "description": "Create/archive Vault, register/inspect Asset, manage memberships, ordinary attributes, URL/Note Evidence and directed Covers Relationships. Relationship removal retains history and both endpoint Assets. Evidence metadata inspection is separate from deliberate content reads; Evidence content is plaintext, never fetched or encrypted. Sign in through /auth/login after /auth/antiforgery bootstrap. Refresh antiforgery after identity changes. Submit the XSRF-TOKEN cookie value in X-XSRF-TOKEN with both HttpOnly cookies on POST, PUT and DELETE. All responses are no-store. Requests are limited to 16 KiB. Unknown JSON fields are rejected. Creation POSTs have no automatic retry or idempotency guarantee; authorized repeated archival succeeds. No account search, global lists or Sensitive attribute operations."
+    "version": "1.6.0",
+    "description": "Create/archive Vault, register/inspect Asset, manage memberships, ordinary attributes, URL/Note Evidence directed Covers Relationships and Reminder lifecycle operations. Reminder action text is plaintext with separate deliberate reads; no scheduler is provided. Relationship removal retains history and both endpoint Assets. Evidence metadata inspection is separate from deliberate content reads; Evidence content is plaintext, never fetched or encrypted. Sign in through /auth/login after /auth/antiforgery bootstrap. Refresh antiforgery after identity changes. Submit the XSRF-TOKEN cookie value in X-XSRF-TOKEN with both HttpOnly cookies on POST, PUT and DELETE. All responses are no-store. Requests are limited to 16 KiB. Unknown JSON fields are rejected. Creation POSTs have no automatic retry or idempotency guarantee; authorized repeated archival succeeds. No account search, global lists or Sensitive attribute operations."
   },
   "servers": [{ "url": "https://localhost:7443" }],
   "security": [{ "cookieAuth": [] }],
   "paths": {
+    "/api/v1/vaults/{vaultId}/reminders": {
+      "post": {
+        "operationId": "createReminder",
+        "description": "Create Pending Reminder after current writer, Active Vault, actual Asset ownership, action and identity checks. Action remains plaintext in storage and is omitted from metadata. No scheduling or automatic retry.",
+        "security": [{ "cookieAuth": [], "antiforgeryCookie": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/VaultIdentity" }, { "$ref": "#/components/parameters/Antiforgery" }],
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/CreateReminderInput" } } } },
+        "responses": {
+          "201": { "description": "Pending Reminder committed.", "headers": { "Location": { "description": "Metadata route.", "schema": { "type": "string" } } }, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Reminder" } } } },
+          "400": { "$ref": "#/components/responses/Problem" }, "401": { "$ref": "#/components/responses/Problem" }, "403": { "$ref": "#/components/responses/Problem" }, "404": { "$ref": "#/components/responses/Problem" }, "409": { "$ref": "#/components/responses/Problem" }, "413": { "$ref": "#/components/responses/Problem" }, "415": { "$ref": "#/components/responses/Problem" }, "429": { "$ref": "#/components/responses/Problem" }, "500": { "$ref": "#/components/responses/Problem" }
+        }
+      }
+    },
+    "/api/v1/vaults/{vaultId}/reminders/{reminderId}": {
+      "get": {
+        "operationId": "inspectReminder", "description": "Current member metadata read, including terminal states and Archived Vaults. No action text.",
+        "parameters": [{ "$ref": "#/components/parameters/VaultIdentity" }, { "$ref": "#/components/parameters/ReminderIdentity" }],
+        "responses": {
+          "200": { "description": "Authorized metadata.", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/Reminder" } } } },
+          "400": { "$ref": "#/components/responses/Problem" }, "401": { "$ref": "#/components/responses/Problem" }, "404": { "$ref": "#/components/responses/Problem" }, "429": { "$ref": "#/components/responses/Problem" }, "500": { "$ref": "#/components/responses/Problem" }
+        }
+      },
+      "put": {
+        "operationId": "updateReminder", "description": "Replace both Pending fields atomically after current writer/Active Vault checks. Terminal state precedes action validation; concurrent edits serialize, last committed edit wins.",
+        "security": [{ "cookieAuth": [], "antiforgeryCookie": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/VaultIdentity" }, { "$ref": "#/components/parameters/ReminderIdentity" }, { "$ref": "#/components/parameters/Antiforgery" }],
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/UpdateReminderInput" } } } },
+        "responses": {
+          "204": { "description": "Both fields committed." },
+          "400": { "$ref": "#/components/responses/Problem" }, "401": { "$ref": "#/components/responses/Problem" }, "403": { "$ref": "#/components/responses/Problem" }, "404": { "$ref": "#/components/responses/Problem" }, "409": { "$ref": "#/components/responses/Problem" }, "413": { "$ref": "#/components/responses/Problem" }, "415": { "$ref": "#/components/responses/Problem" }, "429": { "$ref": "#/components/responses/Problem" }, "500": { "$ref": "#/components/responses/Problem" }
+        }
+      }
+    },
+    "/api/v1/vaults/{vaultId}/reminders/{reminderId}/action": {
+      "get": {
+        "operationId": "readReminderAction", "description": "Deliberate private action read after current membership and actual ownership checks; includes Archived Vaults. Never log returned content.",
+        "parameters": [{ "$ref": "#/components/parameters/VaultIdentity" }, { "$ref": "#/components/parameters/ReminderIdentity" }],
+        "responses": {
+          "200": { "description": "Authorized action text.", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ReminderAction" } } } },
+          "400": { "$ref": "#/components/responses/Problem" }, "401": { "$ref": "#/components/responses/Problem" }, "404": { "$ref": "#/components/responses/Problem" }, "429": { "$ref": "#/components/responses/Problem" }, "500": { "$ref": "#/components/responses/Problem" }
+        }
+      }
+    },
+    "/api/v1/vaults/{vaultId}/reminders/{reminderId}/complete": {
+      "post": {
+        "operationId": "completeReminder", "description": "No body. Complete Pending; same-terminal repeat succeeds only after current writer/Active checks. Cancelled yields 409 not_pending.",
+        "security": [{ "cookieAuth": [], "antiforgeryCookie": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/VaultIdentity" }, { "$ref": "#/components/parameters/ReminderIdentity" }, { "$ref": "#/components/parameters/Antiforgery" }],
+        "responses": {
+          "204": { "description": "Completed or authorized repeat." },
+          "400": { "$ref": "#/components/responses/Problem" }, "401": { "$ref": "#/components/responses/Problem" }, "403": { "$ref": "#/components/responses/Problem" }, "404": { "$ref": "#/components/responses/Problem" }, "409": { "$ref": "#/components/responses/Problem" }, "413": { "$ref": "#/components/responses/Problem" }, "429": { "$ref": "#/components/responses/Problem" }, "500": { "$ref": "#/components/responses/Problem" }
+        }
+      }
+    },
+    "/api/v1/vaults/{vaultId}/reminders/{reminderId}/cancel": {
+      "post": {
+        "operationId": "cancelReminder", "description": "No body. Cancel Pending; same-terminal repeat succeeds only after current writer/Active checks. Completed yields 409 not_pending.",
+        "security": [{ "cookieAuth": [], "antiforgeryCookie": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/VaultIdentity" }, { "$ref": "#/components/parameters/ReminderIdentity" }, { "$ref": "#/components/parameters/Antiforgery" }],
+        "responses": {
+          "204": { "description": "Cancelled or authorized repeat." },
+          "400": { "$ref": "#/components/responses/Problem" }, "401": { "$ref": "#/components/responses/Problem" }, "403": { "$ref": "#/components/responses/Problem" }, "404": { "$ref": "#/components/responses/Problem" }, "409": { "$ref": "#/components/responses/Problem" }, "413": { "$ref": "#/components/responses/Problem" }, "429": { "$ref": "#/components/responses/Problem" }, "500": { "$ref": "#/components/responses/Problem" }
+        }
+      }
+    },
     "/api/v1/vaults/{vaultId}/relationships": {
       "post": {
         "operationId": "createRelationship",
@@ -324,6 +389,7 @@
       "antiforgeryCookie": { "type": "apiKey", "in": "cookie", "name": "__Host-HomeVault-Antiforgery" }
     },
     "parameters": {
+      "ReminderIdentity": { "name": "reminderId", "in": "path", "required": true, "schema": { "$ref": "#/components/schemas/Identity" } },
       "RelationshipIdentity": { "name": "relationshipId", "in": "path", "required": true, "schema": { "$ref": "#/components/schemas/Identity" } },
       "EvidenceIdentity": { "name": "evidenceId", "in": "path", "required": true, "schema": { "$ref": "#/components/schemas/Identity" } },
       "AssetIdentity": { "name": "assetId", "in": "path", "required": true, "schema": { "$ref": "#/components/schemas/Identity" } },
@@ -335,6 +401,20 @@
       "Problem": { "description": "Safe failure; no input values or exception text. Status matches HTTP. Access checks precede conflict checks.", "content": { "application/problem+json": { "schema": { "$ref": "#/components/schemas/Problem" } } } }
     },
     "schemas": {
+      "ReminderInstant": { "type": "string", "format": "date-time", "description": "Exact representable UTC instant; explicit Z or numeric offset, seconds, at most seven fractional digits. No timezone inference or precision truncation. Past dates and full year 0001..9999 UTC range allowed.", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]{1,7})?(Z|[+-][0-9]{2}:[0-9]{2})$" },
+      "CreateReminderInput": {
+        "type": "object", "additionalProperties": false, "required": ["id", "assetId", "action", "dueAt"],
+        "properties": { "id": { "$ref": "#/components/schemas/Identity" }, "assetId": { "$ref": "#/components/schemas/Identity" }, "action": { "$ref": "#/components/schemas/Name" }, "dueAt": { "$ref": "#/components/schemas/ReminderInstant" } }
+      },
+      "UpdateReminderInput": {
+        "type": "object", "additionalProperties": false, "required": ["action", "dueAt"],
+        "properties": { "action": { "$ref": "#/components/schemas/Name" }, "dueAt": { "$ref": "#/components/schemas/ReminderInstant" } }
+      },
+      "Reminder": {
+        "type": "object", "additionalProperties": false, "required": ["id", "vaultId", "assetId", "dueAt", "status"],
+        "properties": { "id": { "$ref": "#/components/schemas/Identity" }, "vaultId": { "$ref": "#/components/schemas/Identity" }, "assetId": { "$ref": "#/components/schemas/Identity" }, "dueAt": { "type": "string", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}\\.[0-9]{7}Z$" }, "status": { "type": "string", "enum": ["pending", "completed", "cancelled"] } }
+      },
+      "ReminderAction": { "type": "object", "additionalProperties": false, "required": ["action"], "properties": { "action": { "$ref": "#/components/schemas/Name" } } },
       "CreateRelationshipInput": {
         "type": "object", "additionalProperties": false, "required": ["id", "sourceAssetId", "targetAssetId", "kind"],
         "properties": { "id": { "$ref": "#/components/schemas/Identity" }, "sourceAssetId": { "$ref": "#/components/schemas/Identity" }, "targetAssetId": { "$ref": "#/components/schemas/Identity" }, "kind": { "type": "string", "enum": ["covers"] } }
@@ -410,7 +490,7 @@
         "properties": {
           "type": { "type": "string", "enum": ["about:blank"] }, "title": { "type": "string", "enum": ["Request failed."] },
           "status": { "type": "integer" },
-          "code": { "type": "string", "enum": ["invalid_request", "unauthenticated", "forbidden", "unavailable", "conflict", "request_too_large", "unsupported_media_type", "rate_limited", "request_failed", "blank_name", "invalid_type", "identity_conflict", "vault_archived", "invalid_identity", "invalid_role", "duplicate_member", "last_owner", "invalid_name", "invalid_value", "unsupported_sensitivity", "attribute_exists", "blank_label", "invalid_kind", "blank_content", "invalid_url", "evidence_exists", "self_reference", "relationship_exists"] },
+          "code": { "type": "string", "enum": ["invalid_request", "unauthenticated", "forbidden", "unavailable", "conflict", "request_too_large", "unsupported_media_type", "rate_limited", "request_failed", "blank_name", "invalid_type", "identity_conflict", "vault_archived", "invalid_identity", "invalid_role", "duplicate_member", "last_owner", "invalid_name", "invalid_value", "unsupported_sensitivity", "attribute_exists", "blank_label", "invalid_kind", "blank_content", "invalid_url", "evidence_exists", "self_reference", "relationship_exists", "invalid_due_at", "blank_action", "not_pending"] },
           "errors": { "type": "object", "description": "Field names mapped to safe error codes. Empty for non-field failures.", "additionalProperties": { "type": "array", "items": { "type": "string" } } }
         }
       }

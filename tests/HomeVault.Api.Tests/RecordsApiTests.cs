@@ -4,6 +4,7 @@ using System.Text.Json;
 using System.Text.RegularExpressions;
 using HomeVault.Application.Assets;
 using HomeVault.Application.Relationships;
+using HomeVault.Application.Reminders;
 using HomeVault.Application.Vaults;
 using HomeVault.Domain.Assets;
 using HomeVault.Infrastructure.Identity;
@@ -77,6 +78,8 @@ public sealed partial class RecordsApiTests
             new SqliteEvidenceStore(services.GetRequiredService<SqliteDatabase>()), _gate));
         builder.Services.AddScoped<IRelationshipStore>(services => new GatedRelationshipStore(
             new SqliteRelationshipStore(services.GetRequiredService<SqliteDatabase>()), _gate));
+        builder.Services.AddScoped<IReminderStore>(services => new GatedReminderStore(
+            new SqliteReminderStore(services.GetRequiredService<SqliteDatabase>()), _gate));
         _app = builder.Build();
         AuthenticationHost.Map(_app);
         RecordsApi.Map(_app);
