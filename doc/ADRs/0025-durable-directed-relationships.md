@@ -1,7 +1,8 @@
 # ADR-0025: Durable directed Relationships
 
-Status: Proposed
+Status: Accepted
 Created: 2026-10-04
+Accepted: 2026-10-04
 Issue: [HV-22.4.5 / #80](https://github.com/mani8785/HomeVault/issues/80)
 
 ## Context
@@ -150,6 +151,6 @@ does not prove no commit occurred.
 
 ## Confirmation
 
-Awaiting explicit owner acceptance. This proposal adds no runtime behavior or
-migration and does not complete #80. Keep #80, #72 and #26 open; Reminders and
-parked encryption/UI work remain separate steps.
+The owner explicitly accepted this contract on 2026-10-04 and authorized
+implementation. Close #80 only when its implementation merges. Keep #72 and #26
+open; Reminders and parked encryption/UI work remain separate steps.

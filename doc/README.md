@@ -1,7 +1,9 @@
 # HomeVault documentation
 
 See [ADR-0025: Durable directed Relationships](ADRs/0025-durable-directed-relationships.md)
-for #80's proposed API/schema and concurrency rules. Implementation awaits approval.
+for #80's accepted API/schema and concurrency rules. The
+[Relationship implementation guide](hv-22-relationships.md) covers behavior,
+database upgrade, validation and terminal examples.
 
 See [ADR-0024: Durable URL/Note Evidence](ADRs/0024-durable-url-note-evidence.md)
 for #79's accepted API/schema and plaintext limitation. The
