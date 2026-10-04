@@ -37,6 +37,22 @@ public sealed class Reminder
     /// <remarks>Does not authorize access. Avoid logging the returned text; previously read strings cannot be revoked.</remarks>
     public string ReadAction() => _action;
 
+    /// <summary>Restores validated persisted state without replaying lifecycle operations.</summary>
+    /// <param name="id">Root identity.</param><param name="vaultId">Owning Vault identity.</param>
+    /// <param name="assetId">Referenced Asset identity.</param><param name="action">Original private action.</param>
+    /// <param name="dueAt">Stored instant, normalized to UTC.</param><param name="status">Stored lifecycle.</param>
+    /// <returns>A validated independent root.</returns>
+    /// <exception cref="InvalidOperationException">Stored state violates Domain invariants.</exception>
+    /// <remarks>The adapter must verify actual ownership and requester authorization.</remarks>
+    public static Reminder Restore(Guid id, Guid vaultId, Guid assetId, string? action, DateTimeOffset dueAt, ReminderStatus status)
+    {
+        var result = Create(id, vaultId, assetId, action, dueAt);
+        if (result.Reminder is not { } root || !Enum.IsDefined(status))
+            throw new InvalidOperationException("Invalid stored Reminder state.");
+        root.Status = status;
+        return root;
+    }
+
     /// <summary>Creates a Pending action with validated identities and text.</summary>
     /// <param name="id">A non-empty Reminder identity.</param>
     /// <param name="vaultId">A non-empty Vault identity.</param>

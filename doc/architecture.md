@@ -6,6 +6,12 @@ Keep business rules in a small domain model. Application coordinates use cases. 
 
 ## Project dependencies
 
+[Reminder lifecycle operations](hv-22-reminders.md) use Application-owned
+IReminderStore with current-access and actual Asset ownership checks inside SQLite
+transactions. Domain restoration validates stored state; UTC ticks preserve exact
+instants. The authenticated API separates metadata from deliberate plaintext action
+reads under accepted ADR-0026. No scheduling or notification service is introduced.
+
 Arrows mean a compile-time project reference, not runtime data flow.
 
 ```mermaid

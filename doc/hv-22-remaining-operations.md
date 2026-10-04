@@ -21,8 +21,8 @@ PRs #83 and #84. [Ordinary attributes #78](hv-22-ordinary-attributes.md) are
 merged through PR #85. [Evidence #79](hv-22-evidence.md) is merged through PR #86.
 [Relationships #80](hv-22-relationships.md) implements accepted
 [ADR-0025](ADRs/0025-durable-directed-relationships.md), merged through PR #87.
-Reminders #81 is In Progress for contract refinement under proposed
-[ADR-0026](ADRs/0026-durable-reminder-lifecycle.md). Implementation awaits acceptance.
+[Reminders #81](hv-22-reminders.md) implements accepted
+[ADR-0026](ADRs/0026-durable-reminder-lifecycle.md) for PR review.
 
 | Order | Bounded outcome | Dependencies | Required evidence |
 | --- | --- | --- | --- |

@@ -83,11 +83,13 @@ Plaintext content storage was explicitly accepted on 2026-10-03; see the
 durable directed Relationships, exact routes/schema, same-Vault checks and
 atomic active-tuple uniqueness for #80. See the [implementation guide](../hv-22-relationships.md).
 
-## Template
+## Accepted durable Reminder contract
 
-[ADR-0026](0026-durable-reminder-lifecycle.md): Proposed durable Reminder lifecycle
+[ADR-0026](0026-durable-reminder-lifecycle.md): Accepted durable Reminder lifecycle
 contract for #81, including exact HTTP routes, UTC ticks and deliberate action reads.
-Created 2026-10-04; pending owner acceptance before implementation.
+Accepted 2026-10-04; see the [implementation guide](../hv-22-reminders.md).
+
+## Template
 
 - Title and ID
 - Status: Proposed / Accepted / Rejected / Superseded

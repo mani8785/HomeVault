@@ -1,7 +1,8 @@
 # ADR-0026: Durable Reminder lifecycle
 
-Status: Proposed
+Status: Accepted
 Created: 2026-10-04
+Accepted: 2026-10-04
 Issue: [#81](https://github.com/mani8785/HomeVault/issues/81), under #72/#26
 
 ## Context
@@ -127,5 +128,5 @@ do not automatically close parents or resume parked UI work.
 
 ## Confirmation
 
-Pending owner review of this exact API, schema, plaintext action storage and
-concurrency contract. Authorization to start #81 does not mark this proposal Accepted.
+The owner explicitly accepted this exact API, schema, plaintext action storage
+and concurrency contract on 2026-10-04. Implementation of #81 is authorized.
