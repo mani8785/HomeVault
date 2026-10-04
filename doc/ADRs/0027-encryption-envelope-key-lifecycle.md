@@ -1,7 +1,8 @@
 # ADR-0027: Encryption envelope and write-key lifecycle
 
-Status: Proposed
+Status: Accepted
 Created: 2026-10-04
+Accepted: 2026-10-04
 Issue: [#63](https://github.com/mani8785/HomeVault/issues/63), under #25
 
 ## Context
@@ -139,8 +140,9 @@ Sensitive APIs remain unexposed. #64 custody/recovery, #65 authorization/schema 
 
 ## Confirmation
 
-Pending owner acceptance of framing, stable identity context, the fresh-key session
-model, bounds and custody contracts. Resuming #63 does not accept these new details.
+The owner explicitly accepted framing, stable identity context, the fresh-key
+session model, bounds and custody contracts on 2026-10-04. #63 implementation is
+authorized; production custody and Sensitive persistence remain later slices.
 
 ## References
 
