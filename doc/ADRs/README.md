@@ -85,6 +85,10 @@ atomic active-tuple uniqueness for #80. See the [implementation guide](../hv-22-
 
 ## Template
 
+[ADR-0026](0026-durable-reminder-lifecycle.md): Proposed durable Reminder lifecycle
+contract for #81, including exact HTTP routes, UTC ticks and deliberate action reads.
+Created 2026-10-04; pending owner acceptance before implementation.
+
 - Title and ID
 - Status: Proposed / Accepted / Rejected / Superseded
 - Created date; accepted date when applicable

@@ -1,5 +1,9 @@
 # HomeVault documentation
 
+See [ADR-0026: Durable Reminder lifecycle](ADRs/0026-durable-reminder-lifecycle.md)
+for #81's proposed API, UTC storage, action privacy and concurrency contract.
+Implementation awaits acceptance of this proposal.
+
 See [ADR-0025: Durable directed Relationships](ADRs/0025-durable-directed-relationships.md)
 for #80's accepted API/schema and concurrency rules. The
 [Relationship implementation guide](hv-22-relationships.md) covers behavior,
