@@ -77,6 +77,12 @@ storage, separate metadata/content reads and exact HTTP/schema contracts for #79
 Plaintext content storage was explicitly accepted on 2026-10-03; see the
 [implementation guide](../hv-22-evidence.md).
 
+## Proposed durable Relationship contract
+
+[ADR-0025](0025-durable-directed-relationships.md) is Proposed (2026-10-04):
+durable directed Relationships, exact routes/schema, same-Vault checks and
+atomic active-tuple uniqueness for #80. Implementation awaits confirmation.
+
 ## Template
 
 - Title and ID
