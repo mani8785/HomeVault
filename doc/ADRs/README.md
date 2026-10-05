@@ -89,6 +89,12 @@ atomic active-tuple uniqueness for #80. See the [implementation guide](../hv-22-
 contract for #81, including exact HTTP routes, UTC ticks and deliberate action reads.
 Accepted 2026-10-04; see the [implementation guide](../hv-22-reminders.md).
 
+## Accepted encryption envelope contract
+
+[ADR-0027](0027-encryption-envelope-key-lifecycle.md): Accepted #63 envelope,
+fresh write-key sessions, nonce limits and key custody boundary. Accepted 2026-10-04;
+see the [implementation guide](../hv-21-encryption-envelopes.md).
+
 ## Template
 
 - Title and ID

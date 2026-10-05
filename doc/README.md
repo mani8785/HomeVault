@@ -1,5 +1,11 @@
 # HomeVault documentation
 
+See [ADR-0027: Encryption envelope and write-key lifecycle](ADRs/0027-encryption-envelope-key-lifecycle.md)
+for the accepted #63 framing, nonce bounds and recovery/custody contracts.
+The [envelope implementation guide](hv-21-encryption-envelopes.md) covers the
+internal implementation, verification and remaining production-custody boundary.
+Sensitive persistence remains unavailable pending later slices.
+
 See [ADR-0026: Durable Reminder lifecycle](ADRs/0026-durable-reminder-lifecycle.md)
 for #81's accepted API, UTC storage, action privacy and concurrency contract.
 The [Reminder implementation guide](hv-22-reminders.md) covers validation,

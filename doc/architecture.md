@@ -6,6 +6,11 @@ Keep business rules in a small domain model. Application coordinates use cases. 
 
 ## Project dependencies
 
+[Encryption envelopes](hv-21-encryption-envelopes.md) are internal Infrastructure
+components under ADR-0027. They implement framing, authenticated record binding,
+owned read-key leases and bounded write sessions. No production custody provider,
+host registration, schema change or Sensitive operation is introduced by #63.
+
 [Reminder lifecycle operations](hv-22-reminders.md) use Application-owned
 IReminderStore with current-access and actual Asset ownership checks inside SQLite
 transactions. Domain restoration validates stored state; UTC ticks preserve exact
