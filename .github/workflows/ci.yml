@@ -34,8 +34,17 @@ jobs:
         run: |
           dotnet restore
           if ($LASTEXITCODE -ne 0) { throw 'Restore failed.' }
-          dotnet test --configuration Release --no-restore --logger trx --results-directory TestResults/windows
-          if ($LASTEXITCODE -ne 0) { throw 'Windows integration tests failed.' }
+          # Disposable runner-only account. This password is not an application recovery key.
+          $env:HOMEVAULT_TEST_USER = 'hv-recovery-test'
+          $env:HOMEVAULT_TEST_PASSWORD = [Convert]::ToHexString([Security.Cryptography.RandomNumberGenerator]::GetBytes(24)) + 'aA!7'
+          New-LocalUser -Name $env:HOMEVAULT_TEST_USER -Password (ConvertTo-SecureString $env:HOMEVAULT_TEST_PASSWORD -AsPlainText -Force) | Out-Null
+          try {
+              dotnet test --configuration Release --no-restore --logger trx --results-directory TestResults/windows
+              if ($LASTEXITCODE -ne 0) { throw 'Windows integration tests failed.' }
+          } finally {
+              Remove-LocalUser -Name $env:HOMEVAULT_TEST_USER
+              Remove-Item Env:HOMEVAULT_TEST_USER, Env:HOMEVAULT_TEST_PASSWORD
+          }
           $reports = @(Get-ChildItem TestResults/windows -Filter '*.trx')
           if ($reports.Count -eq 0) { throw 'Windows test reports missing.' }
           foreach ($report in $reports) {

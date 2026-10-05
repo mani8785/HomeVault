@@ -9,6 +9,8 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.10.1" PrivateAssets="all" />
   </ItemGroup>
   <ItemGroup>
+    <!-- Exercise the small operator boundary without a reverse project reference to the composition root. -->
+    <Compile Include="../../src/HomeVault.Playground/EncryptionKeyJourney.cs" Link="Operator/EncryptionKeyJourney.cs" />
     <ProjectReference Include="../../src/HomeVault.Infrastructure/HomeVault.Infrastructure.csproj" />
     <ProjectReference Include="../../src/HomeVault.Application/HomeVault.Application.csproj" />
     <ProjectReference Include="../../src/HomeVault.Domain/HomeVault.Domain.csproj" />
