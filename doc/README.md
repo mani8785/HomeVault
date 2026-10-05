@@ -1,5 +1,38 @@
 # HomeVault documentation
 
+See [ADR-0028: Windows key custody and recovery](ADRs/0028-windows-key-custody-recovery.md)
+for #64's accepted secret-input interaction, protected ring/export formats and
+atomic publication protocol. The [operator guide](hv-21-key-recovery.md) explains
+initialization, verification and recovery. Sensitive persistence remains #65.
+
+See [ADR-0027: Encryption envelope and write-key lifecycle](ADRs/0027-encryption-envelope-key-lifecycle.md)
+for the accepted #63 framing, nonce bounds and recovery/custody contracts.
+The [envelope implementation guide](hv-21-encryption-envelopes.md) covers the
+internal implementation, verification and remaining production-custody boundary.
+Sensitive persistence remains unavailable pending later slices.
+
+See [ADR-0026: Durable Reminder lifecycle](ADRs/0026-durable-reminder-lifecycle.md)
+for #81's accepted API, UTC storage, action privacy and concurrency contract.
+The [Reminder implementation guide](hv-22-reminders.md) covers validation,
+database upgrade and the terminal journey.
+
+See [ADR-0025: Durable directed Relationships](ADRs/0025-durable-directed-relationships.md)
+for #80's accepted API/schema and concurrency rules. The
+[Relationship implementation guide](hv-22-relationships.md) covers behavior,
+database upgrade, validation and terminal examples.
+
+See [ADR-0024: Durable URL/Note Evidence](ADRs/0024-durable-url-note-evidence.md)
+for #79's accepted API/schema and plaintext limitation. The
+[Evidence implementation guide](hv-22-evidence.md) covers behavior, validation,
+database upgrade and terminal examples.
+
+See [HV-22.4.3: Ordinary attributes](hv-22-ordinary-attributes.md) for durable
+add/change/remove/list operations and terminal verification under accepted
+[ADR-0023](ADRs/0023-durable-ordinary-attributes.md).
+
+See [HV-22.4.2: Authorized Vault membership](hv-22-vault-membership.md) for
+add/change-role/remove operations, concurrency rules and terminal verification.
+
 See [HV-22.4.1: Owner-only Vault archival](hv-22-vault-archive.md) for the
 authenticated archive operation, transactional guarantees and terminal journey.
 

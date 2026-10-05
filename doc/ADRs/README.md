@@ -64,7 +64,42 @@ and membership contracts, real-account targets and validated Domain restoration.
 The [task plan](../hv-22-remaining-operations.md) splits #72 into reviewable slices.
 Accepted 2026-10-02; ArchiveVault (#76) is the first authorized implementation.
 
+## Accepted ordinary attribute contract
+
+[ADR-0023](0023-durable-ordinary-attributes.md) accepts the HTTP operations,
+ordinary-only schema, atomic writes and fail-closed sensitivity boundary for #78.
+Accepted 2026-10-03; see the [implementation guide](../hv-22-ordinary-attributes.md).
+
+## Accepted durable Evidence contract
+
+[ADR-0024](0024-durable-url-note-evidence.md) accepts Asset-owned URL/Note
+storage, separate metadata/content reads and exact HTTP/schema contracts for #79.
+Plaintext content storage was explicitly accepted on 2026-10-03; see the
+[implementation guide](../hv-22-evidence.md).
+
+## Accepted durable Relationship contract
+
+[ADR-0025](0025-durable-directed-relationships.md) was accepted on 2026-10-04:
+durable directed Relationships, exact routes/schema, same-Vault checks and
+atomic active-tuple uniqueness for #80. See the [implementation guide](../hv-22-relationships.md).
+
+## Accepted durable Reminder contract
+
+[ADR-0026](0026-durable-reminder-lifecycle.md): Accepted durable Reminder lifecycle
+contract for #81, including exact HTTP routes, UTC ticks and deliberate action reads.
+Accepted 2026-10-04; see the [implementation guide](../hv-22-reminders.md).
+
+## Accepted encryption envelope contract
+
+[ADR-0027](0027-encryption-envelope-key-lifecycle.md): Accepted #63 envelope,
+fresh write-key sessions, nonce limits and key custody boundary. Accepted 2026-10-04;
+see the [implementation guide](../hv-21-encryption-envelopes.md).
+
 ## Template
+
+[ADR-0028](0028-windows-key-custody-recovery.md): Accepted #64 Windows custody,
+hidden recovery-secret input and portable export/publication contract. Created
+2026-10-05; accepted 2026-10-05. Implemented by #64.
 
 - Title and ID
 - Status: Proposed / Accepted / Rejected / Superseded

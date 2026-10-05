@@ -6,6 +6,22 @@ Keep business rules in a small domain model. Application coordinates use cases. 
 
 ## Project dependencies
 
+[Encryption envelopes](hv-21-encryption-envelopes.md) are internal Infrastructure
+components under ADR-0027. They implement framing, authenticated record binding,
+owned read-key leases and bounded write sessions. No production custody provider,
+host registration, schema change or Sensitive operation is introduced by #63.
+
+#64 adds an internal Windows DPAPI CurrentUser custody adapter and explicit
+[key recovery commands](hv-21-key-recovery.md) under accepted ADR-0028. Immutable
+protected generations and authenticated portable exports are verified before
+issuing a fresh write session. API/SQLite integration remains #65.
+
+[Reminder lifecycle operations](hv-22-reminders.md) use Application-owned
+IReminderStore with current-access and actual Asset ownership checks inside SQLite
+transactions. Domain restoration validates stored state; UTC ticks preserve exact
+instants. The authenticated API separates metadata from deliberate plaintext action
+reads under accepted ADR-0026. No scheduling or notification service is introduced.
+
 Arrows mean a compile-time project reference, not runtime data flow.
 
 ```mermaid
@@ -90,6 +106,32 @@ adapters. Versioned transport DTOs and the embedded OpenAPI contract belong to t
 API boundary. No Domain/Application dependency or persistence schema changes.
 
 ## Accepted domain boundaries
+
+[Relationship operations](hv-22-relationships.md) use an Application-owned
+IRelationshipStore for atomic creation/removal and consistent inspection. The
+SQLite adapter verifies both actual Asset VaultIds; membership in multiple Vaults
+does not permit cross-Vault links. Domain restoration preserves retained lifecycle
+state. Separate EF mapping and a filtered unique index enforce one active directed
+tuple under ADR-0025; removing a Relationship never deletes either Asset.
+
+[Evidence operations](hv-22-evidence.md) use an Application-owned IEvidenceStore
+for Asset-local add/remove, metadata inspection and deliberate content reads.
+SQLite serializes writes with current membership/archive checks and restores only
+the needed Evidence state before Domain mutations. Separate EF configuration maps
+AssetEvidence under ADR-0024. Metadata queries never load content; content is
+plaintext, and no URL fetching, document resolution or encryption is implied.
+
+[Ordinary attribute operations](hv-22-ordinary-attributes.md) use an
+Application-owned IOrdinaryAttributeStore. SQLite checks access and classification
+before validated Domain restoration, serializes writes with membership/archive
+changes and persists only the affected row. Separate EF configuration maps the
+ordinary-only AssetAttributes table under accepted ADR-0023. Sensitive storage
+remains blocked on the encryption implementation.
+
+[Vault membership operations](hv-22-vault-membership.md) use an Application-owned
+IVaultMembershipStore for atomic current-role checks, real-account addition and
+Domain mutation through validated restoration. SQLite serializes membership,
+archival and Asset writes; the existing schema and project dependencies remain.
 
 Under accepted [ADR-0022](ADRs/0022-remaining-authorized-operations.md),
 [ArchiveVault](hv-22-vault-archive.md) restores validated Vault/membership state

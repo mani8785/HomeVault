@@ -116,6 +116,30 @@ namespace HomeVault.Infrastructure.Persistence.Migrations
                         });
                 });
 
+            modelBuilder.Entity("HomeVault.Infrastructure.Persistence.AssetAttributeRow", b =>
+                {
+                    b.Property<Guid>("AssetId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Name")
+                        .HasColumnType("TEXT")
+                        .UseCollation("BINARY");
+
+                    b.Property<int>("Sensitivity")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Value")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("AssetId", "Name");
+
+                    b.ToTable("AssetAttributes", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_AssetAttribute_Ordinary", "Sensitivity = 0");
+                        });
+                });
+
             modelBuilder.Entity("HomeVault.Infrastructure.Persistence.AssetRow", b =>
                 {
                     b.Property<Guid>("Id")
@@ -138,6 +162,35 @@ namespace HomeVault.Infrastructure.Persistence.Migrations
                         });
                 });
 
+            modelBuilder.Entity("HomeVault.Infrastructure.Persistence.EvidenceRow", b =>
+                {
+                    b.Property<Guid>("AssetId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Kind")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<string>("Label")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("AssetId", "Id");
+
+                    b.ToTable("AssetEvidence", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_Evidence_Id", "Id <> '00000000-0000-0000-0000-000000000000'");
+
+                            t.HasCheckConstraint("CK_Evidence_Kind", "Kind IN (0, 1)");
+                        });
+                });
+
             modelBuilder.Entity("HomeVault.Infrastructure.Persistence.MembershipRow", b =>
                 {
                     b.Property<Guid>("VaultId")
@@ -156,6 +209,85 @@ namespace HomeVault.Infrastructure.Persistence.Migrations
                             t.HasCheckConstraint("CK_Membership_Actor", "ActorId <> '00000000-0000-0000-0000-000000000000'");
 
                             t.HasCheckConstraint("CK_Membership_Role", "Role IN (0, 1, 2, 3)");
+                        });
+                });
+
+            modelBuilder.Entity("HomeVault.Infrastructure.Persistence.RelationshipRow", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Kind")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Guid>("SourceAssetId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Guid>("TargetAssetId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("VaultId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("SourceAssetId");
+
+                    b.HasIndex("TargetAssetId");
+
+                    b.HasIndex("VaultId", "SourceAssetId", "TargetAssetId", "Kind")
+                        .IsUnique()
+                        .HasFilter("Status = 0");
+
+                    b.ToTable("Relationships", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_Relationship_DistinctEndpoints", "SourceAssetId <> TargetAssetId");
+
+                            t.HasCheckConstraint("CK_Relationship_Id", "Id <> '00000000-0000-0000-0000-000000000000'");
+
+                            t.HasCheckConstraint("CK_Relationship_Kind", "Kind = 0");
+
+                            t.HasCheckConstraint("CK_Relationship_Status", "Status IN (0, 1)");
+                        });
+                });
+
+            modelBuilder.Entity("HomeVault.Infrastructure.Persistence.ReminderRow", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("TEXT");
+
+                    b.Property<string>("Action")
+                        .IsRequired()
+                        .HasColumnType("TEXT");
+
+                    b.Property<Guid>("AssetId")
+                        .HasColumnType("TEXT");
+
+                    b.Property<long>("DueAtUtcTicks")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("INTEGER");
+
+                    b.Property<Guid>("VaultId")
+                        .HasColumnType("TEXT");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AssetId");
+
+                    b.HasIndex("VaultId");
+
+                    b.ToTable("Reminders", null, t =>
+                        {
+                            t.HasCheckConstraint("CK_Reminder_DueAt", "typeof(DueAtUtcTicks) = 'integer' AND DueAtUtcTicks BETWEEN 0 AND 3155378975999999999");
+
+                            t.HasCheckConstraint("CK_Reminder_Id", "Id <> '00000000-0000-0000-0000-000000000000'");
+
+                            t.HasCheckConstraint("CK_Reminder_Status", "Status IN (0, 1, 2)");
                         });
                 });
 
@@ -312,6 +444,15 @@ namespace HomeVault.Infrastructure.Persistence.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
+            modelBuilder.Entity("HomeVault.Infrastructure.Persistence.AssetAttributeRow", b =>
+                {
+                    b.HasOne("HomeVault.Infrastructure.Persistence.AssetRow", null)
+                        .WithMany()
+                        .HasForeignKey("AssetId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("HomeVault.Infrastructure.Persistence.AssetRow", b =>
                 {
                     b.HasOne("HomeVault.Infrastructure.Persistence.VaultRow", null)
@@ -321,8 +462,53 @@ namespace HomeVault.Infrastructure.Persistence.Migrations
                         .IsRequired();
                 });
 
+            modelBuilder.Entity("HomeVault.Infrastructure.Persistence.EvidenceRow", b =>
+                {
+                    b.HasOne("HomeVault.Infrastructure.Persistence.AssetRow", null)
+                        .WithMany()
+                        .HasForeignKey("AssetId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
             modelBuilder.Entity("HomeVault.Infrastructure.Persistence.MembershipRow", b =>
                 {
+                    b.HasOne("HomeVault.Infrastructure.Persistence.VaultRow", null)
+                        .WithMany()
+                        .HasForeignKey("VaultId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("HomeVault.Infrastructure.Persistence.RelationshipRow", b =>
+                {
+                    b.HasOne("HomeVault.Infrastructure.Persistence.AssetRow", null)
+                        .WithMany()
+                        .HasForeignKey("SourceAssetId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("HomeVault.Infrastructure.Persistence.AssetRow", null)
+                        .WithMany()
+                        .HasForeignKey("TargetAssetId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("HomeVault.Infrastructure.Persistence.VaultRow", null)
+                        .WithMany()
+                        .HasForeignKey("VaultId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+                });
+
+            modelBuilder.Entity("HomeVault.Infrastructure.Persistence.ReminderRow", b =>
+                {
+                    b.HasOne("HomeVault.Infrastructure.Persistence.AssetRow", null)
+                        .WithMany()
+                        .HasForeignKey("AssetId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
                     b.HasOne("HomeVault.Infrastructure.Persistence.VaultRow", null)
                         .WithMany()
                         .HasForeignKey("VaultId")

@@ -16,8 +16,13 @@ Tracked sub-issues: [archive #76](https://github.com/mani8785/HomeVault/issues/7
 [Evidence #79](https://github.com/mani8785/HomeVault/issues/79),
 [Relationships #80](https://github.com/mani8785/HomeVault/issues/80), and
 [Reminders #81](https://github.com/mani8785/HomeVault/issues/81).
-Archive #76 is implemented in the [archive slice](hv-22-vault-archive.md), pending
-PR review. Tasks #77–#81 remain planned work under the stated review gates.
+Archive #76 and [membership #77](hv-22-vault-membership.md) are merged through
+PRs #83 and #84. [Ordinary attributes #78](hv-22-ordinary-attributes.md) are
+merged through PR #85. [Evidence #79](hv-22-evidence.md) is merged through PR #86.
+[Relationships #80](hv-22-relationships.md) implements accepted
+[ADR-0025](ADRs/0025-durable-directed-relationships.md), merged through PR #87.
+[Reminders #81](hv-22-reminders.md) implements accepted
+[ADR-0026](ADRs/0026-durable-reminder-lifecycle.md) for PR review.
 
 | Order | Bounded outcome | Dependencies | Required evidence |
 | --- | --- | --- | --- |

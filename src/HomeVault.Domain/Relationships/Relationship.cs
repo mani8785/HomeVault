@@ -33,6 +33,22 @@ public sealed class Relationship
     /// <summary>Gets the lifecycle state, initially Active.</summary>
     public RelationshipStatus Status { get; private set; } = RelationshipStatus.Active;
 
+    /// <summary>Restores validated references and lifecycle without replaying creation or removal.</summary>
+    /// <param name="id">Stored nonempty root identity.</param><param name="vaultId">Stored nonempty Vault identity.</param>
+    /// <param name="sourceAssetId">Stored source identity.</param><param name="targetAssetId">Stored distinct target identity.</param>
+    /// <param name="kind">Stored supported kind.</param><param name="status">Stored Active or Removed state.</param>
+    /// <returns>A complete independent root; no graph is loaded and no events are emitted.</returns>
+    /// <exception cref="InvalidOperationException">Stored state violates Domain invariants; no supplied data is included.</exception>
+    /// <remarks>The caller must separately verify actual endpoint ownership and authorize access.</remarks>
+    public static Relationship Restore(Guid id, Guid vaultId, Guid sourceAssetId, Guid targetAssetId, RelationshipKind kind, RelationshipStatus status)
+    {
+        var result = Create(id, vaultId, sourceAssetId, targetAssetId, kind);
+        if (result.Relationship is not { } relationship || !Enum.IsDefined(status))
+            throw new InvalidOperationException("Invalid stored Relationship state.");
+        relationship.Status = status;
+        return relationship;
+    }
+
     /// <summary>Creates a locally valid association without loading its endpoints.</summary>
     /// <param name="id">A non-empty caller-supplied Relationship identity.</param>
     /// <param name="vaultId">The non-empty intended Vault identity.</param>

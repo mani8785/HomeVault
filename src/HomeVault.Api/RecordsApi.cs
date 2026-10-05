@@ -1,5 +1,7 @@
 using HomeVault.Application.Assets;
 using HomeVault.Application.Identity;
+using HomeVault.Application.Relationships;
+using HomeVault.Application.Reminders;
 using HomeVault.Application.Vaults;
 using HomeVault.Domain.Vaults;
 using HomeVault.Infrastructure.Persistence;
@@ -26,12 +28,27 @@ public static class RecordsApi
         services.AddScoped<InspectAssetUseCase>();
         services.AddScoped<IVaultArchiveStore, SqliteVaultArchiveStore>();
         services.AddScoped<ArchiveVaultUseCase>();
+        services.AddScoped<IVaultMembershipStore, SqliteVaultMembershipStore>();
+        services.AddScoped<VaultMembershipUseCases>();
+        services.AddScoped<IOrdinaryAttributeStore, SqliteOrdinaryAttributeStore>();
+        services.AddScoped<OrdinaryAttributeUseCases>();
+        services.AddScoped<IEvidenceStore, SqliteEvidenceStore>();
+        services.AddScoped<EvidenceUseCases>();
+        services.AddScoped<IRelationshipStore, SqliteRelationshipStore>();
+        services.AddScoped<RelationshipUseCases>();
+        services.AddScoped<IReminderStore, SqliteReminderStore>();
+        services.AddScoped<ReminderUseCases>();
     }
 
     /// <summary>Maps authenticated endpoints; use after AuthenticationHost.Map to retain antiforgery and safe failures.</summary>
     /// <param name="app">Configured application with scoped use cases.</param>
     public static void Map(WebApplication app)
     {
+        MembershipApi.Map(app);
+        AttributeApi.Map(app);
+        EvidenceApi.Map(app);
+        RelationshipApi.Map(app);
+        ReminderApi.Map(app);
         var group = app.MapGroup("/api/v1").RequireAuthorization();
         group.MapPost("/vaults/{vaultId}/archive", async (string vaultId, HttpContext context, ArchiveVaultUseCase useCase, CancellationToken token) =>
         {
