@@ -1,7 +1,8 @@
 # ADR-0028: Windows key custody and portable recovery
 
-Status: Proposed
+Status: Accepted
 Created: 2026-10-05
+Accepted: 2026-10-05
 Issue: [#64](https://github.com/mani8785/HomeVault/issues/64), under #25
 
 ## Context
@@ -10,7 +11,7 @@ Issue: [#64](https://github.com/mani8785/HomeVault/issues/64), under #25
 separately held random recovery material but defers the provisioning interaction
 and package details. [ADR-0027](0027-encryption-envelope-key-lifecycle.md), implemented
 in merged PR #89, requires verified durable publication before issuing a fresh
-write-key session. This proposal defines that custody boundary. Sensitive attribute
+write-key session. This decision defines that custody boundary. Sensitive attribute
 schema, HTTP policy and production write integration remain #65.
 
 ## Operator interaction and recovery secret
@@ -151,9 +152,9 @@ reencryption and unattended hosting remain separate reviewed work.
 
 ## Confirmation
 
-Pending owner acceptance of the hidden-input operator interaction, externally
-generated random secret, package pin, formats and publication protocol. No custody
-implementation or provisioning is authorized by this proposal alone.
+The owner explicitly confirmed the hidden-input operator interaction, externally
+generated random secret, package pin, formats and publication protocol on
+2026-10-05. #64 implementation is authorized; Sensitive persistence remains #65.
 
 ## References
 

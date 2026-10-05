@@ -97,9 +97,9 @@ see the [implementation guide](../hv-21-encryption-envelopes.md).
 
 ## Template
 
-[ADR-0028](0028-windows-key-custody-recovery.md): Proposed #64 Windows custody,
+[ADR-0028](0028-windows-key-custody-recovery.md): Accepted #64 Windows custody,
 hidden recovery-secret input and portable export/publication contract. Created
-2026-10-05; pending acceptance before implementation.
+2026-10-05; accepted 2026-10-05. Implemented by #64.
 
 - Title and ID
 - Status: Proposed / Accepted / Rejected / Superseded

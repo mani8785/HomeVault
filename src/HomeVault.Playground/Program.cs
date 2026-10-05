@@ -11,6 +11,11 @@ using HomeVault.Application.Assets;
 
 if (args.Length > 0)
 {
+    if (args[0] == "encryption-keys")
+    {
+        Environment.ExitCode = EncryptionKeyJourney.Run(args);
+        return;
+    }
     if (args[0] == "session-keys")
     {
         Environment.ExitCode = SessionKeyJourney.Run(args);

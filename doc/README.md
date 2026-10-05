@@ -1,8 +1,9 @@
 # HomeVault documentation
 
 See [ADR-0028: Windows key custody and recovery](ADRs/0028-windows-key-custody-recovery.md)
-for #64's proposed secret-input interaction, protected ring/export formats and
-atomic publication protocol. Custody implementation awaits acceptance.
+for #64's accepted secret-input interaction, protected ring/export formats and
+atomic publication protocol. The [operator guide](hv-21-key-recovery.md) explains
+initialization, verification and recovery. Sensitive persistence remains #65.
 
 See [ADR-0027: Encryption envelope and write-key lifecycle](ADRs/0027-encryption-envelope-key-lifecycle.md)
 for the accepted #63 framing, nonce bounds and recovery/custody contracts.

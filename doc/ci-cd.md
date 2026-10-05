@@ -32,6 +32,12 @@ build and the full suite. Windows-specific tests are skipped on Linux and run on
 Windows, while unsupported-platform rejection is covered on Linux. Separate TRX
 artifacts identify the two runs.
 
+HV-21.2 also verifies data-key recovery using a disposable second Windows account
+in CI. The job creates and removes that runner-local account around the tests;
+the recovery secret remains fictional in-memory test data. Local runs never
+create an account and report the fresh-profile portion as CI-only. See the
+[operator guide](hv-21-key-recovery.md) for manual commands and scope.
+
 Run the standard commands directly from the solution directory:
 
 ```powershell
