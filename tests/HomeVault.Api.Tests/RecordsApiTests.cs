@@ -58,13 +58,13 @@ public sealed partial class RecordsApiTests
         Assert.That(_contract.RootElement.GetProperty("openapi").GetString(), Is.EqualTo("3.0.3"));
     }
 
-    private async Task Start()
+    private async Task Start(HomeVault.Infrastructure.Encryption.SensitiveStorageSession? encrypted = null)
     {
         var builder = WebApplication.CreateBuilder(new WebApplicationOptions { EnvironmentName = "Production" });
         builder.WebHost.UseTestServer();
         builder.Logging.ClearProviders();
         AuthenticationHost.Configure(builder.Services, _path, _keys);
-        RecordsApi.Configure(builder.Services, _path);
+        RecordsApi.Configure(builder.Services, _path, encrypted);
         // Test-only barrier, delegating to the real SQLite adapter; no actor substitution.
         builder.Services.AddScoped<IAssetRegistrationStore>(services => new GatedRegistrationStore(
             new SqliteAssetRegistrationStore(services.GetRequiredService<SqliteDatabase>()), _gate));
@@ -82,7 +82,7 @@ public sealed partial class RecordsApiTests
             new SqliteReminderStore(services.GetRequiredService<SqliteDatabase>()), _gate));
         _app = builder.Build();
         AuthenticationHost.Map(_app);
-        RecordsApi.Map(_app);
+        RecordsApi.Map(_app, encrypted is not null);
         await _app.StartAsync();
     }
 

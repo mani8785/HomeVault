@@ -3,11 +3,69 @@
   "info": {
     "title": "HomeVault authenticated Vault and Asset API",
     "version": "1.6.0",
-    "description": "Create/archive Vault, register/inspect Asset, manage memberships, ordinary attributes, URL/Note Evidence directed Covers Relationships and Reminder lifecycle operations. Reminder action text is plaintext with separate deliberate reads; no scheduler is provided. Relationship removal retains history and both endpoint Assets. Evidence metadata inspection is separate from deliberate content reads; Evidence content is plaintext, never fetched or encrypted. Sign in through /auth/login after /auth/antiforgery bootstrap. Refresh antiforgery after identity changes. Submit the XSRF-TOKEN cookie value in X-XSRF-TOKEN with both HttpOnly cookies on POST, PUT and DELETE. All responses are no-store. Requests are limited to 16 KiB. Unknown JSON fields are rejected. Creation POSTs have no automatic retry or idempotency guarantee; authorized repeated archival succeeds. No account search, global lists or Sensitive attribute operations."
+    "description": "Create/archive Vault, register/inspect Asset, manage memberships, ordinary attributes, URL/Note Evidence directed Covers Relationships and Reminder lifecycle operations. Reminder action text is plaintext with separate deliberate reads; no scheduler is provided. Relationship removal retains history and both endpoint Assets. Evidence metadata inspection is separate from deliberate content reads; Evidence content is plaintext, never fetched or encrypted. Sign in through /auth/login after /auth/antiforgery bootstrap. Refresh antiforgery after identity changes. Submit the XSRF-TOKEN cookie value in X-XSRF-TOKEN with both HttpOnly cookies on POST, PUT and DELETE. All responses are no-store. Requests are limited to 16 KiB. Unknown JSON fields are rejected. Creation POSTs have no automatic retry or idempotency guarantee; authorized repeated archival succeeds. No account search or global lists. Sensitive attribute operations require the explicitly unlocked serve-encrypted host; only Owners and Administrators may access private values."
   },
   "servers": [{ "url": "https://localhost:7443" }],
   "security": [{ "cookieAuth": [] }],
   "paths": {
+    "/api/v1/assets/{assetId}/sensitive-attributes": {
+      "get": {
+        "operationId": "listSensitiveAttributes",
+        "description": "Available only in serve-encrypted mode. Current members receive metadata without values or ciphertext; Cache-Control: no-store.",
+        "parameters": [{ "$ref": "#/components/parameters/AssetIdentity" }],
+        "responses": {
+          "200": { "description": "Visible Sensitive metadata.", "content": { "application/json": { "schema": { "type": "object", "additionalProperties": false, "required": ["attributes"], "properties": { "attributes": { "type": "array", "items": { "$ref": "#/components/schemas/SensitiveAttributeMetadata" } } } } } } },
+          "400": { "$ref": "#/components/responses/Problem" }, "401": { "$ref": "#/components/responses/Problem" }, "404": { "$ref": "#/components/responses/Problem" }, "429": { "$ref": "#/components/responses/Problem" }, "500": { "$ref": "#/components/responses/Problem" }
+        }
+      }
+    },
+    "/api/v1/assets/{assetId}/sensitive-attributes/add": {
+      "post": {
+        "operationId": "addSensitiveAttribute",
+        "description": "Encrypted-host only. Owner/Administrator adds explicitly Sensitive text to an Active Vault, with a generated stable ID. No conversion or upsert; no-store responses.",
+        "security": [{ "cookieAuth": [], "antiforgeryCookie": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/AssetIdentity" }, { "$ref": "#/components/parameters/Antiforgery" }],
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "type": "object", "additionalProperties": false, "required": ["name", "value", "sensitivity"], "properties": { "name": { "type": "string" }, "value": { "type": "string" }, "sensitivity": { "type": "string", "enum": ["sensitive"] } } } } } },
+        "responses": {
+          "201": { "description": "Encrypted attribute committed.", "content": { "application/json": { "schema": { "type": "object", "additionalProperties": false, "required": ["id"], "properties": { "id": { "$ref": "#/components/schemas/Identity" } } } } } },
+          "400": { "$ref": "#/components/responses/Problem" }, "401": { "$ref": "#/components/responses/Problem" }, "403": { "$ref": "#/components/responses/Problem" }, "404": { "$ref": "#/components/responses/Problem" }, "409": { "$ref": "#/components/responses/Problem" }, "413": { "$ref": "#/components/responses/Problem" }, "415": { "$ref": "#/components/responses/Problem" }, "429": { "$ref": "#/components/responses/Problem" }, "500": { "$ref": "#/components/responses/Problem" }, "503": { "$ref": "#/components/responses/Problem" }
+        }
+      }
+    },
+    "/api/v1/assets/{assetId}/sensitive-attributes/{attributeId}/change": {
+      "post": {
+        "operationId": "changeSensitiveAttribute", "description": "Encrypted-host only. Owner/Administrator replaces text in an Active Vault, retaining identity and label. No-store responses.",
+        "security": [{ "cookieAuth": [], "antiforgeryCookie": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/AssetIdentity" }, { "$ref": "#/components/parameters/SensitiveAttributeIdentity" }, { "$ref": "#/components/parameters/Antiforgery" }],
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "type": "object", "additionalProperties": false, "required": ["value"], "properties": { "value": { "type": "string" } } } } } },
+        "responses": {
+          "204": { "description": "Encrypted replacement committed." },
+          "400": { "$ref": "#/components/responses/Problem" }, "401": { "$ref": "#/components/responses/Problem" }, "403": { "$ref": "#/components/responses/Problem" }, "404": { "$ref": "#/components/responses/Problem" }, "409": { "$ref": "#/components/responses/Problem" }, "413": { "$ref": "#/components/responses/Problem" }, "415": { "$ref": "#/components/responses/Problem" }, "429": { "$ref": "#/components/responses/Problem" }, "500": { "$ref": "#/components/responses/Problem" }, "503": { "$ref": "#/components/responses/Problem" }
+        }
+      }
+    },
+    "/api/v1/assets/{assetId}/sensitive-attributes/{attributeId}/remove": {
+      "post": {
+        "operationId": "removeSensitiveAttribute", "description": "Encrypted-host only. Empty body; Owner/Administrator removes an Active-Vault attribute without decrypting its old value. No-store responses.",
+        "security": [{ "cookieAuth": [], "antiforgeryCookie": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/AssetIdentity" }, { "$ref": "#/components/parameters/SensitiveAttributeIdentity" }, { "$ref": "#/components/parameters/Antiforgery" }],
+        "responses": {
+          "204": { "description": "Attribute removed." },
+          "400": { "$ref": "#/components/responses/Problem" }, "401": { "$ref": "#/components/responses/Problem" }, "403": { "$ref": "#/components/responses/Problem" }, "404": { "$ref": "#/components/responses/Problem" }, "409": { "$ref": "#/components/responses/Problem" }, "413": { "$ref": "#/components/responses/Problem" }, "429": { "$ref": "#/components/responses/Problem" }, "500": { "$ref": "#/components/responses/Problem" }
+        }
+      }
+    },
+    "/api/v1/assets/{assetId}/sensitive-attributes/{attributeId}/read": {
+      "post": {
+        "operationId": "readSensitiveAttribute", "description": "Encrypted-host only. Empty body; deliberate Owner/Administrator read, including Archived Vaults. Authorization precedes decryption. Response is no-store; never log returned text.",
+        "security": [{ "cookieAuth": [], "antiforgeryCookie": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/AssetIdentity" }, { "$ref": "#/components/parameters/SensitiveAttributeIdentity" }, { "$ref": "#/components/parameters/Antiforgery" }],
+        "responses": {
+          "200": { "description": "Deliberately authorized plaintext.", "content": { "application/json": { "schema": { "type": "object", "additionalProperties": false, "required": ["value"], "properties": { "value": { "type": "string" } } } } } },
+          "400": { "$ref": "#/components/responses/Problem" }, "401": { "$ref": "#/components/responses/Problem" }, "403": { "$ref": "#/components/responses/Problem" }, "404": { "$ref": "#/components/responses/Problem" }, "413": { "$ref": "#/components/responses/Problem" }, "429": { "$ref": "#/components/responses/Problem" }, "500": { "$ref": "#/components/responses/Problem" }, "503": { "$ref": "#/components/responses/Problem" }
+        }
+      }
+    },
     "/api/v1/vaults/{vaultId}/reminders": {
       "post": {
         "operationId": "createReminder",
@@ -389,6 +447,7 @@
       "antiforgeryCookie": { "type": "apiKey", "in": "cookie", "name": "__Host-HomeVault-Antiforgery" }
     },
     "parameters": {
+      "SensitiveAttributeIdentity": { "name": "attributeId", "in": "path", "required": true, "schema": { "$ref": "#/components/schemas/Identity" } },
       "ReminderIdentity": { "name": "reminderId", "in": "path", "required": true, "schema": { "$ref": "#/components/schemas/Identity" } },
       "RelationshipIdentity": { "name": "relationshipId", "in": "path", "required": true, "schema": { "$ref": "#/components/schemas/Identity" } },
       "EvidenceIdentity": { "name": "evidenceId", "in": "path", "required": true, "schema": { "$ref": "#/components/schemas/Identity" } },
@@ -401,6 +460,10 @@
       "Problem": { "description": "Safe failure; no input values or exception text. Status matches HTTP. Access checks precede conflict checks.", "content": { "application/problem+json": { "schema": { "$ref": "#/components/schemas/Problem" } } } }
     },
     "schemas": {
+      "SensitiveAttributeMetadata": {
+        "type": "object", "additionalProperties": false, "required": ["id", "name", "sensitivity"],
+        "properties": { "id": { "$ref": "#/components/schemas/Identity" }, "name": { "type": "string" }, "sensitivity": { "type": "string", "enum": ["sensitive"] } }
+      },
       "ReminderInstant": { "type": "string", "format": "date-time", "description": "Exact representable UTC instant; explicit Z or numeric offset, seconds, at most seven fractional digits. No timezone inference or precision truncation. Past dates and full year 0001..9999 UTC range allowed.", "pattern": "^[0-9]{4}-[0-9]{2}-[0-9]{2}T[0-9]{2}:[0-9]{2}:[0-9]{2}(\\.[0-9]{1,7})?(Z|[+-][0-9]{2}:[0-9]{2})$" },
       "CreateReminderInput": {
         "type": "object", "additionalProperties": false, "required": ["id", "assetId", "action", "dueAt"],
@@ -490,7 +553,7 @@
         "properties": {
           "type": { "type": "string", "enum": ["about:blank"] }, "title": { "type": "string", "enum": ["Request failed."] },
           "status": { "type": "integer" },
-          "code": { "type": "string", "enum": ["invalid_request", "unauthenticated", "forbidden", "unavailable", "conflict", "request_too_large", "unsupported_media_type", "rate_limited", "request_failed", "blank_name", "invalid_type", "identity_conflict", "vault_archived", "invalid_identity", "invalid_role", "duplicate_member", "last_owner", "invalid_name", "invalid_value", "unsupported_sensitivity", "attribute_exists", "blank_label", "invalid_kind", "blank_content", "invalid_url", "evidence_exists", "self_reference", "relationship_exists", "invalid_due_at", "blank_action", "not_pending"] },
+          "code": { "type": "string", "enum": ["invalid_request", "unauthenticated", "forbidden", "unavailable", "conflict", "request_too_large", "unsupported_media_type", "rate_limited", "request_failed", "blank_name", "invalid_type", "identity_conflict", "vault_archived", "invalid_identity", "invalid_role", "duplicate_member", "last_owner", "invalid_name", "invalid_value", "unsupported_sensitivity", "attribute_exists", "blank_label", "invalid_kind", "blank_content", "invalid_url", "evidence_exists", "self_reference", "relationship_exists", "invalid_due_at", "blank_action", "not_pending", "sensitive_unavailable"] },
           "errors": { "type": "object", "description": "Field names mapped to safe error codes. Empty for non-field failures.", "additionalProperties": { "type": "array", "items": { "type": "string" } } }
         }
       }

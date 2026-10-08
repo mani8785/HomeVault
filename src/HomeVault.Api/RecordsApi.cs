@@ -5,6 +5,7 @@ using HomeVault.Application.Reminders;
 using HomeVault.Application.Vaults;
 using HomeVault.Domain.Vaults;
 using HomeVault.Infrastructure.Persistence;
+using HomeVault.Infrastructure.Encryption;
 
 namespace HomeVault.Api;
 
@@ -14,8 +15,9 @@ public static class RecordsApi
     /// <summary>Registers scoped use cases and actor context with the existing SQLite adapters.</summary>
     /// <param name="services">Host composition services; authentication must also be configured.</param>
     /// <param name="databasePath">The same existing migrated database used for Identity.</param>
+    /// <param name="encrypted">Explicitly unlocked host session; null keeps Sensitive routes unavailable.</param>
     /// <exception cref="ArgumentException">The database path is blank or not absolute.</exception>
-    public static void Configure(IServiceCollection services, string databasePath)
+    public static void Configure(IServiceCollection services, string databasePath, SensitiveStorageSession? encrypted = null)
     {
         services.AddHttpContextAccessor();
         services.AddScoped<ICurrentActor, HttpCurrentActor>();
@@ -38,17 +40,24 @@ public static class RecordsApi
         services.AddScoped<RelationshipUseCases>();
         services.AddScoped<IReminderStore, SqliteReminderStore>();
         services.AddScoped<ReminderUseCases>();
+        if (encrypted is not null)
+        {
+            services.AddScoped<ISensitiveAttributeStore>(provider => encrypted.CreateStore(provider.GetRequiredService<SqliteDatabase>()));
+            services.AddScoped<SensitiveAttributeUseCases>();
+        }
     }
 
     /// <summary>Maps authenticated endpoints; use after AuthenticationHost.Map to retain antiforgery and safe failures.</summary>
     /// <param name="app">Configured application with scoped use cases.</param>
-    public static void Map(WebApplication app)
+    /// <param name="sensitive">Map Sensitive operations only when an unlocked session has been configured.</param>
+    public static void Map(WebApplication app, bool sensitive = false)
     {
         MembershipApi.Map(app);
         AttributeApi.Map(app);
         EvidenceApi.Map(app);
         RelationshipApi.Map(app);
         ReminderApi.Map(app);
+        if (sensitive) SensitiveAttributeApi.Map(app);
         var group = app.MapGroup("/api/v1").RequireAuthorization();
         group.MapPost("/vaults/{vaultId}/archive", async (string vaultId, HttpContext context, ArchiveVaultUseCase useCase, CancellationToken token) =>
         {

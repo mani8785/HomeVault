@@ -1,8 +1,9 @@
 # HomeVault documentation
 
-See proposed [ADR-0029: Authorized encrypted attributes](ADRs/0029-authorized-sensitive-attributes.md)
+See accepted [ADR-0029: Authorized encrypted attributes](ADRs/0029-authorized-sensitive-attributes.md)
 for #65's role policy, stable identity, additive schema and explicit host unlock.
-Implementation awaits review of this contract.
+The [encrypted attribute guide](hv-21-sensitive-attributes.md) covers #65's
+implementation, explicit migration, host unlock and terminal validation.
 
 See [ADR-0028: Windows key custody and recovery](ADRs/0028-windows-key-custody-recovery.md)
 for #64's accepted secret-input interaction, protected ring/export formats and

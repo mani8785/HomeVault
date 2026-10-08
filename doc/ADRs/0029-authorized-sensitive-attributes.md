@@ -1,7 +1,8 @@
 # ADR-0029: Authorized encrypted Asset attributes
 
-Status: Proposed
+Status: Accepted
 Created: 2026-10-05
+Accepted: 2026-10-08
 Issue: [HV-21.3 / #65](https://github.com/mani8785/HomeVault/issues/65)
 
 ## Context and review boundary
@@ -221,6 +222,6 @@ task alone does not claim whole-system security or production readiness.
 
 ## Confirmation
 
-Pending owner review of the Sensitive role policy, routes, separate-table/stable-ID
-design and interactive host lifetime. No application code or migration is included
-in this proposal; acceptance will authorize the implementation sequence above.
+The owner explicitly accepted the Sensitive role policy, routes, separate-table/
+stable-ID design and interactive host lifetime on 2026-10-08. Implementation of
+the sequence above is authorized. This acceptance does not authorize a merge.

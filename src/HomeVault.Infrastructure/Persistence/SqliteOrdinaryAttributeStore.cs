@@ -83,6 +83,9 @@ public sealed class SqliteOrdinaryAttributeStore : IOrdinaryAttributeStore
             AssetAttributeError.NotFound => AttributeOutcome.Unavailable,
             _ => throw new InvalidOperationException("Unexpected attribute outcome.")
         };
+        if (operation == Operation.Add && (await AttributeMetadata.Load(context, assetId, token))
+            .Any(row => row.Id.HasValue && StringComparer.OrdinalIgnoreCase.Equals(row.Name, name!.Trim())))
+            return AttributeOutcome.DuplicateName;
         var key = name!.Trim();
         if (operation == Operation.Add)
         {
@@ -107,6 +110,7 @@ public sealed class SqliteOrdinaryAttributeStore : IOrdinaryAttributeStore
 
     private static async Task<Asset> Restore(HomeVaultDbContext context, AccessState access, CancellationToken token)
     {
+        await AttributeMetadata.Load(context, access.Id, token);
         if (await context.AssetAttributes.AnyAsync(row => row.AssetId == access.Id && row.Sensitivity != 0, token))
             throw new InvalidOperationException("Unsupported stored attribute classification.");
         var rows = await context.AssetAttributes.AsNoTracking().Where(row => row.AssetId == access.Id && row.Sensitivity == 0).ToListAsync(token);
