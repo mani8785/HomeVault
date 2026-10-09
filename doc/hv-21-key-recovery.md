@@ -3,7 +3,9 @@
 HomeVault can explicitly initialize a DPAPI CurrentUser key ring, verify an
 encrypted portable export, and restore that export under another Windows user.
 The commands do not enable Sensitive attributes, change a database, or configure
-the API. Those integrations remain #65; rotation and coordinated backups remain #66.
+the API. See [Sensitive integration](hv-21-sensitive-attributes.md) for #65 and
+[coordinated database recovery](hv-21-rotation-recovery.md) for #66. A key-only
+recovery is not a verified application restore.
 See accepted [ADR-0028](ADRs/0028-windows-key-custody-recovery.md).
 
 ## Terminal validation

@@ -20,6 +20,12 @@ table, and explicit Owner/Administrator text operations. Metadata listing never
 loads ciphertext. The optional encrypted host owns the bounded write session;
 the normal host keeps Sensitive endpoints unmapped.
 
+#66 adds [offline maintenance](hv-21-rotation-recovery.md) under ADR-0030.
+Infrastructure coordinates bounded re-encryption, authenticated recovery sets,
+new-destination restoration and existing account invalidation. The API executable
+provides terminal commands; no maintenance HTTP endpoint or automatic activation
+is introduced. Domain and Application remain independent of key/storage formats.
+
 [Reminder lifecycle operations](hv-22-reminders.md) use Application-owned
 IReminderStore with current-access and actual Asset ownership checks inside SQLite
 transactions. Domain restoration validates stored state; UTC ticks preserve exact

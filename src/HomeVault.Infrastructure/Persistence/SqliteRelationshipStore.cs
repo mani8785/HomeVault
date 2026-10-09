@@ -97,7 +97,7 @@ public sealed class SqliteRelationshipStore : IRelationshipStore
         return RelationshipOutcome.Succeeded;
     }
 
-    private static async Task<Relationship> Restore(HomeVaultDbContext context, RelationshipRow row, CancellationToken token)
+    internal static async Task<Relationship> Restore(HomeVaultDbContext context, RelationshipRow row, CancellationToken token)
     {
         var root = Relationship.Restore(row.Id, row.VaultId, row.SourceAssetId, row.TargetAssetId, (RelationshipKind)row.Kind, (RelationshipStatus)row.Status);
         if (!await OwnsEndpoints(context, root.VaultId, root.SourceAssetId, root.TargetAssetId, token))

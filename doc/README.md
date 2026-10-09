@@ -96,6 +96,10 @@ See [HV-08: Asset attributes](hv-08-asset-attributes.md) for the accepted text a
 
 Start here for project context, architecture, and the decisions governing each small review step.
 
+See [offline rotation and coordinated recovery](hv-21-rotation-recovery.md) for
+#66 and accepted [ADR-0030](ADRs/0030-offline-rotation-coordinated-recovery.md).
+The real Sensitive-data readiness gate requires completed verification and review.
+
 ## Table of contents
 
 1. [Project context, domain language, and roadmap](context.md)
