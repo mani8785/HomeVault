@@ -86,11 +86,15 @@ public static class AuthenticationHost
                 {
                     // Bound chunked requests too, including hosts without Kestrel's size feature.
                     var bytes = new byte[16 * 1024 + 1];
-                    var count = await context.Request.Body.ReadAtLeastAsync(bytes, bytes.Length, throwOnEndOfStream: false, context.RequestAborted);
-                    if (count == bytes.Length) { context.Response.StatusCode = 413; return; }
-                    using var body = new MemoryStream(bytes, 0, count, writable: false);
-                    context.Request.Body = body;
-                    await next(context);
+                    try
+                    {
+                        var count = await context.Request.Body.ReadAtLeastAsync(bytes, bytes.Length, throwOnEndOfStream: false, context.RequestAborted);
+                        if (count == bytes.Length) { context.Response.StatusCode = 413; return; }
+                        using var body = new MemoryStream(bytes, 0, count, writable: false);
+                        context.Request.Body = body;
+                        await next(context);
+                    }
+                    finally { System.Security.Cryptography.CryptographicOperations.ZeroMemory(bytes); }
                 }
                 else await next(context);
             }

@@ -14,7 +14,11 @@ host registration, schema change or Sensitive operation is introduced by #63.
 #64 adds an internal Windows DPAPI CurrentUser custody adapter and explicit
 [key recovery commands](hv-21-key-recovery.md) under accepted ADR-0028. Immutable
 protected generations and authenticated portable exports are verified before
-issuing a fresh write session. API/SQLite integration remains #65.
+issuing a fresh write session. [Sensitive attribute integration](hv-21-sensitive-attributes.md)
+under ADR-0029 adds an Application-owned atomic store, a separate ciphertext-only
+table, and explicit Owner/Administrator text operations. Metadata listing never
+loads ciphertext. The optional encrypted host owns the bounded write session;
+the normal host keeps Sensitive endpoints unmapped.
 
 [Reminder lifecycle operations](hv-22-reminders.md) use Application-owned
 IReminderStore with current-access and actual Asset ownership checks inside SQLite

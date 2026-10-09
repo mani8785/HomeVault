@@ -95,11 +95,16 @@ Accepted 2026-10-04; see the [implementation guide](../hv-22-reminders.md).
 fresh write-key sessions, nonce limits and key custody boundary. Accepted 2026-10-04;
 see the [implementation guide](../hv-21-encryption-envelopes.md).
 
-## Template
-
 [ADR-0028](0028-windows-key-custody-recovery.md): Accepted #64 Windows custody,
 hidden recovery-secret input and portable export/publication contract. Created
 2026-10-05; accepted 2026-10-05. Implemented by #64.
+
+[ADR-0029](0029-authorized-sensitive-attributes.md): Accepted #65 Sensitive role
+policy, operations, stable identity, additive schema and explicit host unlock.
+Created 2026-10-05; accepted 2026-10-08. See the
+[implementation guide](../hv-21-sensitive-attributes.md).
+
+## Template
 
 - Title and ID
 - Status: Proposed / Accepted / Rejected / Superseded

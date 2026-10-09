@@ -14,6 +14,7 @@ public sealed class HomeVaultDbContext(DbContextOptions<HomeVaultDbContext> opti
     internal DbSet<MembershipRow> Memberships => Set<MembershipRow>();
     internal DbSet<AssetRow> Assets => Set<AssetRow>();
     internal DbSet<AssetAttributeRow> AssetAttributes => Set<AssetAttributeRow>();
+    internal DbSet<SensitiveAttributeRow> SensitiveAttributes => Set<SensitiveAttributeRow>();
     internal DbSet<EvidenceRow> AssetEvidence => Set<EvidenceRow>();
     internal DbSet<RelationshipRow> Relationships => Set<RelationshipRow>();
     internal DbSet<ReminderRow> Reminders => Set<ReminderRow>();

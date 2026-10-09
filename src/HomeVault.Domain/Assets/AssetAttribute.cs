@@ -6,6 +6,19 @@ namespace HomeVault.Domain.Assets;
 /// <remarks>Entries are created through Asset operations; values may contain sensitive information.</remarks>
 public sealed class AssetAttribute
 {
+    /// <summary>Validates an independent candidate without authorizing access or assigning storage identity.</summary>
+    /// <param name="name">Nonblank label, trimmed on success.</param>
+    /// <param name="value">Nonblank text preserved exactly; never log it.</param>
+    /// <param name="sensitivity">Explicit supported classification.</param>
+    /// <returns>A candidate or safe validation error, in name/value/classification order.</returns>
+    public static (AssetAttribute? Attribute, AssetAttributeError Error) Create(string? name, string? value, AttributeSensitivity sensitivity)
+    {
+        try { return (new AssetAttribute(name, value, sensitivity), AssetAttributeError.None); }
+        catch (ArgumentException error) when (error.ParamName == nameof(name)) { return (null, AssetAttributeError.BlankName); }
+        catch (ArgumentException error) when (error.ParamName == nameof(value)) { return (null, AssetAttributeError.BlankValue); }
+        catch (ArgumentException error) when (error.ParamName == nameof(sensitivity)) { return (null, AssetAttributeError.InvalidSensitivity); }
+    }
+
     private readonly string _value;
 
     internal AssetAttribute(string? name, string? value, AttributeSensitivity sensitivity)
