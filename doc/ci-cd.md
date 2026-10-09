@@ -17,6 +17,9 @@ CI checks required files and relative Markdown links. The approved HV-03 scaffol
 3. Release build with warnings treated as errors.
 4. Tests with TRX reports; zero executed tests fails the check.
 5. Test report upload, including on failure when reports exist.
+6. Pinned Node/pnpm setup, locked Angular dependency installation with lifecycle
+   scripts disabled, production build and non-interactive Vitest tests. See the
+   [frontend terminal guide](hv-23-angular-ui.md) for matching direct commands.
 
 The scaffold uses the NUnit framework, test SDK and adapter versions recorded in ADR-0001, with the existing VSTest/TRX commands. Review compatibility if adopting another test runner.
 Code without a root solution fails repository validation.

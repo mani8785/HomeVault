@@ -6,6 +6,12 @@ Keep business rules in a small domain model. Application coordinates use cases. 
 
 ## Project dependencies
 
+The independent [Angular UI](hv-23-angular-ui.md) calls the authenticated API over
+HTTP. It imports no C# assemblies, persistence models or database schemas. A local
+same-origin HTTPS proxy preserves cookie/antiforgery behavior. Domain rules and
+current-access checks remain in the existing server layers; route guards only
+control navigation. Angular builds independently under `frontend/homevault`.
+
 [Encryption envelopes](hv-21-encryption-envelopes.md) are internal Infrastructure
 components under ADR-0027. They implement framing, authenticated record binding,
 owned read-key leases and bounded write sessions. No production custody provider,

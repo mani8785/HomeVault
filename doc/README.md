@@ -1,5 +1,9 @@
 # HomeVault documentation
 
+The [Angular first-journey guide](hv-23-angular-ui.md) covers #27's independent UI,
+sign-in, Vault/Asset flow, validation and terminal setup. The owner resumed this
+accepted phase on 2026-10-09 after the authentication dependency was completed.
+
 See accepted [ADR-0029: Authorized encrypted attributes](ADRs/0029-authorized-sensitive-attributes.md)
 for #65's role policy, stable identity, additive schema and explicit host unlock.
 The [encrypted attribute guide](hv-21-sensitive-attributes.md) covers #65's
@@ -60,7 +64,7 @@ authorization implementation are tracked in the linked tasks.
 
 See [ADR-0019: Browser UI](ADRs/0019-browser-ui-first-journey.md) for the accepted
 HV-23 Angular/API separation, first journey, and authentication dependency boundary.
-UI implementation is parked while HV-22 authentication takes priority.
+The first Angular journey is now implemented; see its guide above.
 
 See [ADR-0018: Sensitive-value encryption](ADRs/0018-sensitive-value-encryption.md)
 for the accepted HV-21 threat model, key recovery choices, and implementation test
