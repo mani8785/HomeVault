@@ -96,6 +96,10 @@ See [HV-08: Asset attributes](hv-08-asset-attributes.md) for the accepted text a
 
 Start here for project context, architecture, and the decisions governing each small review step.
 
+The next encryption step is [ADR-0030: Offline rotation and coordinated recovery](ADRs/0030-offline-rotation-coordinated-recovery.md)
+for #66. Its maintenance and recovery contracts are Proposed; implementation and
+the real Sensitive-data readiness gate remain pending.
+
 ## Table of contents
 
 1. [Project context, domain language, and roadmap](context.md)
