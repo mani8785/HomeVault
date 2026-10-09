@@ -98,7 +98,7 @@ public sealed class SqliteReminderStore : IReminderStore
         ReminderError.NotPending => ReminderOutcome.NotPending,
         _ => throw new InvalidOperationException("Unexpected Reminder outcome.")
     };
-    private static async Task<Reminder> Restore(HomeVaultDbContext context, ReminderRow row, CancellationToken token)
+    internal static async Task<Reminder> Restore(HomeVaultDbContext context, ReminderRow row, CancellationToken token)
     {
         if (row.DueAtUtcTicks < 0 || row.DueAtUtcTicks > DateTimeOffset.MaxValue.UtcTicks)
             throw new InvalidOperationException("Invalid stored Reminder instant.");

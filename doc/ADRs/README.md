@@ -104,9 +104,10 @@ policy, operations, stable identity, additive schema and explicit host unlock.
 Created 2026-10-05; accepted 2026-10-08. See the
 [implementation guide](../hv-21-sensitive-attributes.md).
 
-[ADR-0030](0030-offline-rotation-coordinated-recovery.md): Proposed #66 offline
+[ADR-0030](0030-offline-rotation-coordinated-recovery.md): Accepted #66 offline
 rotation, authenticated database/key recovery sets and staged recovery with
-session invalidation. Created 2026-10-09; owner acceptance is pending.
+session invalidation. Created and accepted 2026-10-09; see the
+[operator guide](../hv-21-rotation-recovery.md).
 
 ## Template
 

@@ -1,7 +1,8 @@
 # ADR-0030: Offline rotation and coordinated recovery
 
-Status: Proposed
+Status: Accepted
 Created: 2026-10-09
+Accepted: 2026-10-09
 Issue: [HV-21.4 / #66](https://github.com/mani8785/HomeVault/issues/66)
 
 ## Context and review boundary
@@ -185,5 +186,5 @@ erasure; clear owned temporary byte buffers and avoid unnecessary materializatio
 
 ## Confirmation
 
-Pending owner acceptance of sections 1-4. This PR is a concrete design proposal;
-it does not implement #66, close that issue or remove the real-data gate.
+The owner explicitly accepted sections 1-4 on 2026-10-09. Implementation and
+passing verification are still required before closing #66 or removing its real-data gate.

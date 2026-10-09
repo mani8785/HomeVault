@@ -3,6 +3,8 @@ using System.Security.AccessControl;
 using System.Security.Cryptography;
 using System.Security.Principal;
 using HomeVault.Infrastructure.Encryption;
+using HomeVault.Infrastructure.Identity;
+using HomeVault.Infrastructure.Persistence;
 using Microsoft.Win32.SafeHandles;
 using NUnit.Framework;
 
@@ -51,6 +53,19 @@ public sealed class WindowsRecoveryProfileTests
                 var context = new EncryptionContext(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid());
                 using var session = new WriteKeySession(id, ring.Keys[id].ToArray());
                 var ciphertext = session.Encrypt(context, "fictional portable record").ReadValue();
+                var original = Path.Combine(root, "original"); PrivateKeyFiles.CreateDirectory(original);
+                var originalData = Path.Combine(original, "database"); PrivateKeyFiles.CreateDirectory(originalData);
+                var originalExports = Path.Combine(original, "exports"); PrivateKeyFiles.CreateDirectory(originalExports);
+                var originalRing = Path.Combine(original, "ring"); WindowsKeyCustody.Initialize(originalRing, originalExports, secret);
+                var originalDatabase = Path.Combine(originalData, "live.sqlite");
+                MaintenanceData data;
+                using (var originalSession = SensitiveStorageSession.OpenWindows(originalRing, originalExports, secret))
+                    data = MaintenanceData.Create(originalDatabase, originalSession).GetAwaiter().GetResult();
+                PrivateKeyFiles.SecureNewFile(originalDatabase);
+                var set = Path.Combine(original, "set");
+                Assert.That(EncryptedMaintenance.BackupAsync(originalDatabase, originalRing, set, secret).GetAwaiter().GetResult(), Is.EqualTo(KeyOperationOutcome.Succeeded));
+                var bundle = Directory.GetFiles(set).ToDictionary(path => Path.GetFileName(path), File.ReadAllBytes);
+                Directory.Delete(original, true);
                 try
                 {
                     WindowsIdentity.RunImpersonated(token, () =>
@@ -66,6 +81,15 @@ public sealed class WindowsRecoveryProfileTests
                             using var custody = new WindowsKeyCustody(destination);
                             Assert.That(new EnvelopeEncryption(custody).Decrypt(context, ciphertext).ReadValue(), Is.EqualTo("fictional portable record"));
                             Assert.That(custody.CreateVerifiedWriteSession(), Is.Null);
+                            var importedSet = Path.Combine(exportDirectory, "set"); PrivateKeyFiles.CreateDirectory(importedSet);
+                            foreach (var file in bundle) PrivateKeyFiles.WriteNew(Path.Combine(importedSet, file.Key!), file.Value);
+                            var recovered = Path.Combine(exportDirectory, "complete-recovery");
+                            Assert.That(EncryptedMaintenance.RecoverAsync(importedSet, recovered, secret).GetAwaiter().GetResult(), Is.EqualTo(KeyOperationOutcome.Succeeded));
+                            var recoveredDatabase = Path.Combine(recovered, "database", "homevault.sqlite");
+                            data.CheckAccounts(recoveredDatabase, Path.Combine(recovered, "session-keys")).GetAwaiter().GetResult();
+                            var nextExports = Path.Combine(exportDirectory, "next-exports"); PrivateKeyFiles.CreateDirectory(nextExports);
+                            using var recoveredSession = SensitiveStorageSession.OpenWindows(Path.Combine(recovered, "data-keys"), nextExports, secret);
+                            data.CheckReads(new SqliteDatabase(recoveredDatabase), recoveredSession).GetAwaiter().GetResult();
                         }
                         finally
                         {

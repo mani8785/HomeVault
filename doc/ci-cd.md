@@ -38,6 +38,12 @@ the recovery secret remains fictional in-memory test data. Local runs never
 create an account and report the fresh-profile portion as CI-only. See the
 [operator guide](hv-21-key-recovery.md) for manual commands and scope.
 
+HV-21.4 extends that same disposable-profile test to a complete authenticated
+database/key recovery set: restoration, new session keys, rejection of historical
+sessions and credentials, fresh account login, and allowed/denied Sensitive reads.
+See [coordinated recovery](hv-21-rotation-recovery.md). No additional local account
+or helper script is required.
+
 Run the standard commands directly from the solution directory:
 
 ```powershell

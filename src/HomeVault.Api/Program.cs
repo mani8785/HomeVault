@@ -13,6 +13,8 @@ try
         Console.WriteLine("Private directory provisioned.");
         return 0;
     }
+    if (args.Length > 0 && args[0] is "rotate-encryption" or "backup-encrypted" or "recover-encrypted")
+        return await EncryptionMaintenanceCommands.RunAsync(args);
     if (args.Length < 3) throw new InvalidOperationException();
     using var lease = PrivateOperatorFiles.AcquireDatabase(args[1]);
     using var keys = WindowsSessionKeys.Open(args[2]);

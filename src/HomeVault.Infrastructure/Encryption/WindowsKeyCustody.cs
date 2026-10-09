@@ -28,6 +28,15 @@ internal sealed class WindowsKeyCustody : IEncryptionKeyCustody, IDisposable
         {
             if (_disposed || _secret is null || _exports is null) return null;
             using var fileLock = PrivateKeyFiles.Lock(_directory);
+            return CreateWriteSessionUnderMaintenanceLock();
+        }
+    }
+    // Only the offline maintenance coordinator may call this while holding writer.lock.
+    internal WriteKeySession? CreateWriteSessionUnderMaintenanceLock()
+    {
+        lock (_sync)
+        {
+            if (_disposed || _secret is null || _exports is null) return null;
             using var ring = Load(_directory, out var generation);
             using (var recovery = RecoveryPackage.Open(PrivateKeyFiles.Read(Path.Combine(_directory, generation + ".recovery")), _secret))
                 if (!RecoveryPackage.Equal(ring, recovery)) throw new InvalidOperationException();
