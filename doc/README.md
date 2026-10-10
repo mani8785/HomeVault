@@ -1,5 +1,10 @@
 # HomeVault documentation
 
+[HV-21 encryption completion](hv-21-encryption-completion.md) records the merged
+#63–#66 implementations, acceptance evidence and supported protection boundary.
+For current operator commands, use the [Sensitive API](hv-21-sensitive-attributes.md)
+and [rotation/recovery](hv-21-rotation-recovery.md) guides.
+
 See accepted [ADR-0029: Authorized encrypted attributes](ADRs/0029-authorized-sensitive-attributes.md)
 for #65's role policy, stable identity, additive schema and explicit host unlock.
 The [encrypted attribute guide](hv-21-sensitive-attributes.md) covers #65's
@@ -8,13 +13,14 @@ implementation, explicit migration, host unlock and terminal validation.
 See [ADR-0028: Windows key custody and recovery](ADRs/0028-windows-key-custody-recovery.md)
 for #64's accepted secret-input interaction, protected ring/export formats and
 atomic publication protocol. The [operator guide](hv-21-key-recovery.md) explains
-initialization, verification and recovery. Sensitive persistence remains #65.
+initialization, verification and key-only recovery. Sensitive persistence was
+delivered by #65; complete database recovery was delivered by #66.
 
 See [ADR-0027: Encryption envelope and write-key lifecycle](ADRs/0027-encryption-envelope-key-lifecycle.md)
 for the accepted #63 framing, nonce bounds and recovery/custody contracts.
 The [envelope implementation guide](hv-21-encryption-envelopes.md) covers the
-internal implementation, verification and remaining production-custody boundary.
-Sensitive persistence remains unavailable pending later slices.
+internal implementation and verification for that first slice. Later merged
+slices add production custody, Sensitive persistence and coordinated recovery.
 
 See [ADR-0026: Durable Reminder lifecycle](ADRs/0026-durable-reminder-lifecycle.md)
 for #81's accepted API, UTC storage, action privacy and concurrency contract.
@@ -98,7 +104,8 @@ Start here for project context, architecture, and the decisions governing each s
 
 See [offline rotation and coordinated recovery](hv-21-rotation-recovery.md) for
 #66 and accepted [ADR-0030](ADRs/0030-offline-rotation-coordinated-recovery.md).
-The real Sensitive-data readiness gate requires completed verification and review.
+The [completion record](hv-21-encryption-completion.md) documents the completed
+verification/review gate and the remaining operational limits.
 
 ## Table of contents
 

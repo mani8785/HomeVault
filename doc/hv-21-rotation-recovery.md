@@ -11,7 +11,8 @@ visible. The separate random recovery secret must never be stored in the set.
 From the repository root, run each command separately; continue only on exit 0:
 
 ```powershell
-git switch codex/hv-21-4-rotation-recovery
+git switch main
+git pull --ff-only
 dotnet restore
 dotnet format --verify-no-changes --no-restore
 dotnet build --configuration Release --no-restore -warnaserror
@@ -30,8 +31,9 @@ Stop the API, Playground and every SQLite editor or other writer. Work in an
 interactive Windows terminal without redirected input/output or a transcript.
 Use the same Windows account that owns the existing database and ring. Keep the
 known-good database, ring, exports and earlier backups. Verify these operations
-with fictional data first; real-data readiness requires completed #66 checks and
-review, not merely a successful build.
+with fictional data first. The [completion record](hv-21-encryption-completion.md)
+documents #66's completed checks and reviewed merge; a successful build alone
+does not replace correct provisioning and a recovery rehearsal.
 
 The examples below use nonsecret placeholder paths; replace them with your actual
 absolute paths. All directories must be outside Git checkouts, without reparse
