@@ -36,7 +36,8 @@ actions, an inspector with labelled sections, visible keyboard focus and a narro
 screen layout that shows one pane at a time. No fake records or inactive toolbar
 buttons. Use server results for lists; temporary form state is not a database.
 
-Each slice gets a focused issue/PR and manual acceptance steps. PR #94 remains
+Each slice gets a focused issue and manual acceptance steps; related inspector
+slices share one PR. PR #94 remains
 the initial three-operation journey; follow-ups depend on it without merging it.
 The owner runs unit/integration tests and checks PR/CI results. The agent may build
 or type-check its implementation, writes meaningful tests, and reports checks not
@@ -73,3 +74,35 @@ A rejected code must show a safe message and clear code/password fields. In Acco
 verify the member ID and confirm Sign out all sessions; another logged-in browser
 must be rejected on its next request. Invitation issuance and disablement stay in
 the terminal. Agent-added tests are not executed; run the commands above yourself.
+
+### Inspector and Vault acceptance (#98–#101)
+
+Select a Vault and an Asset. The right-hand inspector has Info, Attributes,
+Evidence, Relationships, Reminders and Sensitive sections. The saved Asset URL
+also provides these sections; the server remains authoritative for every action.
+
+| Area | Owner-run checks |
+| --- | --- |
+| Ordinary attributes | Add, change and remove a name/value pair; duplicate names fail safely; Viewer cannot write |
+| Evidence | Add a Note and URL, deliberately read content, hide it, remove after confirmation; URLs open only on user action |
+| Relationships | Select another same-Vault Asset from paged results, choose Covers direction, create, open linked Asset, remove; both Assets remain |
+| Reminders | Create with local due time, explicitly read/hide action, update action/date, complete or cancel with confirmation; terminal status prevents further edits |
+| Vault access | Open Vault information & access; add a known enabled member ID, change role, remove; verify Administrator restrictions and last-Owner rejection |
+| Archive | Confirm archive as Owner, refresh and verify read-only controls and server rejection of stale writes |
+| Sensitive | Start the encrypted host using existing operator guidance; add, replace, reveal/hide and remove; ordinary host shows unavailable state without claiming encryption is active |
+
+Sensitive values clear on hide, panel/selection changes, navigation, focus loss,
+visibility changes, failures and a 30-second reveal timeout. A late response after
+Hide must not reveal the value again. No value is copied automatically or persisted
+in browser storage. Clearing JavaScript state is not a guarantee of secure memory
+erasure. Evidence and Reminder text is still ordinary plaintext storage; their
+separate reads prevent incidental display, not encryption.
+
+Reminder inputs use the browser's local timezone and transmit an explicit UTC
+instant. Updating only action text preserves the existing exact server timestamp;
+changing the date uses the input's seconds precision. No scheduler is introduced.
+
+The expanded UI has not been browser-acceptance-tested by the agent under the
+owner's new preference. Production compilation and test-file type checks are
+separate from executing tests. Use disposable data for acceptance, especially
+archival, membership changes and credential recovery.
