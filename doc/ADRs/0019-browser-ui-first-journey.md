@@ -183,9 +183,22 @@ No implementation or scaffolding is included in this decision.
 
 ## References
 
+### Implementation checkpoint (2026-10-09)
+
+The owner explicitly resumed #27 after HV-22 and the HV-21 implementation slices.
+The [Angular implementation](../hv-23-angular-ui.md) uses existing invitation-only
+Identity accounts and the completed API, not the earlier fictional prototype.
+The landing page describes the authenticated journey. Angular/CLI 22.2.2,
+Node 24.19.0, TypeScript 6.0.3 and RxJS 7.8.2 are pinned; Angular's unit-test
+builder uses Vitest/jsdom. pnpm 11.25.0 provides a committed lockfile. No new
+browser-test dependency, package script wrapper, backend or schema is introduced.
+The earlier parked/deferred statements above record the accepted sequence at
+decision time; this checkpoint records its authorized resumption.
+
 Implementation checkpoint: [HV-22.3 authenticated API](../hv-22-authorized-api.md)
 implements the three HTTP operations using accepted Identity cookies, not the
-earlier fictional prototype option. The Angular/UI phase remains parked for review.
+earlier fictional prototype option. The Angular/UI phase is covered by the
+implementation checkpoint above.
 
 - [Angular version compatibility](https://angular.dev/reference/versions)
 - [Angular security and HttpClient XSRF](https://angular.dev/best-practices/security)

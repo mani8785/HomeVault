@@ -1,0 +1,4 @@
+{
+  "/api/**": { "target": "https://localhost:7443", "secure": true, "changeOrigin": true },
+  "/auth/**": { "target": "https://localhost:7443", "secure": true, "changeOrigin": true }
+}

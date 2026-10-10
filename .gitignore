@@ -13,3 +13,7 @@ artifacts/
 *.p12
 .DS_Store
 Thumbs.db
+**/node_modules/
+**/.angular/
+**/dist/
+**/coverage/

@@ -158,6 +158,23 @@ jobs:
           path: TestResults/**/*.trx
           if-no-files-found: warn
           retention-days: 14
+      - name: Set up pinned UI runtime
+        uses: actions/setup-node@v7
+        with:
+          node-version-file: frontend/homevault/.node-version
+      - name: Install pinned frontend package manager
+        run: |
+          npm install --global pnpm@11.25.0 --ignore-scripts
+          if ($LASTEXITCODE -ne 0) { throw 'Frontend package-manager setup failed.' }
+      - name: Build and test independent Angular UI
+        working-directory: frontend/homevault
+        run: |
+          pnpm install --frozen-lockfile --ignore-scripts
+          if ($LASTEXITCODE -ne 0) { throw 'Locked frontend install failed.' }
+          node node_modules/@angular/cli/bin/ng.js build --configuration production
+          if ($LASTEXITCODE -ne 0) { throw 'Frontend build failed.' }
+          node node_modules/@angular/cli/bin/ng.js test --watch=false
+          if ($LASTEXITCODE -ne 0) { throw 'Frontend tests failed.' }
       - name: Package validated source
         if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'schedule')
         run: |
