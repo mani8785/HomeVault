@@ -111,6 +111,9 @@ session invalidation. Created and accepted 2026-10-09; see the
 
 ## Template
 
+[ADR-0031](0031-library-browsing-queries.md): Accepted 2026-10-10. Actor-filtered,
+paged metadata queries for the independent Angular library workspace.
+
 - Title and ID
 - Status: Proposed / Accepted / Rejected / Superseded
 - Created date; accepted date when applicable
