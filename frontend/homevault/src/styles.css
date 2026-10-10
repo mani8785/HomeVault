@@ -91,6 +91,27 @@ main:has(.library-layout) { max-width: none; padding: 0; }
 .empty-state { color: #6c7580; padding: 1.2rem .3rem; }
 .empty-state h3 { color: #384553; font-size: 1rem; }
 .mobile-panes { display: none; }
+.asset-detail-page { max-width: 900px; margin: auto; }
+.asset-detail-page h1 { font-size: 2.5rem; }
+.inspector-tabs { display: flex; flex-wrap: wrap; gap: .3rem; border-bottom: 1px solid #d5d9df; margin: 1rem 0; padding-bottom: .6rem; }
+.inspector-tabs button { padding: .35rem .5rem; font-size: .75rem; border: 1px solid #c4cbd3; border-radius: 4px; cursor: pointer; background: #fff; color: #344154; }
+.inspector-tabs button[aria-pressed="true"] { background: #deebff; border-color: #719bcf; }
+.metadata-list { display: grid; grid-template-columns: minmax(70px, 28%) minmax(0, 1fr); gap: .5rem .8rem; font-size: .85rem; }
+.metadata-list dt { color: #65707c; overflow-wrap: anywhere; }
+.metadata-list dd { margin: 0; border-bottom: 1px solid #edf0f3; padding-bottom: .5rem; overflow-wrap: anywhere; }
+.panel-form { border-top: 1px solid #d5d9df; padding-top: .9rem; margin: 1rem 0; }
+.panel-form h4 { margin: 0 0 .7rem; }
+.panel-form input, .panel-form select, .panel-form textarea { min-height: 36px; font-size: .85rem; margin-bottom: .7rem; padding: .45rem; width: 100%; }
+textarea { font: inherit; border: 1px solid #7c8e85; border-radius: 5px; resize: vertical; }
+.panel-form label { font-size: .8rem; }
+.record-list { padding: 0; list-style: none; }
+.record-list li { border-bottom: 1px solid #dfe2e6; padding: .7rem 0; }
+.record-list small { display: block; color: #64717e; }
+.row-actions { display: flex; flex-wrap: wrap; gap: .4rem; margin: .5rem 0; }
+.private-text { display: block; font: inherit; white-space: pre-wrap; overflow-wrap: anywhere; max-height: 300px; overflow: auto; margin: .5rem 0; }
+.sensitive-value { background: #fff3d9; border: 1px solid #ccaa65; padding: .7rem; }
+.confirmation, .danger-zone { margin: 1rem 0; border: 1px solid #d6b69f; background: #fff7ef; padding: .8rem; }
+.site-header nav { display: flex; gap: .75rem; align-items: center; }
 @media (max-width: 850px) {
   .library-layout { display: block; }
   .mobile-panes { display: flex; gap: .5rem; padding: .7rem; background: #f2f3f5; }

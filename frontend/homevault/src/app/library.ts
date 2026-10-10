@@ -3,13 +3,15 @@ import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { Subscription } from 'rxjs';
 import { Api, Asset, failureMessage, LibraryVault, Page } from './api';
+import { Inspector } from './inspector';
+import { VaultPanel } from './vault-panel';
 
 @Component({
-  imports: [FormsModule, RouterLink],
+  imports: [FormsModule, RouterLink, Inspector, VaultPanel],
   template: `
     <div class="library-heading"><div><p class="eyebrow">HOMEVAULT</p><h1>My library</h1></div><button (click)="loadVaults(0)">Refresh library</button></div>
     @if (error()) { <p class="error-summary" role="alert">{{ error() }}</p> }
-    <nav class="mobile-panes" aria-label="Library panes"><button (click)="pane.set('vaults')" [attr.aria-pressed]="pane() === 'vaults'">Vaults</button><button (click)="pane.set('assets')" [disabled]="!selectedVault()" [attr.aria-pressed]="pane() === 'assets'">Assets</button><button (click)="pane.set('details')" [disabled]="!selectedAsset()" [attr.aria-pressed]="pane() === 'details'">Details</button></nav>
+    <nav class="mobile-panes" aria-label="Library panes"><button (click)="pane.set('vaults')" [attr.aria-pressed]="pane() === 'vaults'">Vaults</button><button (click)="pane.set('assets')" [disabled]="!selectedVault()" [attr.aria-pressed]="pane() === 'assets'">Assets</button><button (click)="pane.set('details')" [disabled]="!selectedAsset() && !managing()" [attr.aria-pressed]="pane() === 'details'">Details</button></nav>
     <div class="library-layout" [attr.data-pane]="pane()">
       <aside class="library-sidebar" aria-label="Vaults">
         <div class="pane-heading"><h2>Vaults</h2><a routerLink="/vaults/new" aria-label="Create a Vault">＋ New</a></div>
@@ -24,6 +26,7 @@ import { Api, Asset, failureMessage, LibraryVault, Page } from './api';
       <section class="library-list" aria-label="Assets">
         <div class="pane-heading"><h2>{{ selectedVault()?.name || 'Assets' }}</h2>@if (canWrite()) { <a [routerLink]="['/vaults', selectedVault()!.id, 'assets', 'new']">＋ Add Asset</a> }</div>
         @if (selectedVault(); as vault) {
+          <button (click)="manageVault()">Vault information & access</button>
           <form (ngSubmit)="loadAssets(0)" class="compact-search"><label for="asset-search">Find an Asset by name</label><div><input id="asset-search" name="assetSearch" [(ngModel)]="assetSearch" maxlength="200" type="search"><button type="submit">Find</button></div></form>
           @if (assetLoading()) { <p role="status">Loading Assets…</p> }
           <table class="asset-table"><thead><tr><th scope="col">Name</th><th scope="col">Record</th></tr></thead><tbody>
@@ -36,9 +39,11 @@ import { Api, Asset, failureMessage, LibraryVault, Page } from './api';
       </section>
       <section class="library-inspector" aria-label="Selected record">
         <div class="pane-heading"><h2>Inspector</h2></div>
-        @if (selectedAsset(); as asset) {
+        @if (managing() && selectedVault()) { <hv-vault-controls [vault]="selectedVault()!" (changed)="loadVaults(0)" (unavailable)="accessChanged()" /> }
+        @else if (selectedAsset(); as asset) {
           <p class="eyebrow">ASSET</p><h2 class="record-name">{{ asset.name }}</h2><p class="hint">{{ selectedVault()?.name }}</p>
           <a [routerLink]="['/assets', asset.id]">Open record & details →</a>
+          <hv-inspector [asset]="asset" [writable]="canWrite()" [mayReveal]="selectedVault()?.role === 'owner' || selectedVault()?.role === 'administrator'" (unavailable)="accessChanged()" />
         } @else { <div class="empty-state"><h3>Your record, in detail</h3><p>Select an Asset to inspect its information.</p></div> }
       </section>
     </div>
@@ -52,6 +57,7 @@ export class LibraryPage {
   readonly selectedVault = signal<LibraryVault | null>(null); readonly selectedAsset = signal<Asset | null>(null);
   readonly error = signal(''); readonly vaultLoading = signal(false); readonly assetLoading = signal(false);
   readonly pane = signal<'vaults' | 'assets' | 'details'>('vaults');
+  readonly managing = signal(false);
   vaultSearch = ''; assetSearch = ''; vaultOffset = 0; assetOffset = 0;
   constructor() {
     inject(DestroyRef).onDestroy(() => { this.vaultRead?.unsubscribe(); this.assetRead?.unsubscribe(); this.detailRead?.unsubscribe(); });
@@ -77,10 +83,14 @@ export class LibraryPage {
     });
   }
   selectAsset(asset: Asset): void {
+    this.managing.set(false);
     this.detailRead?.unsubscribe(); this.selectedAsset.set(null); this.error.set('');
     this.detailRead = this.api.asset(asset.id).subscribe({ next: value => { this.selectedAsset.set(value); this.pane.set('details'); }, error: error => { this.clearSelection(); this.error.set(failureMessage(error)); } });
   }
-  private clearSelection(): void {
+  manageVault(): void { this.detailRead?.unsubscribe(); this.selectedAsset.set(null); this.managing.set(true); this.pane.set('details'); }
+  accessChanged(): void { this.clearSelection(); this.error.set('Access to this operation or record changed. Refresh your library to continue.'); }
+  clearSelection(): void {
+    this.managing.set(false);
     this.assetRead?.unsubscribe(); this.detailRead?.unsubscribe(); this.selectedAsset.set(null); this.selectedVault.set(null);
     this.assets.set({ items: [], hasMore: false }); this.assetLoading.set(false);
     this.pane.set('vaults');

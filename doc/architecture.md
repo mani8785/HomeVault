@@ -12,6 +12,12 @@ same-origin HTTPS proxy preserves cookie/antiforgery behavior. Domain rules and
 current-access checks remain in the existing server layers; route guards only
 control navigation. Angular builds independently under `frontend/homevault`.
 
+Accepted [ADR-0031](ADRs/0031-library-browsing-queries.md) adds Application-owned
+library query contracts, projected through no-tracking SQLite reads under current
+membership. Lists are bounded and contain metadata, with separate explicit reads
+for Sensitive values, Evidence content and Reminder actions. No schema or generic
+CRUD repository is introduced. The three-pane UI uses these query contracts.
+
 [Encryption envelopes](hv-21-encryption-envelopes.md) are internal Infrastructure
 components under ADR-0027. They implement framing, authenticated record binding,
 owned read-key leases and bounded write sessions. No production custody provider,

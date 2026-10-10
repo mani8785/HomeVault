@@ -4,6 +4,7 @@ import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { finalize, Subscription } from 'rxjs';
 import { Api, Asset, failureMessage, safeReturnUrl, validId, VaultType } from './api';
+import { Inspector } from './inspector';
 
 @Component({
   imports: [RouterLink],
@@ -175,14 +176,15 @@ export class AddAssetPage {
 }
 
 @Component({
-  imports: [RouterLink],
+  imports: [RouterLink, Inspector],
   template: `
-    <section class="form-page"><a class="back-link" routerLink="/">← Home</a><p class="eyebrow">ASSET RECORD</p>
+    <section class="asset-detail-page"><a class="back-link" routerLink="/">← My library</a><p class="eyebrow">ASSET RECORD</p>
       @if (loading()) { <h1>Opening your Asset…</h1><p role="status">Loading the current record.</p> }
       @if (asset(); as record) {
         <h1 class="record-name">{{ record.name }}</h1><p class="status"><span aria-hidden="true">✓</span> Saved in your Vault</p>
         <div class="info-card"><h2>A record you can return to</h2><p>Bookmark this page to find your Asset again. The latest record is loaded whenever you open or refresh this link.</p></div>
         <a class="button secondary" [routerLink]="['/vaults', record.vaultId, 'assets', 'new']">Add another Asset</a>
+        <hv-inspector [asset]="record" (unavailable)="asset.set(null); error.set('Access changed. Return to your library and refresh.')" />
       }
       @if (error()) { <h1>Asset unavailable</h1><p class="error-summary" role="alert">{{ error() }}</p><button class="button secondary" (click)="load()" [disabled]="loading()">Try again</button> }
     </section>
