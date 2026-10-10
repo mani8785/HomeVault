@@ -5,6 +5,9 @@ import { catchError, map, Observable, of, switchMap, tap, throwError } from 'rxj
 export type VaultType = 'personal' | 'household' | 'organization';
 export interface Vault { id: string; name: string; type: VaultType }
 export interface Asset { id: string; vaultId: string; name: string }
+export type Role = 'owner' | 'administrator' | 'editor' | 'viewer';
+export interface LibraryVault extends Vault { status: 'active' | 'archived'; role: Role }
+export interface Page<T> { items: T[]; hasMore: boolean }
 
 /** HTTP transport only. The API remains authoritative for identities, validation and access. */
 @Injectable({ providedIn: 'root' })
@@ -12,6 +15,7 @@ export class Api {
   private readonly http = inject(HttpClient);
   private actor = '';
   readonly signedIn = signal(false);
+  readonly actorId = signal('');
   // Ephemeral confirmation only: never write record payloads to browser storage or route history.
   readonly createdVault = signal<Vault | null>(null);
 
@@ -19,10 +23,10 @@ export class Api {
     return this.http.get<{ actorId: string }>('/auth/session').pipe(
       map((session) => {
         if (this.actor !== session.actorId) this.createdVault.set(null);
-        this.actor = session.actorId; return true;
+        this.actor = session.actorId; this.actorId.set(session.actorId); return true;
       }),
       catchError((error: unknown) => error instanceof HttpErrorResponse && error.status === 401 ? of(false) : throwError(() => error)),
-      tap((authenticated) => { this.signedIn.set(authenticated); if (!authenticated) { this.actor = ''; this.createdVault.set(null); } }),
+      tap((authenticated) => { this.signedIn.set(authenticated); if (!authenticated) { this.actor = ''; this.actorId.set(''); this.createdVault.set(null); } }),
     );
   }
   login(login: string, password: string): Observable<void> {
@@ -42,9 +46,17 @@ export class Api {
   }
   asset(id: string): Observable<Asset> { return this.http.get<Asset>(`/api/v1/assets/${encodeURIComponent(id)}`); }
 
+  /** Bounded same-origin reads. Callers supply only application-owned route prefixes. */
+  read<T>(path: string): Observable<T> { return this.http.get<T>(path); }
+
+  /** Every mutation bootstraps antiforgery; null means an intentionally empty HTTP body. */
+  mutate<T>(method: 'POST' | 'PUT' | 'DELETE', path: string, body: unknown = null): Observable<T> {
+    return this.http.get<void>('/auth/antiforgery').pipe(switchMap(() => this.http.request<T>(method, path, { body })));
+  }
+
   private post<T>(url: string, body: unknown): Observable<T> {
     // Login changes the antiforgery identity. Bootstrap before each mutation; never retry a POST.
-    return this.http.get<void>('/auth/antiforgery').pipe(switchMap(() => this.http.post<T>(url, body)));
+    return this.mutate<T>('POST', url, body);
   }
 }
 
