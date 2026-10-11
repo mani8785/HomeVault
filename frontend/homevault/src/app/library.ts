@@ -20,7 +20,8 @@ import { VaultPanel } from './vault-panel';
         <ul class="vault-tree">@for (vault of vaults().items; track vault.id) {
           <li><button type="button" [class.selected]="selectedVault()?.id === vault.id" [attr.aria-pressed]="selectedVault()?.id === vault.id" (click)="selectVault(vault)"><span aria-hidden="true">▱</span><span>{{ vault.name }}<small>{{ vault.type }} · {{ vault.role }}{{ vault.status === 'archived' ? ' · archived' : '' }}</small></span></button></li>
         }</ul>
-        @if (!vaultLoading() && !vaults().items.length) { <p class="empty-state">No Vaults found. Create one or ask an Owner to add you.</p> }
+        @if (vaultLoadFailed()) { <p class="empty-state">Vaults could not be loaded. Use Refresh library to try again.</p> }
+        @else if (!vaultLoading() && !vaults().items.length) { <p class="empty-state">No Vaults found. Create one or ask an Owner to add you.</p> }
         <div class="paging"><button (click)="loadVaults(vaultOffset - 50)" [disabled]="vaultLoading() || vaultOffset === 0">Previous</button><button (click)="loadVaults(vaultOffset + 50)" [disabled]="vaultLoading() || !vaults().hasMore">Next</button></div>
       </aside>
       <section class="library-list" aria-label="Assets">
@@ -56,6 +57,7 @@ export class LibraryPage {
   readonly assets = signal<Page<Asset>>({ items: [], hasMore: false });
   readonly selectedVault = signal<LibraryVault | null>(null); readonly selectedAsset = signal<Asset | null>(null);
   readonly error = signal(''); readonly vaultLoading = signal(false); readonly assetLoading = signal(false);
+  readonly vaultLoadFailed = signal(false);
   readonly pane = signal<'vaults' | 'assets' | 'details'>('vaults');
   readonly managing = signal(false);
   vaultSearch = ''; assetSearch = ''; vaultOffset = 0; assetOffset = 0;
@@ -66,10 +68,11 @@ export class LibraryPage {
   canWrite(): boolean { const vault = this.selectedVault(); return !!vault && vault.status === 'active' && vault.role !== 'viewer'; }
   loadVaults(offset: number): void {
     this.vaultRead?.unsubscribe(); this.clearSelection(); this.vaultLoading.set(true); this.error.set(''); this.vaultOffset = offset;
+    this.vaultLoadFailed.set(false);
     this.vaults.set({ items: [], hasMore: false });
     this.vaultRead = this.api.read<Page<LibraryVault>>(`/api/v1/vaults?offset=${offset}&search=${encodeURIComponent(this.vaultSearch)}`).subscribe({
       next: value => { this.vaults.set(value); this.vaultLoading.set(false); },
-      error: error => { this.error.set(failureMessage(error)); this.vaultLoading.set(false); },
+      error: error => { this.error.set(failureMessage(error)); this.vaultLoadFailed.set(true); this.vaultLoading.set(false); },
     });
   }
   selectVault(vault: LibraryVault): void { this.clearSelection(); this.selectedVault.set(vault); this.assetSearch = ''; this.pane.set('assets'); this.loadAssets(0); }
