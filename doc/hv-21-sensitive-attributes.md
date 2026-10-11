@@ -104,8 +104,9 @@ so damaged data can be deliberately replaced or removed.
 The integration tests recover a separately exported Windows ring and authenticate
 records in a copied SQLite database. For the operator workflow, see
 [#66 coordinated recovery and rotation](hv-21-rotation-recovery.md), including
-retention, interrupted recovery and old-backup rehearsals. Use fictional
-Sensitive values until #66 verification and review pass. Metadata, Ordinary attributes,
+retention, interrupted recovery and old-backup rehearsals. The
+[completion record](hv-21-encryption-completion.md) documents #66's passing
+verification and reviewed merge. Use fictional values for rehearsals. Metadata, Ordinary attributes,
 Evidence and Reminder text retain their existing visible/plaintext treatment.
 
 No new NuGet package or cryptographic primitive is introduced. Framework AES-GCM,
