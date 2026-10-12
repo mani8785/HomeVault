@@ -47,8 +47,9 @@ public sealed partial class RecordsApiTests
         Assert.That((await _owner.Send("GET", $"/api/v1/vaults/{vault}/members")).StatusCode, Is.EqualTo(HttpStatusCode.OK));
         await Sql($"UPDATE Memberships SET Role = 3 WHERE VaultId = {vault} AND ActorId = {_ownerId}");
         Assert.That((await _owner.Send("GET", $"/api/v1/vaults/{vault}/members")).StatusCode, Is.EqualTo(HttpStatusCode.NotFound));
-        using var anonymous = _app.GetTestClient();
-        Assert.That((await anonymous.GetAsync("/api/v1/vaults")).StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
+        // Use the HTTPS client helper so this tests authentication, not transport rejection.
+        using var anonymous = new Browser(_app.GetTestClient());
+        Assert.That((await anonymous.Send("GET", "/api/v1/vaults")).StatusCode, Is.EqualTo(HttpStatusCode.Unauthorized));
     }
 
     [Test]
