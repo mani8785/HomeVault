@@ -64,3 +64,12 @@ the Vault and Asset, search a visible name, and inspect the record. Confirm that
 another account sees only its memberships, archived Vaults remain readable, and
 a removed membership disappears after Refresh. Check keyboard and narrow panes.
 PR/CI checks and test execution are left to the owner, not verified by the agent.
+
+### Account acceptance (#97)
+
+From Sign in, open Accept invitation or Use a recovery code. Use only a disposable
+operator-issued code, choose matching 15–128 character passwords and verify sign-in.
+A rejected code must show a safe message and clear code/password fields. In Account,
+verify the member ID and confirm Sign out all sessions; another logged-in browser
+must be rejected on its next request. Invitation issuance and disablement stay in
+the terminal. Agent-added tests are not executed; run the commands above yourself.

@@ -25,7 +25,7 @@ import { Api, Asset, failureMessage, safeReturnUrl, validId, VaultType } from '.
 export class HomePage {}
 
 @Component({
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, RouterLink],
   template: `
     <section class="form-page"><p class="eyebrow">WELCOME BACK</p><h1>Sign in to HomeVault</h1>
       <p class="lead">Your Vaults stay yours. Sign in with your HomeVault account to continue.</p>
@@ -46,6 +46,7 @@ export class HomePage {}
         <button class="button" type="submit" [disabled]="busy()">{{ busy() ? 'Signing in…' : 'Sign in' }}</button>
       </form>
       <p class="quiet">Accounts are invitation-only. Ask your HomeVault operator if you need an account or help recovering access.</p>
+      <p><a routerLink="/invitation">Accept an invitation</a> · <a routerLink="/recovery">Use a recovery code</a></p>
     </section>
   `,
 })

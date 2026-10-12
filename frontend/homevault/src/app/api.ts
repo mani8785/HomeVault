@@ -34,10 +34,9 @@ export class Api {
     return this.post<void>('/auth/login', { login, password }).pipe(tap(() => this.signedIn.set(true)));
   }
   logout(): Observable<void> {
-    return this.post<void>('/auth/logout', {}).pipe(tap(() => {
-      this.signedIn.set(false); this.createdVault.set(null);
-    }));
+    return this.post<void>('/auth/logout', {}).pipe(tap(() => this.clearSession()));
   }
+  clearSession(): void { this.signedIn.set(false); this.actor = ''; this.actorId.set(''); this.createdVault.set(null); }
   createVault(name: string, type: VaultType): Observable<Vault> {
     return this.post<Vault>('/api/v1/vaults', { name, type }).pipe(tap((vault) => this.createdVault.set(vault)));
   }
