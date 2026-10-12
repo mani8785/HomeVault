@@ -11,9 +11,9 @@ dotnet restore
 dotnet format --verify-no-changes --no-restore
 dotnet build --configuration Release --no-restore -warnaserror
 dotnet test --configuration Release --no-build --no-restore --logger trx --results-directory TestResults
-dotnet run --project src/HomeVault.Playground --configuration Release --no-build
+dotnet run --project src/HomeVault.Playground --configuration Release --no-build -- --database 'C:\HomeVaultDemo\homevault.db'
 ```
 
-Tests cover Asset creation, validated identity/name value objects, project dependency boundaries, and solution coverage. See [HV-06](doc/hv-06-value-objects.md) for value equality and validation details. Run them from a source checkout; they inspect project files. Playground demonstrates valid Asset creation and rejection of an empty identity; persistence and Vault access are not implemented. See the [HV-05 implementation record](doc/hv-05-domain-building-blocks.md). See the [CI/CD and review policy](doc/ci-cd.md) for validation and delivery requirements.
+First provision a dedicated fictional demo database using the [Playground setup guide](doc/playground-modes.md). Normal Playground startup reads SQLite; use `in-memory` explicitly for temporary examples. The authenticated Angular application is a separate entry point; see the [UI guide](doc/hv-23-angular-ui.md). Tests cover domain behavior, authorization, persistence and application boundaries. Run them from a source checkout. See the [CI/CD and review policy](doc/ci-cd.md) for validation and delivery requirements.
 
 Agent guidance: [AGENTS.md](AGENTS.md).

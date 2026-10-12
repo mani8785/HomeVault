@@ -1,5 +1,8 @@
 # HomeVault documentation
 
+Use [Playground storage modes](playground-modes.md) for default SQLite startup,
+explicit database configuration and the opt-in temporary in-memory demonstration.
+
 [HV-21 encryption completion](hv-21-encryption-completion.md) records the merged
 #63–#66 implementations, acceptance evidence and supported protection boundary.
 For current operator commands, use the [Sensitive API](hv-21-sensitive-attributes.md)

@@ -52,7 +52,7 @@ dotnet restore
 dotnet format --verify-no-changes --no-restore
 dotnet build --configuration Release --no-restore -warnaserror
 dotnet test --configuration Release --no-build --no-restore --logger trx --results-directory TestResults
-dotnet run --project src/HomeVault.Playground --configuration Release --no-build
+dotnet run --project src/HomeVault.Playground --configuration Release --no-build -- in-memory
 ```
 
 There are 34 tests: 7 architecture, 11 Asset creation, and 16 value-object cases.
