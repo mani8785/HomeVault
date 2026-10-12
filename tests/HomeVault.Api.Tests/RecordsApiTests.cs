@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using HomeVault.Application.Assets;
 using HomeVault.Application.Relationships;
 using HomeVault.Application.Reminders;
+using HomeVault.Application.Records;
 using HomeVault.Application.Vaults;
 using HomeVault.Domain.Assets;
 using HomeVault.Infrastructure.Identity;
@@ -65,6 +66,8 @@ public sealed partial class RecordsApiTests
         builder.Logging.ClearProviders();
         AuthenticationHost.Configure(builder.Services, _path, _keys);
         RecordsApi.Configure(builder.Services, _path, encrypted);
+        builder.Services.AddScoped<IRecordNameStore>(services => new GatedNameStore(
+            new SqliteRecordNameStore(services.GetRequiredService<SqliteDatabase>()), _gate));
         // Test-only barrier, delegating to the real SQLite adapter; no actor substitution.
         builder.Services.AddScoped<IAssetRegistrationStore>(services => new GatedRegistrationStore(
             new SqliteAssetRegistrationStore(services.GetRequiredService<SqliteDatabase>()), _gate));

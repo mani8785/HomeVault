@@ -4,6 +4,12 @@ Status: stack and project boundaries accepted on 2026-09-25; see [ADR-0001](ADRs
 
 Keep business rules in a small domain model. Application coordinates use cases. Infrastructure supplies persistence and external services. The Playground exercises behavior before a UI exists. Do not add interfaces or abstractions without a concrete use.
 
+[Record renaming](hv-25-renaming.md) uses Application-owned IRecordNameStore
+under accepted [ADR-0032](ADRs/0032-vault-asset-renaming.md). SQLite serializes
+current access/archive checks and ordinal expected-name comparison with a
+name-only write. Domain preserves identity and owned data; no schema migration,
+Sensitive-value loading or key access is introduced.
+
 ## Project dependencies
 
 The independent [Angular UI](hv-23-angular-ui.md) calls the authenticated API over

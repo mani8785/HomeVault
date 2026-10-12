@@ -13,7 +13,7 @@ namespace HomeVault.Domain.Assets;
 public sealed class Asset
 {
     private readonly AssetId _id;
-    private readonly AssetName _name;
+    private AssetName _name;
     private readonly Dictionary<string, AssetAttribute> _attributes = new(StringComparer.OrdinalIgnoreCase);
     private readonly Dictionary<Guid, Evidence> _evidence = new();
 
@@ -33,6 +33,23 @@ public sealed class Asset
     /// <summary>Gets the immutable owning Vault identity, or null for an unbound domain-only Asset.</summary>
     /// <remarks>Creation does not verify Vault existence or access. Storage must reject unbound Assets.</remarks>
     public Guid? VaultId { get; }
+
+    /// <summary>Replaces only the name after validating it, preserving identity and all owned data.</summary>
+    /// <param name="name">Nonblank text preserved exactly, without normalization.</param>
+    /// <returns>None on success or BlankName with no changes.</returns>
+    /// <remarks>Application and storage must enforce current Vault access and lifecycle. Does not persist or emit events.</remarks>
+    public RenameError Rename(string? name)
+    {
+        try
+        {
+            _name = new AssetName(name);
+            return RenameError.None;
+        }
+        catch (ArgumentException exception) when (exception.ParamName == nameof(name))
+        {
+            return RenameError.BlankName;
+        }
+    }
 
     /// <summary>Restores Asset identity and the supplied Evidence state without creation events or attribute loading.</summary>
     /// <param name="id">Stored nonempty Asset identity.</param>

@@ -44,6 +44,21 @@ public sealed class SqliteSensitiveAttributeTests
     private Task<SensitiveAttributeResult> Add(string name = " Private/طبقه ", string value = Secret) => _store.AddAsync(_asset, _owner, name, value, AttributeSensitivity.Sensitive, default);
 
     [Test]
+    public async Task RecordRenamingLeavesCiphertextBindingAndReadableSecretUnchanged()
+    {
+        var id = (await Add()).Id!.Value;
+        byte[] envelope;
+        await using (var db = _database.CreateContext()) envelope = (await db.SensitiveAttributes.SingleAsync()).Envelope.ToArray();
+        var reads = _custody.Reads;
+        var names = new SqliteRecordNameStore(_database);
+        Assert.That(await names.RenameAssetAsync(_asset, _owner, " Renamed Asset ", "Asset", default), Is.EqualTo(HomeVault.Application.Records.RenameOutcome.Succeeded));
+        Assert.That(await names.RenameVaultAsync(_vault, _owner, " Renamed Vault ", "Vault", default), Is.EqualTo(HomeVault.Application.Records.RenameOutcome.Succeeded));
+        Assert.That(_custody.Reads, Is.EqualTo(reads));
+        await using (var db = _database.CreateContext()) Assert.That((await db.SensitiveAttributes.SingleAsync()).Envelope, Is.EqualTo(envelope));
+        Assert.That((await _store.ReadAsync(_asset, _owner, id, default)).ReadValue(), Is.EqualTo(Secret));
+    }
+
+    [Test]
     public async Task ExactTextStableIdentityAndOrdinaryCoexistence()
     {
         var added = await Add(); Assert.That(added.Outcome, Is.EqualTo(SensitiveAttributeOutcome.Succeeded));

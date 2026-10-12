@@ -1,5 +1,6 @@
 using HomeVault.Application.Assets;
 using HomeVault.Application.Identity;
+using HomeVault.Application.Records;
 using HomeVault.Application.Relationships;
 using HomeVault.Application.Reminders;
 using HomeVault.Application.Vaults;
@@ -30,6 +31,8 @@ public static class RecordsApi
         services.AddScoped<CreateVaultUseCase>();
         services.AddScoped<RegisterAssetUseCase>();
         services.AddScoped<InspectAssetUseCase>();
+        services.AddScoped<IRecordNameStore, SqliteRecordNameStore>();
+        services.AddScoped<RenameRecords>();
         services.AddScoped<IVaultArchiveStore, SqliteVaultArchiveStore>();
         services.AddScoped<ArchiveVaultUseCase>();
         services.AddScoped<IVaultMembershipStore, SqliteVaultMembershipStore>();
@@ -55,6 +58,7 @@ public static class RecordsApi
     public static void Map(WebApplication app, bool sensitive = false)
     {
         MembershipApi.Map(app);
+        NameApi.Map(app);
         LibraryApi.Map(app);
         AttributeApi.Map(app);
         EvidenceApi.Map(app);
