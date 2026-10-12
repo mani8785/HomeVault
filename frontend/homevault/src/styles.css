@@ -1,0 +1,58 @@
+:root { font-family: "Segoe UI", system-ui, sans-serif; color: #243b37; background: #faf9f5; font-synthesis: none; line-height: 1.6; }
+* { box-sizing: border-box; }
+body { margin: 0; }
+a { color: #1d5b4d; text-underline-offset: .2em; }
+button, input, select { font: inherit; }
+button, a, input, select { -webkit-tap-highlight-color: transparent; }
+:focus-visible { outline: 3px solid #a56216; outline-offset: 4px; }
+.site-header { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1.3rem max(6vw, 1.25rem); border-bottom: 1px solid #d9dfd6; }
+.brand { display: inline-flex; align-items: center; gap: .65rem; font-size: 1.3rem; font-weight: 650; text-decoration: none; color: #243b37; letter-spacing: -.03em; }
+.brand-mark { display: grid; place-items: center; background: #275b4e; color: #fff; border-radius: 9px; width: 34px; height: 36px; font-family: Georgia, serif; font-size: 1.7rem; font-weight: 400; }
+.text-button { border: 0; background: transparent; color: #275b4e; cursor: pointer; text-decoration: underline; padding: .6rem; }
+main { min-height: calc(100vh - 172px); max-width: 1180px; margin: 0 auto; padding: 3.5rem max(4vw, 1.25rem) 4rem; }
+main:focus { outline: none; }
+h1, h2, p { margin-top: 0; }
+h1 { font-family: Georgia, "Times New Roman", serif; font-weight: 400; line-height: 1.12; font-size: clamp(2.4rem, 5vw, 4.8rem); letter-spacing: -.035em; margin-bottom: 1.3rem; }
+h2 { font-size: 1.08rem; font-weight: 650; margin-bottom: .45rem; }
+.eyebrow { letter-spacing: .15em; font-size: .74rem; font-weight: 700; color: #526c62; margin-bottom: 1.15rem; }
+.lead { font-size: 1.12rem; color: #53635e; max-width: 590px; margin-bottom: 1.8rem; }
+.button { display: inline-flex; justify-content: center; align-items: center; gap: 1.75rem; border: 1px solid #275b4e; border-radius: 7px; background: #275b4e; color: #fff; text-decoration: none; padding: .85rem 1.3rem; font-weight: 600; cursor: pointer; min-height: 48px; }
+.button:hover { background: #194538; }
+.button.secondary { background: transparent; color: #275b4e; }
+.button.secondary:hover { background: #e9eee6; }
+button:disabled { opacity: .65; cursor: wait; }
+.journey { margin: 3.5rem 0 1.7rem; display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid #d9dfd6; border-bottom: 1px solid #d9dfd6; }
+.journey article { padding: 1.7rem 1.7rem 1.6rem 0; }
+.journey article + article { border-left: 1px solid #d9dfd6; padding-left: 1.7rem; }
+.journey p { color: #53635e; font-size: .94rem; margin-bottom: 0; }
+.step { display: inline-block; font-size: .78rem; color: #61776d; margin-bottom: 1.1rem; }
+.quiet, .hint { font-size: .88rem; color: #576861; }
+.form-page { max-width: 610px; margin: 0 auto; }
+.form-page h1 { font-size: clamp(2.1rem, 4.5vw, 3.4rem); }
+.back-link { display: inline-block; margin-bottom: 2rem; font-size: .9rem; }
+form { margin: 2rem 0; }
+label { display: block; font-weight: 600; font-size: .93rem; margin-bottom: .4rem; }
+input, select { display: block; width: 100%; min-height: 48px; padding: .7rem .85rem; border: 1px solid #7c8e85; background: #fff; border-radius: 6px; color: #243b37; }
+input[aria-invalid="true"] { border-color: #a72f2f; }
+select { margin-bottom: 1.7rem; }
+.hint { margin: .45rem 0 0; }
+.field-error { color: #8b2828; font-size: .88rem; margin: .35rem 0 1.3rem; min-height: .35rem; }
+.error-summary, .shell-error { background: #fcf0e9; border-left: 3px solid #a04425; color: #712e1a; padding: 1rem 1.2rem; margin-bottom: 1.6rem; overflow-wrap: anywhere; }
+.error-summary a { color: #712e1a; }
+.error-summary p:last-child, .error-summary ul { margin-bottom: 0; }
+.shell-error { max-width: 1000px; margin: 1rem auto; }
+.info-card { border: 1px solid #d9dfd6; padding: 1.5rem; border-radius: 8px; margin: 2rem 0; background: #f1f3eb; }
+.info-card p { margin-bottom: 0; color: #53635e; }
+.record-name { overflow-wrap: anywhere; }
+.status { font-size: .95rem; color: #275b4e; }
+footer { color: #65736d; font-size: .8rem; padding: 1.6rem max(6vw, 1.25rem); border-top: 1px solid #d9dfd6; }
+.skip-link { position: fixed; left: 1rem; top: -100px; background: #fff; padding: 1rem; z-index: 10; }
+.skip-link:focus { top: .5rem; }
+@media (max-width: 600px) {
+  main { padding-top: 2.2rem; }
+  .journey { grid-template-columns: 1fr; margin-top: 2.5rem; }
+  .journey article, .journey article + article { border-left: 0; padding: 1.1rem 0; }
+  .journey article + article { border-top: 1px solid #d9dfd6; }
+  .step { margin-bottom: .4rem; }
+  .button { width: 100%; }
+}
