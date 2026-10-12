@@ -45,6 +45,12 @@ run. This request authorizes working through these UI slices, not automatic merg
 
 ## Owner validation
 
+The original stacked PRs #102–#104 were merged into their parent feature
+branches, not main. Their implementation is consolidated with current main on
+`codex/hv-23-consolidate`. Review that branch until its consolidation PR is merged;
+afterward, start new feature branches from an updated main. No existing main
+documentation or encryption closeout changes are removed by the consolidation.
+
 Stop a running API before building Release; Windows may lock its DLLs.
 Run from the repository root, checking each command succeeds:
 

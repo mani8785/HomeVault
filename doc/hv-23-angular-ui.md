@@ -42,7 +42,8 @@ From a clean checkout of this PR branch (do not discard local work):
 ```powershell
 cd D:\repos\HomeVault
 git fetch origin
-git switch codex/hv-23-angular-first-journey
+git switch main
+git pull --ff-only
 dotnet restore
 dotnet format --verify-no-changes --no-restore
 dotnet build --configuration Release --no-restore -warnaserror
@@ -62,7 +63,7 @@ node node_modules/@angular/cli/bin/ng.js test --watch=false
 ```
 
 Run each command only after the preceding command succeeds. Expect a production
-bundle under `dist/homevault/browser` and 40 passing frontend tests. NUnit counts
+bundle under `dist/homevault/browser` and a successful frontend test run. NUnit counts
 vary by OS because Windows custody tests cannot run on Linux. The existing CI
 requires Windows and Linux backend checks, then the locked frontend install,
 production build and non-interactive tests. No package-command wrappers or helper
@@ -89,9 +90,9 @@ That path is an environment convenience, not a repository dependency.
 
 The API and its Windows-protected session keys require Windows. First complete
 the [account setup and invitation procedure](hv-22-accounts.md), using a dedicated
-database outside the checkout. Invitation redemption remains the existing HTTP
-operator/client workflow; this slice adds sign-in, not an enrollment or recovery
-screen. Use an already enrolled account. Never paste real passwords or invitation
+database outside the checkout. Invitation issuance remains an operator task;
+the sign-in page links to invitation and recovery redemption screens. Use an
+already enrolled account or redeem an operator-issued invitation. Never paste real passwords or invitation
 secrets into shell arguments, task logs or source files.
 
 After the Release build above, terminal 1 at the repository root:
@@ -105,8 +106,9 @@ dotnet run --project src/HomeVault.Api -c Release --no-build -- serve $accountDa
 
 Expect `https://localhost:7443`. Migrations and session-key creation are explicit
 setup operations, never performed by opening the UI. The ordinary host supports
-the entire UI journey; an encrypted host can also serve it after its documented
-unlock procedure. No Sensitive attributes are displayed by this UI.
+the ordinary UI operations. Sensitive operations require an encrypted host after
+its documented unlock procedure and an authorized role; values are revealed only
+on explicit request. See [the complete UI checklist](hv-23-ui-coverage.md).
 
 For local HTTPS, export the ASP.NET development certificate into a **new private
 directory** outside the repository. Run the first three commands once from the
