@@ -11,6 +11,7 @@ import { Api, failureMessage } from './api';
     <header class="site-header">
       <a class="brand" routerLink="/" aria-label="HomeVault home"><span class="brand-mark" aria-hidden="true">H</span>HomeVault</a>
       <nav aria-label="Account">
+        @if (api.signedIn()) { <a routerLink="/account">Account</a> }
         @if (api.signedIn()) { <button class="text-button" (click)="logout()" [disabled]="busy()">{{ busy() ? 'Signing out…' : 'Sign out' }}</button> }
       </nav>
     </header>
