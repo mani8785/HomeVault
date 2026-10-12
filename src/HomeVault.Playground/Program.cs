@@ -9,7 +9,29 @@ using HomeVault.Infrastructure;
 using HomeVault.Infrastructure.Assets;
 using HomeVault.Application.Assets;
 
-if (args.Length > 0)
+// Ordinary startup only reads persisted demo records. Provisioning and seeding stay explicit.
+if (args.Length == 0 || args[0] == "--database")
+{
+    var path = args.Length == 0 ? Environment.GetEnvironmentVariable("HOMEVAULT_PLAYGROUND_DATABASE") :
+        args.Length == 2 ? args[1] : null;
+    if (string.IsNullOrWhiteSpace(path) || !Path.IsPathFullyQualified(path))
+    {
+        Console.Error.WriteLine("SQLite mode requires --database <absolute-path> or HOMEVAULT_PLAYGROUND_DATABASE. Use a dedicated demo database outside the checkout. Run storage migrate and storage create explicitly first. For temporary examples use in-memory.");
+        Environment.ExitCode = 2;
+        return;
+    }
+    if (!File.Exists(path))
+    {
+        Console.Error.WriteLine("The configured demo database is unavailable. Run storage migrate and storage create explicitly on a dedicated demo path first.");
+        Environment.ExitCode = 1;
+        return;
+    }
+    Console.WriteLine("SQLite mode: reading persisted fictional demo records; no migration or seeding is performed.");
+    Environment.ExitCode = await DurableJourney.RunAsync(["storage", "read", path]);
+    return;
+}
+
+if (args is not ["in-memory"])
 {
     if (args[0] == "encryption-keys")
     {
@@ -85,7 +107,7 @@ if (relationshipResult.Relationship is { } relationship)
     relationship.Remove();
     Console.WriteLine($"Relationship state after removal: {relationship.Status}");
 }
-Console.WriteLine("Demonstration only: storage is in memory; real authentication/Vault access is not implemented.");
+Console.WriteLine("Demonstration only: this in-memory mode uses a fictional actor, not the authenticated API.");
 var exampleDue = new DateTimeOffset(2026, 10, 1, 12, 0, 0, TimeSpan.Zero);
 var reminderResult = Reminder.Create(Guid.NewGuid(), Guid.NewGuid(), Guid.NewGuid(), "Example insurance review", exampleDue);
 Console.WriteLine($"Valid Reminder creation: {reminderResult.IsSuccess}");

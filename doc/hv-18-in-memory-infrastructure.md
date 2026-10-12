@@ -45,7 +45,7 @@ dotnet restore
 dotnet format --verify-no-changes --no-restore
 dotnet build --configuration Release --no-restore -warnaserror
 dotnet test --configuration Release --no-build --no-restore --logger trx --results-directory TestResults/hv-18
-dotnet run --project src/HomeVault.Playground --configuration Release --no-build
+dotnet run --project src/HomeVault.Playground --configuration Release --no-build -- in-memory
 ```
 
 Playground manually shares one repository between application instances and shows
