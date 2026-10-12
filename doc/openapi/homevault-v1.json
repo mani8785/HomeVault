@@ -2,7 +2,7 @@
   "openapi": "3.0.3",
   "info": {
     "title": "HomeVault authenticated Vault and Asset API",
-    "version": "1.6.0",
+    "version": "1.7.0",
     "description": "Create/archive Vault, register/inspect Asset, manage memberships, ordinary attributes, URL/Note Evidence directed Covers Relationships and Reminder lifecycle operations. Reminder action text is plaintext with separate deliberate reads; no scheduler is provided. Relationship removal retains history and both endpoint Assets. Evidence metadata inspection is separate from deliberate content reads; Evidence content is plaintext, never fetched or encrypted. Sign in through /auth/login after /auth/antiforgery bootstrap. Refresh antiforgery after identity changes. Submit the XSRF-TOKEN cookie value in X-XSRF-TOKEN with both HttpOnly cookies on POST, PUT and DELETE. All responses are no-store. Requests are limited to 16 KiB. Unknown JSON fields are rejected. Creation POSTs have no automatic retry or idempotency guarantee; authorized repeated archival succeeds. No account search or global lists. Sensitive attribute operations require the explicitly unlocked serve-encrypted host; only Owners and Administrators may access private values."
   },
   "servers": [{ "url": "https://localhost:7443" }],
@@ -67,6 +67,11 @@
       }
     },
     "/api/v1/vaults/{vaultId}/reminders": {
+      "get": {
+        "operationId": "browseReminders", "description": "Current Vault members only; metadata excludes action text. Identity-ordered offset pages can shift during concurrent writes.",
+        "parameters": [{ "$ref": "#/components/parameters/VaultIdentity" }, { "$ref": "#/components/parameters/PageOffset" }, { "$ref": "#/components/parameters/PageLimit" }, { "$ref": "#/components/parameters/AssetFilter" }],
+        "responses": { "200": { "description": "Permitted metadata page.", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/ReminderPage" } } } }, "400": { "$ref": "#/components/responses/Problem" }, "401": { "$ref": "#/components/responses/Problem" }, "404": { "$ref": "#/components/responses/Problem" }, "429": { "$ref": "#/components/responses/Problem" }, "500": { "$ref": "#/components/responses/Problem" } }
+      },
       "post": {
         "operationId": "createReminder",
         "description": "Create Pending Reminder after current writer, Active Vault, actual Asset ownership, action and identity checks. Action remains plaintext in storage and is omitted from metadata. No scheduling or automatic retry.",
@@ -132,6 +137,11 @@
       }
     },
     "/api/v1/vaults/{vaultId}/relationships": {
+      "get": {
+        "operationId": "browseRelationships", "description": "Current Vault members only; optional filter matches either endpoint. Includes removed metadata, with no private content.",
+        "parameters": [{ "$ref": "#/components/parameters/VaultIdentity" }, { "$ref": "#/components/parameters/PageOffset" }, { "$ref": "#/components/parameters/PageLimit" }, { "$ref": "#/components/parameters/AssetFilter" }],
+        "responses": { "200": { "description": "Permitted metadata page.", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RelationshipPage" } } } }, "400": { "$ref": "#/components/responses/Problem" }, "401": { "$ref": "#/components/responses/Problem" }, "404": { "$ref": "#/components/responses/Problem" }, "429": { "$ref": "#/components/responses/Problem" }, "500": { "$ref": "#/components/responses/Problem" } }
+      },
       "post": {
         "operationId": "createRelationship",
         "description": "Create directed Covers from source policy Asset to target Asset; categories remain caller responsibilities. Caller supplies global id. Within one write transaction check membership, role, Active Vault, both actual endpoint VaultIds, kind/self-link, identity conflict, then active tuple duplicate. Cross-Vault endpoints are unavailable even for members of both Vaults. No reverse link or retry guarantee.",
@@ -297,6 +307,11 @@
       }
     },
     "/api/v1/vaults/{vaultId}/members": {
+      "get": {
+        "operationId": "browseMembers", "description": "Current Owner/Administrator only. Returns actor IDs and roles, never a global account directory or emails. Other scopes share the unavailable response.",
+        "parameters": [{ "$ref": "#/components/parameters/VaultIdentity" }, { "$ref": "#/components/parameters/PageOffset" }, { "$ref": "#/components/parameters/PageLimit" }],
+        "responses": { "200": { "description": "Permitted metadata page.", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/MemberPage" } } } }, "400": { "$ref": "#/components/responses/Problem" }, "401": { "$ref": "#/components/responses/Problem" }, "404": { "$ref": "#/components/responses/Problem" }, "429": { "$ref": "#/components/responses/Problem" }, "500": { "$ref": "#/components/responses/Problem" } }
+      },
       "post": {
         "operationId": "addVaultMember",
         "description": "Owner may add any role. Administrator may add Editor/Viewer only and cannot target an existing privileged member. Requires an existing enabled target account; requesting actor comes only from the session. Check requester permission, Active state, target availability, then duplicates within one write transaction. Missing/disabled targets share unavailable. No invitation or account search.",
@@ -379,6 +394,11 @@
       }
     },
     "/api/v1/vaults": {
+      "get": {
+        "operationId": "browseVaults", "description": "Only current actor memberships, filtered before paging. Includes archived Vaults and current role. Refresh to restart paging after concurrent changes.",
+        "parameters": [{ "$ref": "#/components/parameters/PageOffset" }, { "$ref": "#/components/parameters/PageLimit" }, { "$ref": "#/components/parameters/NameSearch" }],
+        "responses": { "200": { "description": "Permitted metadata page.", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/VaultPage" } } } }, "400": { "$ref": "#/components/responses/Problem" }, "401": { "$ref": "#/components/responses/Problem" }, "404": { "$ref": "#/components/responses/Problem" }, "429": { "$ref": "#/components/responses/Problem" }, "500": { "$ref": "#/components/responses/Problem" } }
+      },
       "post": {
         "operationId": "createVault",
         "description": "Creates a Vault with a server-generated ID and the authenticated account as sole Owner. No Location header: no Vault-read route exists.",
@@ -398,6 +418,11 @@
       }
     },
     "/api/v1/vaults/{vaultId}/assets": {
+      "get": {
+        "operationId": "browseAssets", "description": "Current Vault members only, including archived reads; metadata excludes all attribute values. Missing/inaccessible Vaults share 404.",
+        "parameters": [{ "$ref": "#/components/parameters/VaultIdentity" }, { "$ref": "#/components/parameters/PageOffset" }, { "$ref": "#/components/parameters/PageLimit" }, { "$ref": "#/components/parameters/NameSearch" }],
+        "responses": { "200": { "description": "Permitted metadata page.", "content": { "application/json": { "schema": { "$ref": "#/components/schemas/AssetPage" } } } }, "400": { "$ref": "#/components/responses/Problem" }, "401": { "$ref": "#/components/responses/Problem" }, "404": { "$ref": "#/components/responses/Problem" }, "429": { "$ref": "#/components/responses/Problem" }, "500": { "$ref": "#/components/responses/Problem" } }
+      },
       "post": {
         "operationId": "registerAsset",
         "description": "Owner, Administrator or Editor may write an Active Vault. Current membership and lifecycle checks serialize with insertion. Viewer yields 403 even when archived. Missing and inaccessible Vaults both yield identical 404. Server generates the Asset ID.",
@@ -447,6 +472,10 @@
       "antiforgeryCookie": { "type": "apiKey", "in": "cookie", "name": "__Host-HomeVault-Antiforgery" }
     },
     "parameters": {
+      "PageOffset": { "name": "offset", "in": "query", "schema": { "type": "integer", "minimum": 0, "maximum": 2147483647, "default": 0 } },
+      "PageLimit": { "name": "limit", "in": "query", "schema": { "type": "integer", "minimum": 1, "maximum": 100, "default": 50 } },
+      "NameSearch": { "name": "search", "in": "query", "description": "Visible-name substring only; SQLite lowercase comparison, no private-value search.", "schema": { "type": "string", "maxLength": 200 } },
+      "AssetFilter": { "name": "assetId", "in": "query", "schema": { "$ref": "#/components/schemas/Identity" } },
       "SensitiveAttributeIdentity": { "name": "attributeId", "in": "path", "required": true, "schema": { "$ref": "#/components/schemas/Identity" } },
       "ReminderIdentity": { "name": "reminderId", "in": "path", "required": true, "schema": { "$ref": "#/components/schemas/Identity" } },
       "RelationshipIdentity": { "name": "relationshipId", "in": "path", "required": true, "schema": { "$ref": "#/components/schemas/Identity" } },
@@ -460,6 +489,13 @@
       "Problem": { "description": "Safe failure; no input values or exception text. Status matches HTTP. Access checks precede conflict checks.", "content": { "application/problem+json": { "schema": { "$ref": "#/components/schemas/Problem" } } } }
     },
     "schemas": {
+      "LibraryVault": { "type": "object", "additionalProperties": false, "required": ["id", "name", "type", "status", "role"], "properties": { "id": { "$ref": "#/components/schemas/Identity" }, "name": { "type": "string" }, "type": { "type": "string", "enum": ["personal", "household", "organization"] }, "status": { "type": "string", "enum": ["active", "archived"] }, "role": { "$ref": "#/components/schemas/VaultRole" } } },
+      "LibraryMember": { "type": "object", "additionalProperties": false, "required": ["actorId", "role"], "properties": { "actorId": { "$ref": "#/components/schemas/Identity" }, "role": { "$ref": "#/components/schemas/VaultRole" } } },
+      "VaultPage": { "type": "object", "additionalProperties": false, "required": ["items", "hasMore"], "properties": { "items": { "type": "array", "maxItems": 100, "items": { "$ref": "#/components/schemas/LibraryVault" } }, "hasMore": { "type": "boolean" } } },
+      "AssetPage": { "type": "object", "additionalProperties": false, "required": ["items", "hasMore"], "properties": { "items": { "type": "array", "maxItems": 100, "items": { "$ref": "#/components/schemas/Asset" } }, "hasMore": { "type": "boolean" } } },
+      "MemberPage": { "type": "object", "additionalProperties": false, "required": ["items", "hasMore"], "properties": { "items": { "type": "array", "maxItems": 100, "items": { "$ref": "#/components/schemas/LibraryMember" } }, "hasMore": { "type": "boolean" } } },
+      "RelationshipPage": { "type": "object", "additionalProperties": false, "required": ["items", "hasMore"], "properties": { "items": { "type": "array", "maxItems": 100, "items": { "$ref": "#/components/schemas/Relationship" } }, "hasMore": { "type": "boolean" } } },
+      "ReminderPage": { "type": "object", "additionalProperties": false, "required": ["items", "hasMore"], "properties": { "items": { "type": "array", "maxItems": 100, "items": { "$ref": "#/components/schemas/Reminder" } }, "hasMore": { "type": "boolean" } } },
       "SensitiveAttributeMetadata": {
         "type": "object", "additionalProperties": false, "required": ["id", "name", "sensitivity"],
         "properties": { "id": { "$ref": "#/components/schemas/Identity" }, "name": { "type": "string" }, "sensitivity": { "type": "string", "enum": ["sensitive"] } }

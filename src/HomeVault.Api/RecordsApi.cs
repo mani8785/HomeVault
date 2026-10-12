@@ -21,6 +21,8 @@ public static class RecordsApi
     {
         services.AddHttpContextAccessor();
         services.AddScoped<ICurrentActor, HttpCurrentActor>();
+        services.AddScoped<HomeVault.Application.Library.ILibraryQueries, SqliteLibraryQueries>();
+        services.AddScoped<HomeVault.Application.Library.BrowseLibrary>();
         services.AddSingleton(new SqliteDatabase(databasePath));
         services.AddScoped<IVaultRepository, SqliteVaultRepository>();
         services.AddScoped<IAssetRegistrationStore, SqliteAssetRegistrationStore>();
@@ -53,6 +55,7 @@ public static class RecordsApi
     public static void Map(WebApplication app, bool sensitive = false)
     {
         MembershipApi.Map(app);
+        LibraryApi.Map(app);
         AttributeApi.Map(app);
         EvidenceApi.Map(app);
         RelationshipApi.Map(app);

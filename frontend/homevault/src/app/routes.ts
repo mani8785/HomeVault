@@ -2,6 +2,7 @@ import { inject } from '@angular/core';
 import { CanActivateFn, Router, Routes } from '@angular/router';
 import { catchError, map, of } from 'rxjs';
 import { Api } from './api';
+import { LibraryPage } from './library';
 import { AddAssetPage, AssetPage, CreateVaultPage, HomePage, NotFoundPage, SignInPage, VaultReadyPage } from './pages';
 
 export const authenticated: CanActivateFn = (_route, state) => {
@@ -14,7 +15,7 @@ export const authenticated: CanActivateFn = (_route, state) => {
 
 export const routes: Routes = [
   { path: 'sign-in', component: SignInPage, title: 'Sign in · HomeVault' },
-  { path: '', component: HomePage, canActivate: [authenticated], pathMatch: 'full', title: 'HomeVault' },
+  { path: '', component: LibraryPage, canActivate: [authenticated], pathMatch: 'full', title: 'My library · HomeVault' },
   { path: 'vaults/new', component: CreateVaultPage, canActivate: [authenticated], title: 'Create a Vault · HomeVault' },
   { path: 'vaults/:vaultId/ready', component: VaultReadyPage, canActivate: [authenticated], title: 'Your Vault · HomeVault' },
   { path: 'vaults/:vaultId/assets/new', component: AddAssetPage, canActivate: [authenticated], title: 'Add an Asset · HomeVault' },
