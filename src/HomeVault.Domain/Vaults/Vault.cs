@@ -25,7 +25,25 @@ public sealed class Vault
     public Guid Id { get; }
 
     /// <summary>Gets the nonblank name exactly as supplied. Names may be private; avoid logging them.</summary>
-    public string Name { get; }
+    public string Name { get; private set; }
+
+    /// <summary>Replaces an Active Vault's name, preserving identity, type and membership.</summary>
+    /// <param name="name">Nonblank text preserved exactly.</param>
+    /// <returns>Archived before validation for a read-only Vault; otherwise None or BlankName.</returns>
+    /// <remarks>Does not authorize the caller or persist. Failures preserve all state.</remarks>
+    public RenameError Rename(string? name)
+    {
+        if (Status == VaultStatus.Archived) return RenameError.Archived;
+        try
+        {
+            Name = Guard.Against.NullOrWhiteSpace(name, nameof(name));
+            return RenameError.None;
+        }
+        catch (ArgumentException exception) when (exception.ParamName == nameof(name))
+        {
+            return RenameError.BlankName;
+        }
+    }
 
     /// <summary>Gets the ownership context.</summary>
     public VaultType Type { get; }

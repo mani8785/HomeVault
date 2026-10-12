@@ -1,5 +1,8 @@
 # HomeVault documentation
 
+See [HV-25.1: Vault and Asset renaming](hv-25-renaming.md) for the library rename
+forms, authorized HTTP operations, stale-edit protection and owner validation.
+
 Use [Playground storage modes](playground-modes.md) for default SQLite startup,
 explicit database configuration and the opt-in temporary in-memory demonstration.
 

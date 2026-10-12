@@ -2,12 +2,14 @@ import { Component, EventEmitter, Input, OnChanges, Output, signal } from '@angu
 import { FormsModule } from '@angular/forms';
 import { LibraryVault, Page, Role, validId } from './api';
 import { Panel } from './panel';
+import { RenamePanel } from './rename-panel';
 
 interface Member { actorId: string; role: Role }
 @Component({
-  selector: 'hv-vault-controls', imports: [FormsModule],
+  selector: 'hv-vault-controls', imports: [FormsModule, RenamePanel],
   template: `
     <h3>{{ vault.name }}</h3><p class="hint">{{ vault.type }} · {{ vault.status }} · your role: {{ vault.role }}</p>
+    <hv-rename [id]="vault.id" [name]="vault.name" kind="vaults" [writable]="canManage() && vault.status === 'active'" (changed)="changed.emit()" (unavailable)="unavailable.emit()" />
     @if (error()) { <p role="alert" class="error-summary">{{ error() }}</p> } @if (notice()) { <p role="status">{{ notice() }}</p> }
     @if (canManage()) {
       <h4>Members</h4><ul class="record-list">@for (member of members().items; track member.actorId) { <li><span class="record-name">{{ member.actorId }}</span><small>{{ member.role }}</small>

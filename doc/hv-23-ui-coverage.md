@@ -15,6 +15,7 @@ Retain independent Angular/API projects and the accepted security boundaries.
 | Relationships and Reminders | Create/read/remove Covers links; create/read/update/complete/cancel Reminders; deliberate action reveal | Existing by-id operations; collection queries in ADR-0031 |
 | Vault administration | Archive confirmation, add member, change role, remove member; preserve last Owner | Existing writes; member list in ADR-0031 |
 | Sensitive values | Metadata list, add/change/remove, explicit reveal/hide for permitted users | Existing encrypted-host endpoints only; never auto-reveal |
+| Rename (HV-25.1 #116) | Vault information and Asset Info forms in My library; refresh after success and preserve draft on conflict | [Authorized renaming](hv-25-renaming.md), accepted ADR-0032 |
 
 Database migrations, private-directory provisioning, account invitation issuance,
 account disablement, key initialization/unlock/rotation, backup and recovery remain

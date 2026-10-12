@@ -109,6 +109,12 @@ rotation, authenticated database/key recovery sets and staged recovery with
 session invalidation. Created and accepted 2026-10-09; see the
 [operator guide](../hv-21-rotation-recovery.md).
 
+## Accepted renaming contract
+
+[ADR-0032](0032-vault-asset-renaming.md): Accepted authorized Vault/Asset rename
+operations with current-role checks and expected-name concurrency protection
+for #116. Explicitly accepted 2026-10-12.
+
 ## Template
 
 [ADR-0031](0031-library-browsing-queries.md): Accepted 2026-10-10. Actor-filtered,

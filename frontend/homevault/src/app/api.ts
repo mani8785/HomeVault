@@ -71,6 +71,7 @@ export function failureMessage(error: unknown, login = false): string {
     case 409:
       switch (error.error?.code) {
         case 'vault_archived': return 'This Vault is archived. Changes are not allowed.';
+        case 'name_conflict': return 'The name changed since you opened this record. Refresh before renaming again.';
         case 'last_owner': return 'A Vault must keep at least one Owner. Add another Owner before making this change.';
         case 'duplicate_member': return 'This account is already a member of the Vault.';
         case 'attribute_exists': return 'An attribute with this name already exists.';

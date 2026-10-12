@@ -44,7 +44,7 @@ import { VaultPanel } from './vault-panel';
         @else if (selectedAsset(); as asset) {
           <p class="eyebrow">ASSET</p><h2 class="record-name">{{ asset.name }}</h2><p class="hint">{{ selectedVault()?.name }}</p>
           <a [routerLink]="['/assets', asset.id]">Open record & details →</a>
-          <hv-inspector [asset]="asset" [writable]="canWrite()" [mayReveal]="selectedVault()?.role === 'owner' || selectedVault()?.role === 'administrator'" (unavailable)="accessChanged()" />
+          <hv-inspector [asset]="asset" [writable]="canWrite()" [allowRename]="canWrite()" [mayReveal]="selectedVault()?.role === 'owner' || selectedVault()?.role === 'administrator'" (changed)="loadAssets(assetOffset)" (unavailable)="accessChanged()" />
         } @else { <div class="empty-state"><h3>Your record, in detail</h3><p>Select an Asset to inspect its information.</p></div> }
       </section>
     </div>

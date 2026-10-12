@@ -2,12 +2,36 @@
   "openapi": "3.0.3",
   "info": {
     "title": "HomeVault authenticated Vault and Asset API",
-    "version": "1.7.0",
+    "version": "1.8.0",
     "description": "Create/archive Vault, register/inspect Asset, manage memberships, ordinary attributes, URL/Note Evidence directed Covers Relationships and Reminder lifecycle operations. Reminder action text is plaintext with separate deliberate reads; no scheduler is provided. Relationship removal retains history and both endpoint Assets. Evidence metadata inspection is separate from deliberate content reads; Evidence content is plaintext, never fetched or encrypted. Sign in through /auth/login after /auth/antiforgery bootstrap. Refresh antiforgery after identity changes. Submit the XSRF-TOKEN cookie value in X-XSRF-TOKEN with both HttpOnly cookies on POST, PUT and DELETE. All responses are no-store. Requests are limited to 16 KiB. Unknown JSON fields are rejected. Creation POSTs have no automatic retry or idempotency guarantee; authorized repeated archival succeeds. No account search or global lists. Sensitive attribute operations require the explicitly unlocked serve-encrypted host; only Owners and Administrators may access private values."
   },
   "servers": [{ "url": "https://localhost:7443" }],
   "security": [{ "cookieAuth": [] }],
   "paths": {
+    "/api/v1/vaults/{vaultId}/name": {
+      "put": {
+        "operationId": "renameVault", "description": "Owner/Administrator, Active Vault only. Preserve exact name and identity. Compare expectedName ordinally inside the write transaction; stale edits yield 409 name_conflict. No automatic retry. Role precedes archive, which precedes name validation and comparison.",
+        "security": [{ "cookieAuth": [], "antiforgeryCookie": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/VaultIdentity" }, { "$ref": "#/components/parameters/Antiforgery" }],
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RenameInput" } } } },
+        "responses": {
+          "204": { "description": "Name committed, or unchanged with matching expectation." },
+          "400": { "$ref": "#/components/responses/Problem" }, "401": { "$ref": "#/components/responses/Problem" }, "403": { "$ref": "#/components/responses/Problem" }, "404": { "$ref": "#/components/responses/Problem" }, "409": { "$ref": "#/components/responses/Problem" }, "413": { "$ref": "#/components/responses/Problem" }, "415": { "$ref": "#/components/responses/Problem" }, "429": { "$ref": "#/components/responses/Problem" }, "500": { "$ref": "#/components/responses/Problem" }
+        }
+      }
+    },
+    "/api/v1/assets/{assetId}/name": {
+      "put": {
+        "operationId": "renameAsset", "description": "Owner/Administrator/Editor in the actual Active owning Vault. Preserve identity and all related data; never load Sensitive values. Expected-name comparison and failure precedence match renameVault; missing/nonmember results are identical 404.",
+        "security": [{ "cookieAuth": [], "antiforgeryCookie": [] }],
+        "parameters": [{ "$ref": "#/components/parameters/AssetIdentity" }, { "$ref": "#/components/parameters/Antiforgery" }],
+        "requestBody": { "required": true, "content": { "application/json": { "schema": { "$ref": "#/components/schemas/RenameInput" } } } },
+        "responses": {
+          "204": { "description": "Name committed, or unchanged with matching expectation." },
+          "400": { "$ref": "#/components/responses/Problem" }, "401": { "$ref": "#/components/responses/Problem" }, "403": { "$ref": "#/components/responses/Problem" }, "404": { "$ref": "#/components/responses/Problem" }, "409": { "$ref": "#/components/responses/Problem" }, "413": { "$ref": "#/components/responses/Problem" }, "415": { "$ref": "#/components/responses/Problem" }, "429": { "$ref": "#/components/responses/Problem" }, "500": { "$ref": "#/components/responses/Problem" }
+        }
+      }
+    },
     "/api/v1/assets/{assetId}/sensitive-attributes": {
       "get": {
         "operationId": "listSensitiveAttributes",
@@ -489,6 +513,11 @@
       "Problem": { "description": "Safe failure; no input values or exception text. Status matches HTTP. Access checks precede conflict checks.", "content": { "application/problem+json": { "schema": { "$ref": "#/components/schemas/Problem" } } } }
     },
     "schemas": {
+      "RenameInput": {
+        "type": "object", "additionalProperties": false, "required": ["name", "expectedName"],
+        "properties": { "name": { "type": "string", "minLength": 1 }, "expectedName": { "type": "string", "minLength": 1 } },
+        "description": "Both names must contain a non-whitespace character and are preserved exactly. Never include actor/ownership fields or log names. expectedName is the last-read value; comparison cannot detect ABA changes."
+      },
       "LibraryVault": { "type": "object", "additionalProperties": false, "required": ["id", "name", "type", "status", "role"], "properties": { "id": { "$ref": "#/components/schemas/Identity" }, "name": { "type": "string" }, "type": { "type": "string", "enum": ["personal", "household", "organization"] }, "status": { "type": "string", "enum": ["active", "archived"] }, "role": { "$ref": "#/components/schemas/VaultRole" } } },
       "LibraryMember": { "type": "object", "additionalProperties": false, "required": ["actorId", "role"], "properties": { "actorId": { "$ref": "#/components/schemas/Identity" }, "role": { "$ref": "#/components/schemas/VaultRole" } } },
       "VaultPage": { "type": "object", "additionalProperties": false, "required": ["items", "hasMore"], "properties": { "items": { "type": "array", "maxItems": 100, "items": { "$ref": "#/components/schemas/LibraryVault" } }, "hasMore": { "type": "boolean" } } },
