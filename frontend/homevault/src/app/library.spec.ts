@@ -1,10 +1,24 @@
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
-import { of, Subject } from 'rxjs';
+import { of, Subject, throwError } from 'rxjs';
+import { HttpErrorResponse } from '@angular/common/http';
 import { Api, Asset, LibraryVault, Page } from './api';
 import { LibraryPage } from './library';
 
 describe('Library selection lifetime', () => {
+  it('distinguishes a failed library request from a successful empty result and allows retry', () => {
+    const read = vi.fn().mockReturnValueOnce(throwError(() => new HttpErrorResponse({ status: 500 })))
+      .mockReturnValue(of({ items: [], hasMore: false }));
+    TestBed.configureTestingModule({ providers: [provideRouter([]), { provide: Api, useValue: { read } }] });
+    const fixture = TestBed.createComponent(LibraryPage);
+    fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).toContain('Vaults could not be loaded');
+    expect(fixture.nativeElement.textContent).not.toContain('No Vaults found');
+    fixture.componentInstance.loadVaults(0); fixture.detectChanges();
+    expect(fixture.nativeElement.textContent).toContain('No Vaults found');
+    expect(fixture.nativeElement.textContent).not.toContain('Vaults could not be loaded');
+    fixture.destroy();
+  });
   it('drops a late detail response after switching Vaults', () => {
     const detail = new Subject<Asset>();
     const first: LibraryVault = { id: '11111111-1111-1111-1111-111111111111', name: 'First', type: 'personal', status: 'active', role: 'owner' };

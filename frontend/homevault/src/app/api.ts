@@ -68,7 +68,16 @@ export function failureMessage(error: unknown, login = false): string {
     case 401: return login ? 'Sign-in was not successful. Check your details and try again.' : 'Your session has ended. Sign in again to continue.';
     case 403: return 'You do not have permission to make this change.';
     case 404: return 'This record is unavailable. It may not exist, or you may not have access.';
-    case 409: return error.error?.code === 'vault_archived' ? 'This Vault is archived. New Assets cannot be added.' : 'This change could not be completed because the record has changed.';
+    case 409:
+      switch (error.error?.code) {
+        case 'vault_archived': return 'This Vault is archived. Changes are not allowed.';
+        case 'last_owner': return 'A Vault must keep at least one Owner. Add another Owner before making this change.';
+        case 'duplicate_member': return 'This account is already a member of the Vault.';
+        case 'attribute_exists': return 'An attribute with this name already exists.';
+        case 'relationship_exists': return 'This active Relationship already exists.';
+        case 'not_pending': return 'Only a pending Reminder can be changed.';
+        default: return 'This change could not be completed because the record has changed.';
+      }
     case 429: return 'Too many requests. Please wait a minute before trying again.';
     default: return 'HomeVault could not complete the request. Please try again later.';
   }

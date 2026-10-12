@@ -60,6 +60,8 @@ authorization implementation are tracked in the linked tasks.
 
 See [ADR-0019: Browser UI](ADRs/0019-browser-ui-first-journey.md) for the accepted
 HV-23 Angular/API separation, first journey, and authentication dependency boundary.
+The [library UI coverage and owner checklist](hv-23-ui-coverage.md) tracks the
+Zotero-inspired workspace and all implemented product-operation screens.
 The [Angular first-journey guide](hv-23-angular-ui.md) covers #27's independent UI,
 sign-in, Vault/Asset flow, validation and terminal setup. The owner resumed this
 accepted phase on 2026-10-09 after the authentication dependency was completed.
